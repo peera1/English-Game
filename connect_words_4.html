@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word Matching Game</title>
+    <style>
+        body {
+            font-family: 'Comic Sans MS', Arial, sans-serif;
+            background: linear-gradient(to bottom, #ffeb3b, #ff9800);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .game-container {
+            background: #fff;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            width: 800px;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        h1 {
+            color: #ff5722;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .columns {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .column {
+            width: 45%;
+            background: #e0f7fa;
+            border-radius: 10px;
+            padding: 10px;
+            min-height: 400px;
+        }
+
+        .word {
+            background: #4caf50;
+            color: white;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.2em;
+            transition: transform 0.2s;
+        }
+
+        .word:hover {
+            transform: scale(1.05);
+        }
+
+        .word.matched {
+            display: none; /* Hide the word from the left column after matching */
+        }
+
+        .word.dragging {
+            opacity: 0.5;
+        }
+
+        .target {
+            background: #2196f3;
+            color: white;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            font-size: 1.2em;
+            min-height: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .target.matched {
+            background: #ffeb3b;
+            color: #333;
+        }
+
+        .matched-pair {
+            color: #333;
+            font-weight: bold;
+        }
+
+        #score {
+            font-size: 1.5em;
+            color: #d81b60;
+            margin-bottom: 10px;
+        }
+
+        #timer {
+            font-size: 1.2em;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        #result {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #ffeb3b, #ff5722);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.4);
+            text-align: center;
+            max-width: 600px;
+            z-index: 2;
+            animation: popIn 0.5s ease-out;
+        }
+
+        @keyframes popIn {
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+            80% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+
+        #result h2 {
+            color: #fff;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            margin-bottom: 20px;
+        }
+
+        #result h3 {
+            color: #fff;
+            font-size: 1.5em;
+            margin-top: 20px;
+        }
+
+        #result p {
+            color: #fff;
+            font-size: 1.3em;
+            margin: 10px 0;
+        }
+
+        #result ul {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0;
+        }
+
+        #result li {
+            margin: 8px 0;
+            color: #fff;
+            font-size: 1.1em;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+
+        #play-again {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 1.2em;
+            font-family: 'Comic Sans MS', Arial, sans-serif;
+            color: #fff;
+            background: #4caf50;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.3s;
+        }
+
+        #play-again:hover {
+            background: #45a049;
+            transform: scale(1.1);
+        }
+
+        #trophy {
+            width: 100px;
+            margin: 0 auto 20px;
+            animation: bounce 1s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .background-anim {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .star {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: url('https://img.icons8.com/emoji/20/000000/star-emoji.png');
+            animation: fall 5s linear infinite;
+        }
+
+        @keyframes fall {
+            0% { transform: translateY(-100vh); opacity: 1; }
+            100% { transform: translateY(100vh); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="background-anim" id="stars"></div>
+    <div class="game-container">
+        <h1>Word Matching Game</h1>
+        <div id="score">Score: 0</div>
+        <div id="timer">Time: 0s</div>
+        <div class="columns">
+            <div class="column" id="hebrew-words">
+                <h2>Hebrew Words</h2>
+            </div>
+            <div class="column" id="english-words">
+                <h2>English Words</h2>
+            </div>
+        </div>
+    </div>
+    <div id="result">
+        <img id="trophy" src="https://img.icons8.com/emoji/100/000000/trophy-emoji.png" alt="Trophy">
+        <h2>Congratulations! 🎉</h2>
+        <p>Your final score: <span id="final-score"></span> / 100</p>
+        <p>Total time: <span id="total-time"></span> seconds</p>
+        <p>Total mistakes: <span id="total-mistakes"></span></p>
+        <h3>Match Details:</h3>
+        <ul id="match-details"></ul>
+        <h3>Mistakes Breakdown:</h3>
+        <ul id="mistakes-breakdown"></ul>
+        <button id="play-again">Play Again</button>
+    </div>
+
+    <audio id="success-sound" src="https://www.soundjay.com/buttons/sounds/button-3.mp3"></audio>
+    <audio id="error-sound" src="https://www.soundjay.com/buttons/sounds/button-4.mp3"></audio>
+
+    <script>
+        const words = [
+            { hebrew: "שמש", english: "Sun" },
+            { hebrew: "ירח", english: "Moon" },
+            { hebrew: "כוכב", english: "Star" },
+            { hebrew: "ים", english: "Sea" },
+            { hebrew: "נהר", english: "River" },
+            { hebrew: "עץ", english: "Tree" },
+            { hebrew: "פרח", english: "Flower" },
+            { hebrew: "ציפור", english: "Bird" },
+            { hebrew: "שמיים", english: "Sky" },
+            { hebrew: "אדמה", english: "Earth" }
+        ];
+
+        const hebrewColumn = document.getElementById('hebrew-words');
+        const englishColumn = document.getElementById('english-words');
+        const scoreDisplay = document.getElementById('score');
+        const timerDisplay = document.getElementById('timer');
+        const resultDiv = document.getElementById('result');
+        const finalScoreDisplay = document.getElementById('final-score');
+        const totalTimeDisplay = document.getElementById('total-time');
+        const totalMistakesDisplay = document.getElementById('total-mistakes');
+        const matchDetails = document.getElementById('match-details');
+        const mistakesBreakdown = document.getElementById('mistakes-breakdown');
+        const playAgainButton = document.getElementById('play-again');
+        const successSound = document.getElementById('success-sound');
+        const errorSound = document.getElementById('error-sound');
+
+        let score = 0;
+        let totalMistakes = 0; // Total mistakes across all words
+        let matches = 0;
+        let startTime = Date.now();
+        let lastMatchTime = startTime;
+        let matchTimes = [];
+        let matchMistakes = new Array(words.length).fill(0); // Track mistakes per word
+        let currentWord = null; // Track the current word being dragged
+        let timerInterval;
+
+        // Shuffle array function
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // Initialize game
+        function initGame() {
+            // Clear previous game state
+            hebrewColumn.innerHTML = '<h2>Hebrew Words</h2>';
+            englishColumn.innerHTML = '<h2>English Words</h2>';
+            score = 0;
+            totalMistakes = 0;
+            matches = 0;
+            matchTimes = [];
+            matchMistakes = new Array(words.length).fill(0);
+            startTime = Date.now();
+            lastMatchTime = startTime;
+            scoreDisplay.textContent = `Score: ${score}`;
+            timerDisplay.textContent = `Time: 0s`;
+            resultDiv.style.display = 'none';
+
+            const shuffledHebrew = shuffle([...words]);
+            const shuffledEnglish = shuffle([...words]);
+
+            shuffledHebrew.forEach(word => {
+                const div = document.createElement('div');
+                div.className = 'word';
+                div.textContent = word.hebrew;
+                div.setAttribute('data-english', word.english);
+                div.setAttribute('data-hebrew', word.hebrew);
+                div.setAttribute('draggable', true);
+                hebrewColumn.appendChild(div);
+            });
+
+            shuffledEnglish.forEach(word => {
+                const div = document.createElement('div');
+                div.className = 'target';
+                div.setAttribute('data-english', word.english);
+                const englishSpan = document.createElement('span');
+                englishSpan.textContent = word.english;
+                div.appendChild(englishSpan);
+                const matchedSpan = document.createElement('span');
+                matchedSpan.className = 'matched-pair';
+                div.appendChild(matchedSpan);
+                englishColumn.appendChild(div);
+            });
+
+            // Start timer
+            clearInterval(timerInterval); // Clear any existing timer
+            timerInterval = setInterval(updateTimer, 1000);
+
+            // Add drag and drop event listeners
+            document.querySelectorAll('.word').forEach(word => {
+                word.addEventListener('dragstart', dragStart);
+                word.addEventListener('dragend', dragEnd);
+            });
+
+            document.querySelectorAll('.target').forEach(target => {
+                target.addEventListener('dragover', dragOver);
+                target.addEventListener('drop', drop);
+            });
+        }
+
+        // Drag and drop functions
+        let draggedWord = null;
+
+        function dragStart(e) {
+            draggedWord = e.target;
+            e.target.classList.add('dragging');
+            currentWord = draggedWord.getAttribute('data-hebrew'); // Track the current word
+        }
+
+        function dragEnd(e) {
+            e.target.classList.remove('dragging');
+            currentWord = null; // Reset current word
+        }
+
+        function dragOver(e) {
+            e.preventDefault();
+        }
+
+        function drop(e) {
+            e.preventDefault();
+            const targetEnglish = e.target.getAttribute('data-english');
+            const wordEnglish = draggedWord.getAttribute('data-english');
+            const wordIndex = words.findIndex(word => word.english === wordEnglish);
+
+            if (targetEnglish === wordEnglish) {
+                // Correct match
+                draggedWord.classList.add('matched');
+                draggedWord.setAttribute('draggable', false);
+                e.target.classList.add('matched');
+                const matchedSpan = e.target.querySelector('.matched-pair');
+                matchedSpan.textContent = ` (${draggedWord.getAttribute('data-hebrew')})`;
+                const wordScore = matchMistakes[wordIndex] === 0 ? 10 : 5; // 10 points if no mistakes, 5 if there were mistakes
+                score += wordScore;
+                scoreDisplay.textContent = `Score: ${score}`;
+                matches++;
+                matchTimes.push((Date.now() - lastMatchTime) / 1000);
+                lastMatchTime = Date.now();
+                successSound.play();
+
+                // Add fireworks only on correct match
+                addStars(e.target);
+
+                if (matches === words.length) {
+                    endGame();
+                }
+            } else {
+                // Wrong match
+                totalMistakes++; // Increment total mistakes
+                matchMistakes[wordIndex]++; // Increment mistakes for this specific word
+                errorSound.play();
+                alert('Oops! Try again.');
+            }
+        }
+
+        // Timer function
+        function updateTimer() {
+            const currentTime = (Date.now() - startTime) / 1000;
+            timerDisplay.textContent = `Time: ${currentTime.toFixed(1)}s`;
+        }
+
+        // End game function
+        function endGame() {
+            clearInterval(timerInterval);
+            const totalTime = (Date.now() - startTime) / 1000;
+            resultDiv.style.display = 'block';
+            finalScoreDisplay.textContent = score;
+            totalTimeDisplay.textContent = totalTime.toFixed(1);
+            totalMistakesDisplay.textContent = totalMistakes; // Display total mistakes
+
+            // Match Details
+            matchDetails.innerHTML = ''; // Clear previous details
+            words.forEach((word, index) => {
+                const li = document.createElement('li');
+                li.textContent = `Match ${index + 1} (${word.hebrew} -> ${word.english}): ${matchTimes[index].toFixed(1)} seconds, Mistakes: ${matchMistakes[index]}`;
+                matchDetails.appendChild(li);
+            });
+
+            // Mistakes Breakdown
+            mistakesBreakdown.innerHTML = ''; // Clear previous breakdown
+            words.forEach((word, index) => {
+                if (matchMistakes[index] > 0) {
+                    const li = document.createElement('li');
+                    li.textContent = `Match ${index + 1} (${word.hebrew} -> ${word.english}): ${matchMistakes[index]} mistakes`;
+                    mistakesBreakdown.appendChild(li);
+                }
+            });
+
+            if (totalMistakes === 0) {
+                const li = document.createElement('li');
+                li.textContent = "No mistakes! Great job!";
+                mistakesBreakdown.appendChild(li);
+            }
+        }
+
+        // Add stars animation (fireworks) for correct matches
+        function addStars(target) {
+            for (let i = 0; i < 5; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = `${target.offsetLeft + Math.random() * target.offsetWidth}px`;
+                star.style.top = `${target.offsetTop + Math.random() * target.offsetHeight}px`;
+                document.getElementById('stars').appendChild(star);
+            }
+        }
+
+        // Background stars animation
+        function addBackgroundStars() {
+            setInterval(() => {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = `${Math.random() * 100}vw`;
+                document.getElementById('stars').appendChild(star);
+            }, 500);
+        }
+
+        // Play Again button functionality
+        playAgainButton.addEventListener('click', () => {
+            initGame(); // Restart the game
+        });
+
+        // Start the game
+        initGame();
+        addBackgroundStars();
+    </script>
+</body>
+</html>
