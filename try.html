@@ -1,21 +1,20 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Word Matching Game</title>
+    <title>משחק התאמת מילים לילדים</title>
     <style>
         body {
-            font-family: 'Comic Sans MS', Arial, sans-serif;
+            font-family: 'Comic Sans MS', Arial, 'Noto Sans Hebrew', sans-serif;
             background: linear-gradient(to bottom, #ffeb3b, #ff9800);
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
+            height: 100vh;
             margin: 0;
-            overflow: auto;
+            overflow: hidden;
             position: relative;
-            touch-action: none; /* Prevent default touch behaviors like scrolling */
         }
 
         .game-container {
@@ -23,8 +22,7 @@
             border-radius: 20px;
             padding: 20px;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
-            width: 90%;
-            max-width: 800px;
+            width: 900px;
             text-align: center;
             position: relative;
             z-index: 1;
@@ -41,7 +39,6 @@
             display: flex;
             justify-content: space-between;
             margin-bottom: 20px;
-            flex-direction: row;
         }
 
         .column {
@@ -60,53 +57,27 @@
             border-radius: 5px;
             cursor: pointer;
             font-size: 1.2em;
-            transition: transform 0.2s, opacity 0.2s;
-            position: relative;
-            user-select: none;
-            -webkit-user-select: none;
-            touch-action: none;
+            transition: transform 0.2s;
         }
 
         .word:hover {
             transform: scale(1.05);
         }
 
-        .word.matched {
-            display: none; /* Hide the word from the left column after matching */
+        .word.selected {
+            background: #ff9800;
         }
 
-        .word.dragging {
-            opacity: 0.5;
-            transform: scale(1.1);
-        }
-
-        .target {
-            background: #2196f3;
-            color: white;
+        .matched-pair {
+            background: #ffeb3b;
+            color: #333;
             padding: 10px;
             margin: 5px 0;
             border-radius: 5px;
             font-size: 1.2em;
-            min-height: 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            position: relative;
-        }
-
-        .target.matched {
-            background: #ffeb3b;
-            color: #333;
-        }
-
-        .target.highlight {
-            background: #42a5f5;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-        }
-
-        .matched-pair {
-            color: #333;
-            font-weight: bold;
         }
 
         #score {
@@ -115,10 +86,26 @@
             margin-bottom: 10px;
         }
 
-        #timer {
+        #check-button {
+            padding: 10px 20px;
             font-size: 1.2em;
-            color: #333;
-            margin-bottom: 10px;
+            color: #fff;
+            background: #2196f3;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 10px auto;
+            display: block;
+            transition: background 0.3s;
+        }
+
+        #check-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        #check-button:hover:not(:disabled) {
+            background: #1976d2;
         }
 
         #result {
@@ -128,12 +115,11 @@
             left: 50%;
             transform: translate(-50%, -50%);
             background: linear-gradient(135deg, #ffeb3b, #ff5722);
-            padding: 20px;
+            padding: 30px;
             border-radius: 20px;
             box-shadow: 0 0 30px rgba(0, 0, 0, 0.4);
             text-align: center;
-            max-width: 90%;
-            width: 500px;
+            max-width: 700px;
             z-index: 2;
             animation: popIn 0.5s ease-out;
         }
@@ -146,45 +132,32 @@
 
         #result h2 {
             color: #fff;
-            font-size: 2em;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            font-size: 2.5em;
             margin-bottom: 20px;
         }
 
-        #result h3 {
-            color: #fff;
-            font-size: 1.3em;
-            margin-top: 20px;
+        #result table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
         }
 
-        #result p {
-            color: #fff;
-            font-size: 1.1em;
-            margin: 10px 0;
+        #result th, #result td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            color: #333;
         }
 
-        #result ul {
-            list-style: none;
-            padding: 0;
-            margin: 15px 0;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-
-        #result li {
-            margin: 8px 0;
-            color: #fff;
-            font-size: 1em;
-            background: rgba(255, 255, 255, 0.2);
-            padding: 5px 10px;
-            border-radius: 5px;
+        #result th {
+            background: #4caf50;
+            color: white;
         }
 
         #play-again {
-            margin-top: 20px;
             padding: 10px 20px;
             font-size: 1.2em;
-            font-family: 'Comic Sans MS', Arial, sans-serif;
             color: #fff;
             background: #4caf50;
             border: none;
@@ -198,125 +171,52 @@
             transform: scale(1.1);
         }
 
-        #trophy {
-            width: 80px;
-            margin: 0 auto 15px;
-            animation: bounce 1s infinite;
-        }
-
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-
-        .background-anim {
+        .confetti {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
+            width: 10px;
+            height: 10px;
+            background: #ff0000;
+            animation: fall 2s linear;
             z-index: 0;
         }
 
-        .star {
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            background: url('https://img.icons8.com/emoji/20/000000/star-emoji.png');
-            animation: fall 5s linear infinite;
-        }
-
         @keyframes fall {
-            0% { transform: translateY(-100vh); opacity: 1; }
-            100% { transform: translateY(100vh); opacity: 0; }
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .game-container {
-                padding: 15px;
-                width: 95%;
-            }
-
-            h1 {
-                font-size: 1.8em;
-            }
-
-            .columns {
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .column {
-                width: 100%;
-                margin-bottom: 15px;
-                min-height: 200px;
-            }
-
-            .word, .target {
-                font-size: 1em;
-                padding: 8px;
-            }
-
-            #score, #timer {
-                font-size: 1.2em;
-            }
-
-            #result {
-                padding: 15px;
-                width: 90%;
-            }
-
-            #result h2 {
-                font-size: 1.5em;
-            }
-
-            #result h3 {
-                font-size: 1.1em;
-            }
-
-            #result p {
-                font-size: 1em;
-            }
-
-            #result li {
-                font-size: 0.9em;
-            }
-
-            #play-again {
-                font-size: 1em;
-                padding: 8px 15px;
-            }
+            0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
         }
     </style>
 </head>
 <body>
-    <div class="background-anim" id="stars"></div>
     <div class="game-container">
-        <h1>Word Matching Game</h1>
-        <div id="score">Score: 0</div>
-        <div id="timer">Time: 0s</div>
+        <h1>משחק התאמת מילים לילדים</h1>
+        <div id="score">ניקוד: 0</div>
         <div class="columns">
             <div class="column" id="hebrew-words">
-                <h2>Hebrew Words</h2>
+                <h2>מילים בעברית</h2>
             </div>
             <div class="column" id="english-words">
-                <h2>English Words</h2>
+                <h2>מילים באנגלית</h2>
             </div>
         </div>
+        <button id="check-button" disabled>בדוק התאמה</button>
     </div>
     <div id="result">
-        <img id="trophy" src="https://img.icons8.com/emoji/100/000000/trophy-emoji.png" alt="Trophy">
-        <h2>Congratulations! 🎉</h2>
-        <p>Your final score: <span id="final-score"></span> / 100</p>
-        <p>Total time: <span id="total-time"></span> seconds</p>
-        <p>Total mistakes: <span id="total-mistakes"></span></p>
-        <h3>Match Details:</h3>
-        <ul id="match-details"></ul>
-        <h3>Mistakes Breakdown:</h3>
-        <ul id="mistakes-breakdown"></ul>
-        <button id="play-again">Play Again</button>
+        <h2>כל הכבוד! 🎉</h2>
+        <p>ניקוד סופי: <span id="final-score"></span></p>
+        <p>זמן כולל: <span id="total-time"></span> שניות</p>
+        <p>סה"כ טעויות: <span id="total-mistakes"></span></p>
+        <table>
+            <thead>
+                <tr>
+                    <th>מילה (עברית - אנגלית)</th>
+                    <th>זמן (שניות)</th>
+                    <th>ניסיונות</th>
+                    <th>טעויות</th>
+                </tr>
+            </thead>
+            <tbody id="match-details"></tbody>
+        </table>
+        <button id="play-again">שחק שוב</button>
     </div>
 
     <audio id="success-sound" src="https://www.soundjay.com/buttons/sounds/button-3.mp3"></audio>
@@ -324,44 +224,42 @@
 
     <script>
         const words = [
+            { hebrew: "תפוח", english: "Apple" },
+            { hebrew: "כלב", english: "Dog" },
+            { hebrew: "ספר", english: "Book" },
+            { hebrew: "בית", english: "House" },
+            { hebrew: "מכונית", english: "Car" },
+            { hebrew: "מים", english: "Water" },
+            { hebrew: "מחשב", english: "Computer" },
             { hebrew: "שמש", english: "Sun" },
-            { hebrew: "ירח", english: "Moon" },
-            { hebrew: "כוכב", english: "Star" },
-            { hebrew: "ים", english: "Sea" },
-            { hebrew: "נהר", english: "River" },
             { hebrew: "עץ", english: "Tree" },
-            { hebrew: "פרח", english: "Flower" },
-            { hebrew: "ציפור", english: "Bird" },
-            { hebrew: "שמיים", english: "Sky" },
-            { hebrew: "אדמה", english: "Earth" }
+            { hebrew: "פרח", english: "Flower" }
         ];
 
         const hebrewColumn = document.getElementById('hebrew-words');
         const englishColumn = document.getElementById('english-words');
         const scoreDisplay = document.getElementById('score');
-        const timerDisplay = document.getElementById('timer');
+        const checkButton = document.getElementById('check-button');
         const resultDiv = document.getElementById('result');
         const finalScoreDisplay = document.getElementById('final-score');
         const totalTimeDisplay = document.getElementById('total-time');
         const totalMistakesDisplay = document.getElementById('total-mistakes');
         const matchDetails = document.getElementById('match-details');
-        const mistakesBreakdown = document.getElementById('mistakes-breakdown');
         const playAgainButton = document.getElementById('play-again');
         const successSound = document.getElementById('success-sound');
         const errorSound = document.getElementById('error-sound');
 
         let score = 0;
-        let totalMistakes = 0;
         let matches = 0;
-        let startTime = Date.now();
-        let lastMatchTime = startTime;
+        let totalMistakes = 0;
         let matchTimes = [];
-        let matchMistakes = new Array(words.length).fill(0);
-        let currentWord = null;
-        let draggedWord = null;
-        let timerInterval;
+        let matchAttempts = [];
+        let matchMistakes = [];
+        let selectedHebrew = null;
+        let selectedEnglish = null;
+        let startTime = null;
+        let wordStartTime = null;
 
-        // Shuffle array function
         function shuffle(array) {
             for (let i = array.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
@@ -370,20 +268,22 @@
             return array;
         }
 
-        // Initialize game
         function initGame() {
-            hebrewColumn.innerHTML = '<h2>Hebrew Words</h2>';
-            englishColumn.innerHTML = '<h2>English Words</h2>';
+            hebrewColumn.innerHTML = '<h2>מילים בעברית</h2>';
+            englishColumn.innerHTML = '<h2>מילים באנגלית</h2>';
             score = 0;
-            totalMistakes = 0;
             matches = 0;
+            totalMistakes = 0;
             matchTimes = [];
-            matchMistakes = new Array(words.length).fill(0);
+            matchAttempts = [];
+            matchMistakes = [];
+            selectedHebrew = null;
+            selectedEnglish = null;
             startTime = Date.now();
-            lastMatchTime = startTime;
-            scoreDisplay.textContent = `Score: ${score}`;
-            timerDisplay.textContent = `Time: 0s`;
+            wordStartTime = null;
+            scoreDisplay.textContent = `ניקוד: ${score}`;
             resultDiv.style.display = 'none';
+            checkButton.disabled = true;
 
             const shuffledHebrew = shuffle([...words]);
             const shuffledEnglish = shuffle([...words]);
@@ -392,176 +292,94 @@
                 const div = document.createElement('div');
                 div.className = 'word';
                 div.textContent = word.hebrew;
-                div.setAttribute('data-english', word.english);
-                div.setAttribute('data-hebrew', word.hebrew);
-                div.setAttribute('draggable', true);
+                div.dataset.english = word.english;
+                div.dataset.hebrew = word.hebrew;
+                div.addEventListener('click', () => selectWord(div, 'hebrew'));
                 hebrewColumn.appendChild(div);
             });
 
             shuffledEnglish.forEach(word => {
                 const div = document.createElement('div');
-                div.className = 'target';
-                div.setAttribute('data-english', word.english);
-                const englishSpan = document.createElement('span');
-                englishSpan.textContent = word.english;
-                div.appendChild(englishSpan);
-                const matchedSpan = document.createElement('span');
-                matchedSpan.className = 'matched-pair';
-                div.appendChild(matchedSpan);
+                div.className = 'word';
+                div.textContent = word.english;
+                div.dataset.english = word.english;
+                div.dataset.hebrew = word.hebrew;
+                div.addEventListener('click', () => selectWord(div, 'english'));
                 englishColumn.appendChild(div);
             });
-
-            clearInterval(timerInterval);
-            timerInterval = setInterval(updateTimer, 1000);
-
-            // Add drag and drop event listeners for desktop
-            document.querySelectorAll('.word').forEach(word => {
-                word.addEventListener('dragstart', dragStart);
-                word.addEventListener('dragend', dragEnd);
-                // Add touch event listeners for mobile
-                word.addEventListener('touchstart', touchStart);
-                word.addEventListener('touchmove', touchMove);
-                word.addEventListener('touchend', touchEnd);
-            });
-
-            document.querySelectorAll('.target').forEach(target => {
-                target.addEventListener('dragover', dragOver);
-                target.addEventListener('drop', drop);
-            });
         }
 
-        // Desktop Drag and Drop Functions
-        function dragStart(e) {
-            draggedWord = e.target;
-            e.target.classList.add('dragging');
-            currentWord = draggedWord.getAttribute('data-hebrew');
-        }
-
-        function dragEnd(e) {
-            e.target.classList.remove('dragging');
-            currentWord = null;
-        }
-
-        function dragOver(e) {
-            e.preventDefault();
-        }
-
-        // Touch Event Functions for Mobile
-        function touchStart(e) {
-            e.preventDefault();
-            draggedWord = e.target;
-            draggedWord.classList.add('dragging');
-            currentWord = draggedWord.getAttribute('data-hebrew');
-
-            // Clone the element to move it visually
-            const clone = draggedWord.cloneNode(true);
-            clone.classList.add('dragging');
-            clone.style.position = 'absolute';
-            clone.style.pointerEvents = 'none';
-            document.body.appendChild(clone);
-            draggedWord.clone = clone;
-
-            const touch = e.touches[0];
-            updateClonePosition(clone, touch);
-        }
-
-        function touchMove(e) {
-            e.preventDefault();
-            const touch = e.touches[0];
-            updateClonePosition(draggedWord.clone, touch);
-
-            // Highlight the target if the touch is over it
-            const target = findTargetUnderTouch(touch);
-            document.querySelectorAll('.target').forEach(t => t.classList.remove('highlight'));
-            if (target) {
-                target.classList.add('highlight');
-            }
-        }
-
-        function touchEnd(e) {
-            e.preventDefault();
-            draggedWord.classList.remove('dragging');
-            document.body.removeChild(draggedWord.clone);
-            delete draggedWord.clone;
-
-            const touch = e.changedTouches[0];
-            const target = findTargetUnderTouch(touch);
-            document.querySelectorAll('.target').forEach(t => t.classList.remove('highlight'));
-
-            if (target) {
-                drop({ target, preventDefault: () => {} });
+        function selectWord(element, type) {
+            if (type === 'hebrew') {
+                if (selectedHebrew) selectedHebrew.classList.remove('selected');
+                selectedHebrew = element;
+                selectedHebrew.classList.add('selected');
+            } else {
+                if (selectedEnglish) selectedEnglish.classList.remove('selected');
+                selectedEnglish = element;
+                selectedEnglish.classList.add('selected');
             }
 
-            currentWord = null;
-            draggedWord = null;
+            if (!wordStartTime) wordStartTime = Date.now();
+            checkButton.disabled = !(selectedHebrew && selectedEnglish);
         }
 
-        function updateClonePosition(clone, touch) {
-            clone.style.left = `${touch.pageX - clone.offsetWidth / 2}px`;
-            clone.style.top = `${touch.pageY - clone.offsetHeight / 2}px`;
-        }
+        function checkMatch() {
+            if (!selectedHebrew || !selectedEnglish) return;
 
-        function findTargetUnderTouch(touch) {
-            const touchX = touch.pageX;
-            const touchY = touch.pageY;
-            const targets = document.querySelectorAll('.target:not(.matched)');
-            for (let target of targets) {
-                const rect = target.getBoundingClientRect();
-                if (
-                    touchX >= rect.left &&
-                    touchX <= rect.right &&
-                    touchY >= rect.top &&
-                    touchY <= rect.bottom
-                ) {
-                    return target;
-                }
-            }
-            return null;
-        }
+            const isMatch = selectedHebrew.dataset.english === selectedEnglish.dataset.english;
+            const wordIndex = words.findIndex(w => w.english === selectedEnglish.dataset.english);
+            const timeTaken = (Date.now() - wordStartTime) / 1000;
 
-        // Drop Function (used by both drag and touch)
-        function drop(e) {
-            e.preventDefault();
-            const targetEnglish = e.target.getAttribute('data-english');
-            const wordEnglish = draggedWord.getAttribute('data-english');
-            const wordIndex = words.findIndex(word => word.english === wordEnglish);
-
-            if (targetEnglish === wordEnglish) {
-                draggedWord.classList.add('matched');
-                draggedWord.setAttribute('draggable', false);
-                e.target.classList.add('matched');
-                const matchedSpan = e.target.querySelector('.matched-pair');
-                matchedSpan.textContent = ` (${draggedWord.getAttribute('data-hebrew')})`;
-                const wordScore = matchMistakes[wordIndex] === 0 ? 10 : 5;
-                score += wordScore;
-                scoreDisplay.textContent = `Score: ${score}`;
+            if (isMatch) {
                 matches++;
-                matchTimes.push((Date.now() - lastMatchTime) / 1000);
-                lastMatchTime = Date.now();
-                successSound.play();
+                matchTimes.push(timeTaken);
+                matchAttempts.push(totalMistakes);
+                matchMistakes.push(totalMistakes);
 
-                addStars(e.target);
+                score += totalMistakes === matchMistakes.length - 1 ? 10 : 5;
+                scoreDisplay.textContent = `ניקוד: ${score}`;
+
+                const matchedDiv = document.createElement('div');
+                matchedDiv.className = 'matched-pair';
+                matchedDiv.innerHTML = `${selectedHebrew.textContent} - ${selectedEnglish.textContent} 😊`;
+                englishColumn.appendChild(matchedDiv);
+
+                selectedHebrew.remove();
+                selectedEnglish.remove();
+                addConfetti();
+
+                successSound.play();
 
                 if (matches === words.length) {
                     endGame();
                 }
             } else {
                 totalMistakes++;
-                matchMistakes[wordIndex]++;
                 errorSound.play();
-                alert('Oops! Try again.');
+                alert('אופס! נסה שוב!');
+            }
+
+            selectedHebrew.classList.remove('selected');
+            selectedEnglish.classList.remove('selected');
+            selectedHebrew = null;
+            selectedEnglish = null;
+            wordStartTime = null;
+            checkButton.disabled = true;
+        }
+
+        function addConfetti() {
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = `${Math.random() * 100}vw`;
+                confetti.style.background = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                document.body.appendChild(confetti);
+                setTimeout(() => confetti.remove(), 2000);
             }
         }
 
-        // Timer function
-        function updateTimer() {
-            const currentTime = (Date.now() - startTime) / 1000;
-            timerDisplay.textContent = `Time: ${currentTime.toFixed(1)}s`;
-        }
-
-        // End game function
         function endGame() {
-            clearInterval(timerInterval);
             const totalTime = (Date.now() - startTime) / 1000;
             resultDiv.style.display = 'block';
             finalScoreDisplay.textContent = score;
@@ -570,56 +388,21 @@
 
             matchDetails.innerHTML = '';
             words.forEach((word, index) => {
-                const li = document.createElement('li');
-                li.textContent = `Match ${index + 1} (${word.hebrew} -> ${word.english}): ${matchTimes[index].toFixed(1)} seconds, Mistakes: ${matchMistakes[index]}`;
-                matchDetails.appendChild(li);
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${word.hebrew} - ${word.english}</td>
+                    <td>${matchTimes[index].toFixed(1)}</td>
+                    <td>${matchAttempts[index] + 1}</td>
+                    <td>${matchMistakes[index]}</td>
+                `;
+                matchDetails.appendChild(tr);
             });
-
-            mistakesBreakdown.innerHTML = '';
-            words.forEach((word, index) => {
-                if (matchMistakes[index] > 0) {
-                    const li = document.createElement('li');
-                    li.textContent = `Match ${index + 1} (${word.hebrew} -> ${word.english}): ${matchMistakes[index]} mistakes`;
-                    mistakesBreakdown.appendChild(li);
-                }
-            });
-
-            if (totalMistakes === 0) {
-                const li = document.createElement('li');
-                li.textContent = "No mistakes! Great job!";
-                mistakesBreakdown.appendChild(li);
-            }
         }
 
-        // Add stars animation (fireworks) for correct matches
-        function addStars(target) {
-            for (let i = 0; i < 5; i++) {
-                const star = document.createElement('div');
-                star.className = 'star';
-                star.style.left = `${target.offsetLeft + Math.random() * target.offsetWidth}px`;
-                star.style.top = `${target.offsetTop + Math.random() * target.offsetHeight}px`;
-                document.getElementById('stars').appendChild(star);
-            }
-        }
+        checkButton.addEventListener('click', checkMatch);
+        playAgainButton.addEventListener('click', initGame);
 
-        // Background stars animation
-        function addBackgroundStars() {
-            setInterval(() => {
-                const star = document.createElement('div');
-                star.className = 'star';
-                star.style.left = `${Math.random() * 100}vw`;
-                document.getElementById('stars').appendChild(star);
-            }, 500);
-        }
-
-        // Play Again button functionality
-        playAgainButton.addEventListener('click', () => {
-            initGame();
-        });
-
-        // Start the game
         initGame();
-        addBackgroundStars();
     </script>
 </body>
 </html>
