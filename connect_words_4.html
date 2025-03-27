@@ -219,9 +219,6 @@
         <button id="play-again">שחק שוב</button>
     </div>
 
-    <audio id="success-sound" src="https://www.soundjay.com/buttons/sounds/button-3.mp3"></audio>
-    <audio id="error-sound" src="https://www.soundjay.com/buttons/sounds/button-4.mp3"></audio>
-
     <script>
         const words = [
             { hebrew: "תפוח", english: "Apple" },
@@ -246,8 +243,6 @@
         const totalMistakesDisplay = document.getElementById('total-mistakes');
         const matchDetails = document.getElementById('match-details');
         const playAgainButton = document.getElementById('play-again');
-        const successSound = document.getElementById('success-sound');
-        const errorSound = document.getElementById('error-sound');
 
         let score = 0;
         let matches = 0;
@@ -349,15 +344,12 @@
                 selectedEnglish.remove();
                 addConfetti();
 
-                successSound.play();
-
                 if (matches === words.length) {
                     endGame();
                 }
             } else {
                 totalMistakes++;
                 matchMistakes[wordIndex]++; // טעות ספציפית למילה זו
-                errorSound.play();
                 alert('אופס! נסה שוב!');
             }
 
