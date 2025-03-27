@@ -219,8 +219,10 @@
         <button id="play-again">שחק שוב</button>
     </div>
 
-    <audio id="success-sound" src="https://www.soundjay.com/buttons/sounds/button-3.mp3"></audio>
-    <audio id="error-sound" src="https://www.soundjay.com/buttons/sounds/button-4.mp3"></audio>
+    <!-- צלילים חדשים -->
+    <audio id="success-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-magic-pow-2308.mp3"></audio>
+    <audio id="error-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-sad-game-over-trombone-350.mp3"></audio>
+    <audio id="clap-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-audience-light-applause-354.mp3"></audio>
 
     <script>
         const words = [
@@ -248,6 +250,7 @@
         const playAgainButton = document.getElementById('play-again');
         const successSound = document.getElementById('success-sound');
         const errorSound = document.getElementById('error-sound');
+        const clapSound = document.getElementById('clap-sound');
 
         let score = 0;
         let matches = 0;
@@ -398,6 +401,13 @@
                 `;
                 matchDetails.appendChild(tr);
             });
+
+            // הפעלת מחיאות כפיים למשך 5 שניות
+            clapSound.play();
+            setTimeout(() => {
+                clapSound.pause();
+                clapSound.currentTime = 0; // איפוס הצליל לסיום
+            }, 5000);
         }
 
         checkButton.addEventListener('click', checkMatch);
