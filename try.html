@@ -219,11 +219,6 @@
         <button id="play-again">שחק שוב</button>
     </div>
 
-    <!-- צלילים חדשים ועובדים -->
-    <audio id="success-sound" src="https://cdn.pixabay.com/audio/2022/03/24/02-57-05-480_1.mp3"></audio>
-    <audio id="error-sound" src="https://cdn.pixabay.com/audio/2022/03/24/02-58-09-191_1.mp3"></audio>
-    <audio id="clap-sound" src="https://cdn.pixabay.com/audio/2022/03/24/03-00-00-621_1.mp3"></audio>
-
     <script>
         const words = [
             { hebrew: "תפוח", english: "Apple" },
@@ -248,9 +243,6 @@
         const totalMistakesDisplay = document.getElementById('total-mistakes');
         const matchDetails = document.getElementById('match-details');
         const playAgainButton = document.getElementById('play-again');
-        const successSound = document.getElementById('success-sound');
-        const errorSound = document.getElementById('error-sound');
-        const clapSound = document.getElementById('clap-sound');
 
         let score = 0;
         let matches = 0;
@@ -352,15 +344,12 @@
                 selectedEnglish.remove();
                 addConfetti();
 
-                successSound.play();
-
                 if (matches === words.length) {
                     endGame();
                 }
             } else {
                 totalMistakes++;
                 matchMistakes[wordIndex]++; // טעות ספציפית למילה זו
-                errorSound.play();
                 alert('אופס! נסה שוב!');
             }
 
@@ -401,13 +390,6 @@
                 `;
                 matchDetails.appendChild(tr);
             });
-
-            // הפעלת מחיאות כפיים למשך 5 שניות
-            clapSound.play();
-            setTimeout(() => {
-                clapSound.pause();
-                clapSound.currentTime = 0; // איפוס הצליל לסיום
-            }, 5000);
         }
 
         checkButton.addEventListener('click', checkMatch);
