@@ -253,8 +253,8 @@
         let matches = 0;
         let totalMistakes = 0;
         let matchTimes = [];
-        let matchAttempts = [];
-        let matchMistakes = [];
+        let matchAttempts = new Array(words.length).fill(0); // ניסיונות לכל מילה
+        let matchMistakes = new Array(words.length).fill(0); // טעויות לכל מילה
         let selectedHebrew = null;
         let selectedEnglish = null;
         let startTime = null;
@@ -275,8 +275,8 @@
             matches = 0;
             totalMistakes = 0;
             matchTimes = [];
-            matchAttempts = [];
-            matchMistakes = [];
+            matchAttempts = new Array(words.length).fill(0);
+            matchMistakes = new Array(words.length).fill(0);
             selectedHebrew = null;
             selectedEnglish = null;
             startTime = Date.now();
@@ -327,17 +327,17 @@
         function checkMatch() {
             if (!selectedHebrew || !selectedEnglish) return;
 
-            const isMatch = selectedHebrew.dataset.english === selectedEnglish.dataset.english;
             const wordIndex = words.findIndex(w => w.english === selectedEnglish.dataset.english);
+            matchAttempts[wordIndex]++; // כל לחיצה על "בדוק" היא ניסיון
             const timeTaken = (Date.now() - wordStartTime) / 1000;
+            const isMatch = selectedHebrew.dataset.english === selectedEnglish.dataset.english;
 
             if (isMatch) {
                 matches++;
                 matchTimes.push(timeTaken);
-                matchAttempts.push(totalMistakes);
-                matchMistakes.push(totalMistakes);
 
-                score += totalMistakes === matchMistakes.length - 1 ? 10 : 5;
+                // ניקוד: 10 נקודות לניסיון ראשון, 5 לניסיונות נוספים
+                score += matchAttempts[wordIndex] === 1 ? 10 : 5;
                 scoreDisplay.textContent = `ניקוד: ${score}`;
 
                 const matchedDiv = document.createElement('div');
@@ -356,6 +356,7 @@
                 }
             } else {
                 totalMistakes++;
+                matchMistakes[wordIndex]++; // טעות ספציפית למילה זו
                 errorSound.play();
                 alert('אופס! נסה שוב!');
             }
@@ -391,8 +392,8 @@
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td>${word.hebrew} - ${word.english}</td>
-                    <td>${matchTimes[index].toFixed(1)}</td>
-                    <td>${matchAttempts[index] + 1}</td>
+                    <td>${matchTimes[index] ? matchTimes[index].toFixed(1) : '-'}</td>
+                    <td>${matchAttempts[index]}</td>
                     <td>${matchMistakes[index]}</td>
                 `;
                 matchDetails.appendChild(tr);
