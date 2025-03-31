@@ -10,61 +10,61 @@
             background: linear-gradient(to bottom, #ffeb3b, #ff9800);
             display: flex;
             justify-content: center;
-            align-items: flex-start; /* Changed from center to allow scrolling */
-            min-height: 100vh; /* Ensure body takes full height */
+            align-items: flex-start;
+            min-height: 100vh;
             margin: 0;
-            padding: 10px; /* Add padding for small screens */
-            overflow-y: auto; /* Enable vertical scrolling */
+            padding: 10px;
+            overflow-y: auto;
             position: relative;
         }
 
         .game-container {
             background: #fff;
             border-radius: 20px;
-            padding: 15px; /* Reduced padding for smaller screens */
+            padding: 15px;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
-            width: 100%; /* Full width on small screens */
-            max-width: 900px; /* Cap width on larger screens */
+            width: 100%;
+            max-width: 900px;
             text-align: center;
             position: relative;
             z-index: 1;
-            box-sizing: border-box; /* Include padding in width */
+            box-sizing: border-box;
         }
 
         h1 {
             color: #ff5722;
-            font-size: 2em; /* Reduced for smaller screens */
+            font-size: 2em;
             margin-bottom: 15px;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
         }
 
         .columns {
             display: flex;
-            flex-direction: column; /* Stack columns on small screens */
+            flex-direction: column;
             justify-content: space-between;
             margin-bottom: 15px;
         }
 
         .column {
-            width: 100%; /* Full width on small screens */
+            width: 100%;
             background: #e0f7fa;
             border-radius: 10px;
             padding: 10px;
-            min-height: 200px; /* Reduced height for smaller screens */
-            max-height: 50vh; /* Limit height and allow scrolling */
-            overflow-y: auto; /* Enable scrolling within columns */
-            margin-bottom: 10px; /* Space between stacked columns */
+            min-height: 200px;
+            max-height: 50vh;
+            overflow-y: auto;
+            margin-bottom: 10px;
             box-sizing: border-box;
         }
 
         .word {
             background: #4caf50;
             color: white;
-            padding: 8px; /* Slightly reduced padding */
+            padding: 8px;
             margin: 5px 0;
             border-radius: 5px;
             cursor: pointer;
-            font-size: 1.1em; /* Slightly smaller for mobile */
+            font-size: 1.1em;
             transition: transform 0.2s;
         }
 
@@ -89,13 +89,13 @@
         }
 
         #score {
-            font-size: 1.3em; /* Reduced for mobile */
+            font-size: 1.3em;
             color: #d81b60;
             margin-bottom: 10px;
         }
 
         #check-button {
-            padding: 8px 16px; /* Smaller button for touch */
+            padding: 8px 16px;
             font-size: 1.1em;
             color: #fff;
             background: #2196f3;
@@ -123,14 +123,14 @@
             left: 50%;
             transform: translate(-50%, -50%);
             background: linear-gradient(135deg, #ffeb3b, #ff5722);
-            padding: 20px; /* Reduced padding */
+            padding: 20px;
             border-radius: 20px;
             box-shadow: 0 0 30px rgba(0, 0, 0, 0.4);
             text-align: center;
-            width: 90%; /* Responsive width */
+            width: 90%;
             max-width: 700px;
-            max-height: 80vh; /* Limit height on small screens */
-            overflow-y: auto; /* Scrollable result popup */
+            max-height: 80vh;
+            overflow-y: auto;
             z-index: 2;
             animation: popIn 0.5s ease-out;
         }
@@ -143,7 +143,7 @@
 
         #result h2 {
             color: #fff;
-            font-size: 2em; /* Reduced for mobile */
+            font-size: 2em;
             margin-bottom: 15px;
         }
 
@@ -153,11 +153,11 @@
             margin: 15px 0;
             background: rgba(255, 255, 255, 0.9);
             border-radius: 10px;
-            font-size: 0.9em; /* Smaller text for tables */
+            font-size: 0.9em;
         }
 
         #result th, #result td {
-            padding: 8px; /* Reduced padding */
+            padding: 8px;
             border: 1px solid #ddd;
             color: #333;
         }
@@ -168,7 +168,7 @@
         }
 
         #play-again {
-            padding: 8px 16px; /* Smaller button */
+            padding: 8px 16px;
             font-size: 1.1em;
             color: #fff;
             background: #4caf50;
@@ -185,7 +185,7 @@
 
         .confetti {
             position: absolute;
-            width: 8px; /* Smaller confetti for mobile */
+            width: 8px;
             height: 8px;
             background: #ff0000;
             animation: fall 2s linear;
@@ -197,33 +197,32 @@
             100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
         }
 
-        /* Media Queries for Larger Screens */
         @media (min-width: 768px) {
             .columns {
-                flex-direction: row; /* Side-by-side columns on larger screens */
+                flex-direction: row;
             }
             .column {
-                width: 45%; /* Restore original width */
+                width: 45%;
                 margin-bottom: 0;
             }
             h1 {
-                font-size: 2.5em; /* Original size */
+                font-size: 2.5em;
             }
             .word, .matched-pair {
-                font-size: 1.2em; /* Original size */
+                font-size: 1.2em;
             }
             #score {
-                font-size: 1.5em; /* Original size */
+                font-size: 1.5em;
             }
             #check-button, #play-again {
-                padding: 10px 20px; /* Original size */
+                padding: 10px 20px;
                 font-size: 1.2em;
             }
             #result h2 {
-                font-size: 2.5em; /* Original size */
+                font-size: 2.5em;
             }
             #result table {
-                font-size: 1em; /* Original size */
+                font-size: 1em;
             }
         }
     </style>
@@ -378,12 +377,13 @@
         let matches = 0;
         let totalMistakes = 0;
         let matchTimes = [];
-        let matchAttempts = new Array(words.length).fill(0);
-        let matchMistakes = new Array(words.length).fill(0);
+        let matchAttempts = [];
+        let matchMistakes = [];
         let selectedHebrew = null;
         let selectedEnglish = null;
         let startTime = null;
         let wordStartTime = null;
+        let currentWords = []; // To store the 10 selected words
 
         function shuffle(array) {
             for (let i = array.length - 1; i > 0; i--) {
@@ -400,8 +400,8 @@
             matches = 0;
             totalMistakes = 0;
             matchTimes = [];
-            matchAttempts = new Array(words.length).fill(0);
-            matchMistakes = new Array(words.length).fill(0);
+            matchAttempts = new Array(10).fill(0); // Only 10 words
+            matchMistakes = new Array(10).fill(0); // Only 10 words
             selectedHebrew = null;
             selectedEnglish = null;
             startTime = Date.now();
@@ -410,8 +410,12 @@
             resultDiv.style.display = 'none';
             checkButton.disabled = true;
 
-            const shuffledHebrew = shuffle([...words]);
-            const shuffledEnglish = shuffle([...words]);
+            // Select 10 random words
+            const shuffledWords = shuffle([...words]);
+            currentWords = shuffledWords.slice(0, 10); // Take first 10 after shuffling
+
+            const shuffledHebrew = shuffle([...currentWords]);
+            const shuffledEnglish = shuffle([...currentWords]);
 
             shuffledHebrew.forEach(word => {
                 const div = document.createElement('div');
@@ -452,9 +456,9 @@
         function checkMatch() {
             if (!selectedHebrew || !selectedEnglish) return;
 
-            const wordIndex = words.findIndex(w => w.english === selectedEnglish.dataset.english);
+            const wordIndex = currentWords.findIndex(w => w.english === selectedEnglish.dataset.english);
             matchAttempts[wordIndex]++;
-            const timeTaken = (Date.now() - wordStartTime) / 1000;
+            const timeTaken = (Date.now() - wordStart venousTime) / 1000;
             const isMatch = selectedHebrew.dataset.english === selectedEnglish.dataset.english;
 
             if (isMatch) {
@@ -473,7 +477,7 @@
                 selectedEnglish.remove();
                 addConfetti();
 
-                if (matches === words.length) {
+                if (matches === 10) { // End game after 10 matches
                     endGame();
                 }
             } else {
@@ -509,7 +513,7 @@
             totalMistakesDisplay.textContent = totalMistakes;
 
             matchDetails.innerHTML = '';
-            words.forEach((word, index) => {
+            currentWords.forEach((word, index) => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td>${word.hebrew} - ${word.english}</td>
