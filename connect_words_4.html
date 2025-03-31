@@ -3,60 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>משחק התאמת מילים באנגלית</title>
+    <title>משחק התאמת מילים לילדים</title>
     <style>
         body {
             font-family: 'Comic Sans MS', Arial, 'Noto Sans Hebrew', sans-serif;
             background: linear-gradient(to bottom, #ffeb3b, #ff9800);
             display: flex;
             justify-content: center;
-            align-items: center;
-            height: 100vh;
+            align-items: flex-start;
+            min-height: 100vh;
             margin: 0;
-            overflow: hidden;
+            padding: 10px;
+            overflow-y: auto;
             position: relative;
         }
 
         .game-container {
             background: #fff;
             border-radius: 20px;
-            padding: 20px;
+            padding: 15px;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
-            width: 900px;
+            width: 100%;
+            max-width: 900px;
             text-align: center;
             position: relative;
             z-index: 1;
+            box-sizing: border-box;
         }
 
         h1 {
             color: #ff5722;
-            font-size: 2.5em;
-            margin-bottom: 20px;
+            font-size: 2em;
+            margin-bottom: 15px;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
         }
 
         .columns {
             display: flex;
+            flex-direction: column;
             justify-content: space-between;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
         .column {
-            width: 45%;
+            width: 100%;
             background: #e0f7fa;
             border-radius: 10px;
             padding: 10px;
-            min-height: 400px;
+            min-height: 200px;
+            max-height: 50vh;
+            overflow-y: auto;
+            margin-bottom: 10px;
+            box-sizing: border-box;
         }
 
         .word {
             background: #4caf50;
             color: white;
-            padding: 10px;
+            padding: 8px;
             margin: 5px 0;
             border-radius: 5px;
             cursor: pointer;
-            font-size: 1.2em;
+            font-size: 1.1em;
             transition: transform 0.2s;
         }
 
@@ -71,24 +79,24 @@
         .matched-pair {
             background: #ffeb3b;
             color: #333;
-            padding: 10px;
+            padding: 8px;
             margin: 5px 0;
             border-radius: 5px;
-            font-size: 1.2em;
+            font-size: 1.1em;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
         #score {
-            font-size: 1.5em;
+            font-size: 1.3em;
             color: #d81b60;
             margin-bottom: 10px;
         }
 
         #check-button {
-            padding: 10px 20px;
-            font-size: 1.2em;
+            padding: 8px 16px;
+            font-size: 1.1em;
             color: #fff;
             background: #2196f3;
             border: none;
@@ -115,11 +123,14 @@
             left: 50%;
             transform: translate(-50%, -50%);
             background: linear-gradient(135deg, #ffeb3b, #ff5722);
-            padding: 30px;
+            padding: 20px;
             border-radius: 20px;
             box-shadow: 0 0 30px rgba(0, 0, 0, 0.4);
             text-align: center;
+            width: 90%;
             max-width: 700px;
+            max-height: 80vh;
+            overflow-y: auto;
             z-index: 2;
             animation: popIn 0.5s ease-out;
         }
@@ -132,20 +143,21 @@
 
         #result h2 {
             color: #fff;
-            font-size: 2.5em;
-            margin-bottom: 20px;
+            font-size: 2em;
+            margin-bottom: 15px;
         }
 
         #result table {
             width: 100%;
             border-collapse: collapse;
-            margin: 20px 0;
+            margin: 15px 0;
             background: rgba(255, 255, 255, 0.9);
             border-radius: 10px;
+            font-size: 0.9em;
         }
 
         #result th, #result td {
-            padding: 10px;
+            padding: 8px;
             border: 1px solid #ddd;
             color: #333;
         }
@@ -156,8 +168,8 @@
         }
 
         #play-again {
-            padding: 10px 20px;
-            font-size: 1.2em;
+            padding: 8px 16px;
+            font-size: 1.1em;
             color: #fff;
             background: #4caf50;
             border: none;
@@ -173,8 +185,8 @@
 
         .confetti {
             position: absolute;
-            width: 10px;
-            height: 10px;
+            width: 8px;
+            height: 8px;
             background: #ff0000;
             animation: fall 2s linear;
             z-index: 0;
@@ -184,11 +196,40 @@
             0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
             100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
         }
+
+        @media (min-width: 768px) {
+            .columns {
+                flex-direction: row;
+            }
+            .column {
+                width: 45%;
+                margin-bottom: 0;
+            }
+            h1 {
+                font-size: 2.5em;
+            }
+            .word, .matched-pair {
+                font-size: 1.2em;
+            }
+            #score {
+                font-size: 1.5em;
+            }
+            #check-button, #play-again {
+                padding: 10px 20px;
+                font-size: 1.2em;
+            }
+            #result h2 {
+                font-size: 2.5em;
+            }
+            #result table {
+                font-size: 1em;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="game-container">
-        <h1>משחק התאמת מילים באנגלית</h1>
+        <h1>משחק התאמת מילים לילדים</h1>
         <div id="score">ניקוד: 0</div>
         <div class="columns">
             <div class="column" id="hebrew-words">
@@ -221,16 +262,104 @@
 
     <script>
         const words = [
-            { hebrew: "תפוח", english: "Apple" },
-            { hebrew: "כלב", english: "Dog" },
-            { hebrew: "ספר", english: "Book" },
-            { hebrew: "בית", english: "House" },
-            { hebrew: "מכונית", english: "Car" },
-            { hebrew: "מים", english: "Water" },
-            { hebrew: "מחשב", english: "Computer" },
-            { hebrew: "שמש", english: "Sun" },
-            { hebrew: "עץ", english: "Tree" },
-            { hebrew: "פרח", english: "Flower" }
+            { hebrew: "חתול", english: "Cat" },
+            { hebrew: "דג", english: "Fish" },
+            { hebrew: "ציפור", english: "Bird" },
+            { hebrew: "אריה", english: "Lion" },
+            { hebrew: "פיל", english: "Elephant" },
+            { hebrew: "סוס", english: "Horse" },
+            { hebrew: "פרה", english: "Cow" },
+            { hebrew: "תרנגולת", english: "Chicken" },
+            { hebrew: "ברווז", english: "Duck" },
+            { hebrew: "עכבר", english: "Mouse" },
+            { hebrew: "שולחן", english: "Table" },
+            { hebrew: "כסא", english: "Chair" },
+            { hebrew: "מיטה", english: "Bed" },
+            { hebrew: "חלון", english: "Window" },
+            { hebrew: "דלת", english: "Door" },
+            { hebrew: "מנורה", english: "Lamp" },
+            { hebrew: "שעון", english: "Clock" },
+            { hebrew: "טלוויזיה", english: "Television" },
+            { hebrew: "מקרר", english: "Refrigerator" },
+            { hebrew: "תנור", english: "Oven" },
+            { hebrew: "כדור", english: "Ball" },
+            { hebrew: "בובה", english: "Doll" },
+            { hebrew: "מטוס", english: "Airplane" },
+            { hebrew: "אופניים", english: "Bicycle" },
+            { hebrew: "משאית", english: "Truck" },
+            { hebrew: "סירה", english: "Boat" },
+            { hebrew: "רכבת", english: "Train" },
+            { hebrew: "אוטובוס", english: "Bus" },
+            { hebrew: "סוסון ים", english: "Seahorse" },
+            { hebrew: "דולפין", english: "Dolphin" },
+            { hebrew: "ירח", english: "Moon" },
+            { hebrew: "כוכב", english: "Star" },
+            { hebrew: "ענן", english: "Cloud" },
+            { hebrew: "גשם", english: "Rain" },
+            { hebrew: "שלג", english: "Snow" },
+            { hebrew: "רוח", english: "Wind" },
+            { hebrew: "קשת", english: "Rainbow" },
+            { hebrew: "ים", english: "Sea" },
+            { hebrew: "חוף", english: "Beach" },
+            { hebrew: "חול", english: "Sand" },
+            { hebrew: "אבן", english: "Stone" },
+            { hebrew: "דשא", english: "Grass" },
+            { hebrew: "שמיים", english: "Sky" },
+            { hebrew: "צל", english: "Shadow" },
+            { hebrew: "אש", english: "Fire" },
+            { hebrew: "עשן", english: "Smoke" },
+            { hebrew: "נר", english: "Candle" },
+            { hebrew: "מטריה", english: "Umbrella" },
+            { hebrew: "תיק", english: "Bag" },
+            { hebrew: "עיפרון", english: "Pencil" },
+            { hebrew: "מחק", english: "Eraser" },
+            { hebrew: "מחברת", english: "Notebook" },
+            { hebrew: "צבע", english: "Color" },
+            { hebrew: "מכחול", english: "Paintbrush" },
+            { hebrew: "ציור", english: "Drawing" },
+            { hebrew: "משחק", english: "Game" },
+            { hebrew: "חבר", english: "Friend" },
+            { hebrew: "מורה", english: "Teacher" },
+            { hebrew: "בית ספר", english: "School" },
+            { hebrew: "שיעור", english: "Lesson" },
+            { hebrew: "ילד", english: "Boy" },
+            { hebrew: "ילדה", english: "Girl" },
+            { hebrew: "משפחה", english: "Family" },
+            { hebrew: "אמא", english: "Mom" },
+            { hebrew: "אבא", english: "Dad" },
+            { hebrew: "אח", english: "Brother" },
+            { hebrew: "אחות", english: "Sister" },
+            { hebrew: "סבא", english: "Grandpa" },
+            { hebrew: "סבתא", english: "Grandma" },
+            { hebrew: "תינוק", english: "Baby" },
+            { hebrew: "שיר", english: "Song" },
+            { hebrew: "ריקוד", english: "Dance" },
+            { hebrew: "צחוק", english: "Laugh" },
+            { hebrew: "חיוך", english: "Smile" },
+            { hebrew: "לב", english: "Heart" },
+            { hebrew: "יד", english: "Hand" },
+            { hebrew: "רל", english: "Foot" },
+            { hebrew: "עין", english: "Eye" },
+            { hebrew: "אוזן", english: "Ear" },
+            { hebrew: "פה", english: "Mouth" },
+            { hebrew: "ראש", english: "Head" },
+            { hebrew: "בגדים", english: "Clothes" },
+            { hebrew: "חולצה", english: "Shirt" },
+            { hebrew: "מכנסיים", english: "Pants" },
+            { hebrew: "נעליים", english: "Shoes" },
+            { hebrew: "כובע", english: "Hat" },
+            { hebrew: "גרביים", english: "Socks" },
+            { hebrew: "לחם", english: "Bread" },
+            { hebrew: "גבינה", english: "Cheese" },
+            { hebrew: "חלב", english: "Milk" },
+            { hebrew: "ביצה", english: "Egg" },
+            { hebrew: "עוגה", english: "Cake" },
+            { hebrew: "ממתק", english: "Candy" },
+            { hebrew: "תפוז", english: "Orange" },
+            { hebrew: "בננה", english: "Banana" },
+            { hebrew: "ענבים", english: "Grapes" },
+            { hebrew: "מלון", english: "Melon" },
+            { hebrew: "מיץ", english: "Juice" }
         ];
 
         const hebrewColumn = document.getElementById('hebrew-words');
@@ -248,12 +377,13 @@
         let matches = 0;
         let totalMistakes = 0;
         let matchTimes = [];
-        let matchAttempts = new Array(words.length).fill(0); // ניסיונות לכל מילה
-        let matchMistakes = new Array(words.length).fill(0); // טעויות לכל מילה
+        let matchAttempts = [];
+        let matchMistakes = [];
         let selectedHebrew = null;
         let selectedEnglish = null;
         let startTime = null;
         let wordStartTime = null;
+        let currentWords = [];
 
         function shuffle(array) {
             for (let i = array.length - 1; i > 0; i--) {
@@ -264,14 +394,15 @@
         }
 
         function initGame() {
+            console.log("Initializing game...");
             hebrewColumn.innerHTML = '<h2>מילים בעברית</h2>';
             englishColumn.innerHTML = '<h2>מילים באנגלית</h2>';
             score = 0;
             matches = 0;
             totalMistakes = 0;
             matchTimes = [];
-            matchAttempts = new Array(words.length).fill(0);
-            matchMistakes = new Array(words.length).fill(0);
+            matchAttempts = new Array(10).fill(0);
+            matchMistakes = new Array(10).fill(0);
             selectedHebrew = null;
             selectedEnglish = null;
             startTime = Date.now();
@@ -280,10 +411,15 @@
             resultDiv.style.display = 'none';
             checkButton.disabled = true;
 
-            const shuffledHebrew = shuffle([...words]);
-            const shuffledEnglish = shuffle([...words]);
+            // Select 10 random words
+            const shuffledWords = shuffle([...words]);
+            currentWords = shuffledWords.slice(0, 10);
+            console.log("Selected 10 words:", currentWords);
 
-            shuffledHebrew.forEach(word => {
+            const shuffledHebrew = shuffle([...currentWords]);
+            const shuffledEnglish = shuffle([...currentWords]);
+
+            shuffledHebrew.forEach((word, index) => {
                 const div = document.createElement('div');
                 div.className = 'word';
                 div.textContent = word.hebrew;
@@ -291,9 +427,10 @@
                 div.dataset.hebrew = word.hebrew;
                 div.addEventListener('click', () => selectWord(div, 'hebrew'));
                 hebrewColumn.appendChild(div);
+                console.log(`Added Hebrew word ${index + 1}: ${word.hebrew}`);
             });
 
-            shuffledEnglish.forEach(word => {
+            shuffledEnglish.forEach((word, index) => {
                 const div = document.createElement('div');
                 div.className = 'word';
                 div.textContent = word.english;
@@ -301,7 +438,11 @@
                 div.dataset.hebrew = word.hebrew;
                 div.addEventListener('click', () => selectWord(div, 'english'));
                 englishColumn.appendChild(div);
+                console.log(`Added English word ${index + 1}: ${word.english}`);
             });
+
+            console.log("Hebrew column content:", hebrewColumn.innerHTML);
+            console.log("English column content:", englishColumn.innerHTML);
         }
 
         function selectWord(element, type) {
@@ -322,8 +463,8 @@
         function checkMatch() {
             if (!selectedHebrew || !selectedEnglish) return;
 
-            const wordIndex = words.findIndex(w => w.english === selectedEnglish.dataset.english);
-            matchAttempts[wordIndex]++; // כל לחיצה על "בדוק" היא ניסיון
+            const wordIndex = currentWords.findIndex(w => w.english === selectedEnglish.dataset.english);
+            matchAttempts[wordIndex]++;
             const timeTaken = (Date.now() - wordStartTime) / 1000;
             const isMatch = selectedHebrew.dataset.english === selectedEnglish.dataset.english;
 
@@ -331,7 +472,6 @@
                 matches++;
                 matchTimes.push(timeTaken);
 
-                // ניקוד: 10 נקודות לניסיון ראשון, 5 לניסיונות נוספים
                 score += matchAttempts[wordIndex] === 1 ? 10 : 5;
                 scoreDisplay.textContent = `ניקוד: ${score}`;
 
@@ -344,12 +484,12 @@
                 selectedEnglish.remove();
                 addConfetti();
 
-                if (matches === words.length) {
+                if (matches === 10) {
                     endGame();
                 }
             } else {
                 totalMistakes++;
-                matchMistakes[wordIndex]++; // טעות ספציפית למילה זו
+                matchMistakes[wordIndex]++;
                 alert('אופס! נסה שוב!');
             }
 
@@ -380,7 +520,7 @@
             totalMistakesDisplay.textContent = totalMistakes;
 
             matchDetails.innerHTML = '';
-            words.forEach((word, index) => {
+            currentWords.forEach((word, index) => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td>${word.hebrew} - ${word.english}</td>
