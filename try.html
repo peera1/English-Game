@@ -338,7 +338,7 @@
             { hebrew: "חיוך", english: "Smile" },
             { hebrew: "לב", english: "Heart" },
             { hebrew: "יד", english: "Hand" },
-            { hebrew: "רגל", english: "Foot" },
+            { hebrew: "רל", english: "Foot" },
             { hebrew: "עין", english: "Eye" },
             { hebrew: "אוזן", english: "Ear" },
             { hebrew: "פה", english: "Mouth" },
@@ -383,7 +383,7 @@
         let selectedEnglish = null;
         let startTime = null;
         let wordStartTime = null;
-        let currentWords = []; // To store the 10 selected words
+        let currentWords = [];
 
         function shuffle(array) {
             for (let i = array.length - 1; i > 0; i--) {
@@ -394,14 +394,15 @@
         }
 
         function initGame() {
+            console.log("Initializing game...");
             hebrewColumn.innerHTML = '<h2>מילים בעברית</h2>';
             englishColumn.innerHTML = '<h2>מילים באנגלית</h2>';
             score = 0;
             matches = 0;
             totalMistakes = 0;
             matchTimes = [];
-            matchAttempts = new Array(10).fill(0); // Only 10 words
-            matchMistakes = new Array(10).fill(0); // Only 10 words
+            matchAttempts = new Array(10).fill(0);
+            matchMistakes = new Array(10).fill(0);
             selectedHebrew = null;
             selectedEnglish = null;
             startTime = Date.now();
@@ -412,12 +413,13 @@
 
             // Select 10 random words
             const shuffledWords = shuffle([...words]);
-            currentWords = shuffledWords.slice(0, 10); // Take first 10 after shuffling
+            currentWords = shuffledWords.slice(0, 10);
+            console.log("Selected 10 words:", currentWords);
 
             const shuffledHebrew = shuffle([...currentWords]);
             const shuffledEnglish = shuffle([...currentWords]);
 
-            shuffledHebrew.forEach(word => {
+            shuffledHebrew.forEach((word, index) => {
                 const div = document.createElement('div');
                 div.className = 'word';
                 div.textContent = word.hebrew;
@@ -425,9 +427,10 @@
                 div.dataset.hebrew = word.hebrew;
                 div.addEventListener('click', () => selectWord(div, 'hebrew'));
                 hebrewColumn.appendChild(div);
+                console.log(`Added Hebrew word ${index + 1}: ${word.hebrew}`);
             });
 
-            shuffledEnglish.forEach(word => {
+            shuffledEnglish.forEach((word, index) => {
                 const div = document.createElement('div');
                 div.className = 'word';
                 div.textContent = word.english;
@@ -435,7 +438,11 @@
                 div.dataset.hebrew = word.hebrew;
                 div.addEventListener('click', () => selectWord(div, 'english'));
                 englishColumn.appendChild(div);
+                console.log(`Added English word ${index + 1}: ${word.english}`);
             });
+
+            console.log("Hebrew column content:", hebrewColumn.innerHTML);
+            console.log("English column content:", englishColumn.innerHTML);
         }
 
         function selectWord(element, type) {
@@ -458,7 +465,7 @@
 
             const wordIndex = currentWords.findIndex(w => w.english === selectedEnglish.dataset.english);
             matchAttempts[wordIndex]++;
-            const timeTaken = (Date.now() - wordStart venousTime) / 1000;
+            const timeTaken = (Date.now() - wordStartTime) / 1000;
             const isMatch = selectedHebrew.dataset.english === selectedEnglish.dataset.english;
 
             if (isMatch) {
@@ -477,7 +484,7 @@
                 selectedEnglish.remove();
                 addConfetti();
 
-                if (matches === 10) { // End game after 10 matches
+                if (matches === 10) {
                     endGame();
                 }
             } else {
