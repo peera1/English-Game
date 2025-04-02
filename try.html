@@ -460,46 +460,60 @@
             checkButton.disabled = !(selectedHebrew && selectedEnglish);
         }
 
-        function checkMatch() {
-            if (!selectedHebrew || !selectedEnglish) return;
+function checkMatch() {
+    if (!selectedHebrew || !selectedEnglish) return;
 
-            const wordIndex = currentWords.findIndex(w => w.english === selectedEnglish.dataset.english);
-            matchAttempts[wordIndex]++;
-            const timeTaken = (Date.now() - wordStartTime) / 1000;
-            const isMatch = selectedHebrew.dataset.english === selectedEnglish.dataset.english;
+    const wordIndex = currentWords.findIndex(w => w.english === selectedEnglish.dataset.english);
+    matchAttempts[wordIndex]++;
+    const timeTaken = (Date.now() - wordStartTime) / 1000;
+    const isMatch = selectedHebrew.dataset.english === selectedEnglish.dataset.english;
 
-            if (isMatch) {
-                matches++;
-                matchTimes.push(timeTaken);
+    if (isMatch) {
+        matches++;
+        matchTimes.push(timeTaken);
 
-                score += matchAttempts[wordIndex] === 1 ? 10 : 5;
-                scoreDisplay.textContent = `ניקוד: ${score}`;
+        score += matchAttempts[wordIndex] === 1 ? 10 : 5;
+        scoreDisplay.textContent = `ניקוד: ${score}`;
 
-                const matchedDiv = document.createElement('div');
-                matchedDiv.className = 'matched-pair';
-                matchedDiv.innerHTML = `${selectedHebrew.textContent} - ${selectedEnglish.textContent} 😊`;
-                englishColumn.appendChild(matchedDiv);
+        const matchedDiv = document.createElement('div');
+        matchedDiv.className = 'matched-pair';
+        matchedDiv.innerHTML = `${selectedHebrew.textContent} - ${selectedEnglish.textContent} 😊`;
+        englishColumn.appendChild(matchedDiv);
 
-                selectedHebrew.remove();
-                selectedEnglish.remove();
-                addConfetti();
+        // השמעת המילה בעברית
+        const hebrewUtterance = new SpeechSynthesisUtterance(selectedHebrew.textContent);
+        hebrewUtterance.lang = 'he-IL'; // שפה עברית
+        hebrewUtterance.rate = 0.9; // מהירות קצת איטית יותר לבהירות
+        window.speechSynthesis.speak(hebrewUtterance);
 
-                if (matches === 10) {
-                    endGame();
-                }
-            } else {
-                totalMistakes++;
-                matchMistakes[wordIndex]++;
-                alert('אופס! נסה שוב!');
-            }
+        // השמעת המילה באנגלית לאחר העברית
+        hebrewUtterance.onend = () => {
+            const englishUtterance = new SpeechSynthesisUtterance(selectedEnglish.textContent);
+            englishUtterance.lang = 'en-US'; // שפה אנגלית
+            englishUtterance.rate = 0.9;
+            window.speechSynthesis.speak(englishUtterance);
+        };
 
-            selectedHebrew.classList.remove('selected');
-            selectedEnglish.classList.remove('selected');
-            selectedHebrew = null;
-            selectedEnglish = null;
-            wordStartTime = null;
-            checkButton.disabled = true;
+        selectedHebrew.remove();
+        selectedEnglish.remove();
+        addConfetti();
+
+        if (matches === 10) {
+            endGame();
         }
+    } else {
+        totalMistakes++;
+        matchMistakes[wordIndex]++;
+        alert('אופס! נסה שוב!');
+    }
+
+    selectedHebrew.classList.remove('selected');
+    selectedEnglish.classList.remove('selected');
+    selectedHebrew = null;
+    selectedEnglish = null;
+    wordStartTime = null;
+    checkButton.disabled = true;
+}
 
         function addConfetti() {
             for (let i = 0; i < 50; i++) {
