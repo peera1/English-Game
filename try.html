@@ -271,95 +271,7 @@
             { hebrew: "פרה", english: "Cow" },
             { hebrew: "תרנגולת", english: "Chicken" },
             { hebrew: "ברווז", english: "Duck" },
-            { hebrew: "עכבר", english: "Mouse" },
-            { hebrew: "שולחן", english: "Table" },
-            { hebrew: "כסא", english: "Chair" },
-            { hebrew: "מיטה", english: "Bed" },
-            { hebrew: "חלון", english: "Window" },
-            { hebrew: "דלת", english: "Door" },
-            { hebrew: "מנורה", english: "Lamp" },
-            { hebrew: "שעון", english: "Clock" },
-            { hebrew: "טלוויזיה", english: "Television" },
-            { hebrew: "מקרר", english: "Refrigerator" },
-            { hebrew: "תנור", english: "Oven" },
-            { hebrew: "כדור", english: "Ball" },
-            { hebrew: "בובה", english: "Doll" },
-            { hebrew: "מטוס", english: "Airplane" },
-            { hebrew: "אופניים", english: "Bicycle" },
-            { hebrew: "משאית", english: "Truck" },
-            { hebrew: "סירה", english: "Boat" },
-            { hebrew: "רכבת", english: "Train" },
-            { hebrew: "אוטובוס", english: "Bus" },
-            { hebrew: "סוסון ים", english: "Seahorse" },
-            { hebrew: "דולפין", english: "Dolphin" },
-            { hebrew: "ירח", english: "Moon" },
-            { hebrew: "כוכב", english: "Star" },
-            { hebrew: "ענן", english: "Cloud" },
-            { hebrew: "גשם", english: "Rain" },
-            { hebrew: "שלג", english: "Snow" },
-            { hebrew: "רוח", english: "Wind" },
-            { hebrew: "קשת", english: "Rainbow" },
-            { hebrew: "ים", english: "Sea" },
-            { hebrew: "חוף", english: "Beach" },
-            { hebrew: "חול", english: "Sand" },
-            { hebrew: "אבן", english: "Stone" },
-            { hebrew: "דשא", english: "Grass" },
-            { hebrew: "שמיים", english: "Sky" },
-            { hebrew: "צל", english: "Shadow" },
-            { hebrew: "אש", english: "Fire" },
-            { hebrew: "עשן", english: "Smoke" },
-            { hebrew: "נר", english: "Candle" },
-            { hebrew: "מטריה", english: "Umbrella" },
-            { hebrew: "תיק", english: "Bag" },
-            { hebrew: "עיפרון", english: "Pencil" },
-            { hebrew: "מחק", english: "Eraser" },
-            { hebrew: "מחברת", english: "Notebook" },
-            { hebrew: "צבע", english: "Color" },
-            { hebrew: "מכחול", english: "Paintbrush" },
-            { hebrew: "ציור", english: "Drawing" },
-            { hebrew: "משחק", english: "Game" },
-            { hebrew: "חבר", english: "Friend" },
-            { hebrew: "מורה", english: "Teacher" },
-            { hebrew: "בית ספר", english: "School" },
-            { hebrew: "שיעור", english: "Lesson" },
-            { hebrew: "ילד", english: "Boy" },
-            { hebrew: "ילדה", english: "Girl" },
-            { hebrew: "משפחה", english: "Family" },
-            { hebrew: "אמא", english: "Mom" },
-            { hebrew: "אבא", english: "Dad" },
-            { hebrew: "אח", english: "Brother" },
-            { hebrew: "אחות", english: "Sister" },
-            { hebrew: "סבא", english: "Grandpa" },
-            { hebrew: "סבתא", english: "Grandma" },
-            { hebrew: "תינוק", english: "Baby" },
-            { hebrew: "שיר", english: "Song" },
-            { hebrew: "ריקוד", english: "Dance" },
-            { hebrew: "צחוק", english: "Laugh" },
-            { hebrew: "חיוך", english: "Smile" },
-            { hebrew: "לב", english: "Heart" },
-            { hebrew: "יד", english: "Hand" },
-            { hebrew: "רל", english: "Foot" },
-            { hebrew: "עין", english: "Eye" },
-            { hebrew: "אוזן", english: "Ear" },
-            { hebrew: "פה", english: "Mouth" },
-            { hebrew: "ראש", english: "Head" },
-            { hebrew: "בגדים", english: "Clothes" },
-            { hebrew: "חולצה", english: "Shirt" },
-            { hebrew: "מכנסיים", english: "Pants" },
-            { hebrew: "נעליים", english: "Shoes" },
-            { hebrew: "כובע", english: "Hat" },
-            { hebrew: "גרביים", english: "Socks" },
-            { hebrew: "לחם", english: "Bread" },
-            { hebrew: "גבינה", english: "Cheese" },
-            { hebrew: "חלב", english: "Milk" },
-            { hebrew: "ביצה", english: "Egg" },
-            { hebrew: "עוגה", english: "Cake" },
-            { hebrew: "ממתק", english: "Candy" },
-            { hebrew: "תפוז", english: "Orange" },
-            { hebrew: "בננה", english: "Banana" },
-            { hebrew: "ענבים", english: "Grapes" },
-            { hebrew: "מלון", english: "Melon" },
-            { hebrew: "מיץ", english: "Juice" }
+            { hebrew: "עכבר", english: "Mouse" }
         ];
 
         const hebrewColumn = document.getElementById('hebrew-words');
@@ -411,7 +323,6 @@
             resultDiv.style.display = 'none';
             checkButton.disabled = true;
 
-            // Select 10 random words
             const shuffledWords = shuffle([...words]);
             currentWords = shuffledWords.slice(0, 10);
             console.log("Selected 10 words:", currentWords);
@@ -441,8 +352,7 @@
                 console.log(`Added English word ${index + 1}: ${word.english}`);
             });
 
-            console.log("Hebrew column content:", hebrewColumn.innerHTML);
-            console.log("English column content:", englishColumn.innerHTML);
+            checkVoices(); // בדיקת קולות בהתחלה
         }
 
         function selectWord(element, type) {
@@ -460,60 +370,94 @@
             checkButton.disabled = !(selectedHebrew && selectedEnglish);
         }
 
-function checkMatch() {
-    if (!selectedHebrew || !selectedEnglish) return;
-
-    const wordIndex = currentWords.findIndex(w => w.english === selectedEnglish.dataset.english);
-    matchAttempts[wordIndex]++;
-    const timeTaken = (Date.now() - wordStartTime) / 1000;
-    const isMatch = selectedHebrew.dataset.english === selectedEnglish.dataset.english;
-
-    if (isMatch) {
-        matches++;
-        matchTimes.push(timeTaken);
-
-        score += matchAttempts[wordIndex] === 1 ? 10 : 5;
-        scoreDisplay.textContent = `ניקוד: ${score}`;
-
-        const matchedDiv = document.createElement('div');
-        matchedDiv.className = 'matched-pair';
-        matchedDiv.innerHTML = `${selectedHebrew.textContent} - ${selectedEnglish.textContent} 😊`;
-        englishColumn.appendChild(matchedDiv);
-
-        // השמעת המילה בעברית
-        const hebrewUtterance = new SpeechSynthesisUtterance(selectedHebrew.textContent);
-        hebrewUtterance.lang = 'he-IL'; // שפה עברית
-        hebrewUtterance.rate = 0.9; // מהירות קצת איטית יותר לבהירות
-        window.speechSynthesis.speak(hebrewUtterance);
-
-        // השמעת המילה באנגלית לאחר העברית
-        hebrewUtterance.onend = () => {
-            const englishUtterance = new SpeechSynthesisUtterance(selectedEnglish.textContent);
-            englishUtterance.lang = 'en-US'; // שפה אנגלית
-            englishUtterance.rate = 0.9;
-            window.speechSynthesis.speak(englishUtterance);
-        };
-
-        selectedHebrew.remove();
-        selectedEnglish.remove();
-        addConfetti();
-
-        if (matches === 10) {
-            endGame();
+        function checkVoices() {
+            const voices = window.speechSynthesis.getVoices();
+            console.log("Available voices:", voices);
+            if (voices.length === 0) {
+                console.log("No voices available yet, waiting for voices to load...");
+                window.speechSynthesis.onvoiceschanged = () => {
+                    const loadedVoices = window.speechSynthesis.getVoices();
+                    console.log("Voices loaded:", loadedVoices);
+                };
+            } else {
+                console.log("Voices are ready!");
+            }
         }
-    } else {
-        totalMistakes++;
-        matchMistakes[wordIndex]++;
-        alert('אופס! נסה שוב!');
-    }
 
-    selectedHebrew.classList.remove('selected');
-    selectedEnglish.classList.remove('selected');
-    selectedHebrew = null;
-    selectedEnglish = null;
-    wordStartTime = null;
-    checkButton.disabled = true;
-}
+        function checkMatch() {
+            if (!selectedHebrew || !selectedEnglish) return;
+
+            const wordIndex = currentWords.findIndex(w => w.english === selectedEnglish.dataset.english);
+            matchAttempts[wordIndex]++;
+            const timeTaken = (Date.now() - wordStartTime) / 1000;
+            const isMatch = selectedHebrew.dataset.english === selectedEnglish.dataset.english;
+
+            if (isMatch) {
+                matches++;
+                matchTimes.push(timeTaken);
+
+                score += matchAttempts[wordIndex] === 1 ? 10 : 5;
+                scoreDisplay.textContent = `ניקוד: ${score}`;
+
+                const matchedDiv = document.createElement('div');
+                matchedDiv.className = 'matched-pair';
+                matchedDiv.innerHTML = `${selectedHebrew.textContent} - ${selectedEnglish.textContent} 😊`;
+                englishColumn.appendChild(matchedDiv);
+
+                // השמעת המילים
+                let voices = window.speechSynthesis.getVoices();
+                if (voices.length === 0) {
+                    console.log("Voices not loaded yet, waiting...");
+                    window.speechSynthesis.onvoiceschanged = () => {
+                        voices = window.speechSynthesis.getVoices();
+                        playWords(voices);
+                    };
+                } else {
+                    playWords(voices);
+                }
+
+                selectedHebrew.remove();
+                selectedEnglish.remove();
+                addConfetti();
+
+                if (matches === 10) {
+                    endGame();
+                }
+            } else {
+                totalMistakes++;
+                matchMistakes[wordIndex]++;
+                alert('אופס! נסה שוב!');
+            }
+
+            selectedHebrew.classList.remove('selected');
+            selectedEnglish.classList.remove('selected');
+            selectedHebrew = null;
+            selectedEnglish = null;
+            wordStartTime = null;
+            checkButton.disabled = true;
+        }
+
+        function playWords(voices) {
+            console.log("Playing words with voices:", voices);
+
+            const hebrewVoice = voices.find(v => v.lang === 'he-IL') || voices[0];
+            const hebrewUtterance = new SpeechSynthesisUtterance(selectedHebrew.textContent);
+            hebrewUtterance.lang = 'he-IL';
+            hebrewUtterance.rate = 0.9;
+            hebrewUtterance.voice = hebrewVoice;
+            console.log(`Playing Hebrew: ${selectedHebrew.textContent} with voice:`, hebrewVoice);
+            window.speechSynthesis.speak(hebrewUtterance);
+
+            hebrewUtterance.onend = () => {
+                const englishVoice = voices.find(v => v.lang === 'en-US') || voices[0];
+                const englishUtterance = new SpeechSynthesisUtterance(selectedEnglish.textContent);
+                englishUtterance.lang = 'en-US';
+                englishUtterance.rate = 0.9;
+                englishUtterance.voice = englishVoice;
+                console.log(`Playing English: ${selectedEnglish.textContent} with voice:`, englishVoice);
+                window.speechSynthesis.speak(englishUtterance);
+            };
+        }
 
         function addConfetti() {
             for (let i = 0; i < 50; i++) {
