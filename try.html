@@ -296,7 +296,6 @@
         let startTime = null;
         let wordStartTime = null;
         let currentWords = [];
-        let speechSynthAvailable = false;
 
         function shuffle(array) {
             for (let i = array.length - 1; i > 0; i--) {
@@ -353,14 +352,7 @@
                 console.log(`Added English word ${index + 1}: ${word.english}`);
             });
 
-            // בדיקת תמיכה בדיבור
-            if ('speechSynthesis' in window) {
-                checkVoices();
-                speechSynthAvailable = true;
-            } else {
-                console.log("Speech synthesis not supported");
-                speechSynthAvailable = false;
-            }
+            checkVoices(); // בדיקת קולות בהתחלה
         }
 
         function selectWord(element, type) {
@@ -381,32 +373,14 @@
         function checkVoices() {
             const voices = window.speechSynthesis.getVoices();
             console.log("Available voices:", voices);
-            
             if (voices.length === 0) {
                 console.log("No voices available yet, waiting for voices to load...");
                 window.speechSynthesis.onvoiceschanged = () => {
                     const loadedVoices = window.speechSynthesis.getVoices();
                     console.log("Voices loaded:", loadedVoices);
-                    
-                    // Check which languages are available
-                    const languages = loadedVoices.map(voice => voice.lang);
-                    console.log("Available languages:", languages);
-                    
-                    // Check if Hebrew is available in any form
-                    const hebrewVoices = loadedVoices.filter(voice => 
-                        voice.lang.startsWith('he') || voice.name.includes('Hebrew'));
-                    console.log("Hebrew voices:", hebrewVoices);
                 };
             } else {
                 console.log("Voices are ready!");
-                // Check which languages are available
-                const languages = voices.map(voice => voice.lang);
-                console.log("Available languages:", languages);
-                
-                // Check if Hebrew is available in any form
-                const hebrewVoices = voices.filter(voice => 
-                    voice.lang.startsWith('he') || voice.name.includes('Hebrew'));
-                console.log("Hebrew voices:", hebrewVoices);
             }
         }
 
@@ -431,18 +405,16 @@
                 englishColumn.appendChild(matchedDiv);
 
                 // Store the selected words before removing them from the DOM
+                // This fixes the error where we try to access the textContent after the elements are removed
                 const hebrewText = selectedHebrew.textContent;
                 const englishText = selectedEnglish.textContent;
+
+                // השמעת המילים
+                playWords(hebrewText, englishText);
 
                 // Remove words from the game board after storing their text content
                 selectedHebrew.remove();
                 selectedEnglish.remove();
-                
-                // השמעת המילים
-                if (speechSynthAvailable) {
-                    playWords(hebrewText, englishText);
-                }
-                
                 addConfetti();
 
                 if (matches === 10) {
@@ -463,60 +435,41 @@
         }
 
         function playWords(hebrewText, englishText) {
-            // Cancel any ongoing speech first
-            window.speechSynthesis.cancel();
-            
-            // Force Hebrew voice to speak Hebrew properly - this is the key fix
-            speakWord(hebrewText, true);
-            
-            // After a delay, speak the English word
-            setTimeout(() => {
-                speakWord(englishText, false);
-            }, 1000);
+            let voices = window.speechSynthesis.getVoices();
+            if (voices.length === 0) {
+                console.log("Voices not loaded yet, waiting...");
+                window.speechSynthesis.onvoiceschanged = () => {
+                    voices = window.speechSynthesis.getVoices();
+                    playWordsWithVoices(hebrewText, englishText, voices);
+                };
+            } else {
+                playWordsWithVoices(hebrewText, englishText, voices);
+            }
         }
 
-        function speakWord(text, isHebrew) {
-            const utterance = new SpeechSynthesisUtterance(text);
+        function playWordsWithVoices(hebrewText, englishText, voices) {
+            console.log("Playing words with voices:", voices);
+
+            const hebrewVoice = voices.find(v => v.lang === 'he-IL') || voices[0];
+            const hebrewUtterance = new SpeechSynthesisUtterance(hebrewText);
+            hebrewUtterance.lang = 'he-IL';
+            hebrewUtterance.rate = 0.9;
+            hebrewUtterance.voice = hebrewVoice;
+            console.log(`Playing Hebrew: ${hebrewText} with voice:`, hebrewVoice);
             
-            // Choose the appropriate voice and language
-            if (isHebrew) {
-                utterance.lang = 'he-IL';
-                console.log(`Speaking Hebrew: ${text} with language: he-IL`);
-            } else {
-                utterance.lang = 'en-US';
-                console.log(`Speaking English: ${text} with language: en-US`);
-            }
+            const englishVoice = voices.find(v => v.lang === 'en-US') || voices[0];
+            const englishUtterance = new SpeechSynthesisUtterance(englishText);
+            englishUtterance.lang = 'en-US';
+            englishUtterance.rate = 0.9;
+            englishUtterance.voice = englishVoice;
             
-            // Set a moderate speech rate
-            utterance.rate = 0.9;
+            // Play Hebrew first, then English
+            hebrewUtterance.onend = () => {
+                console.log(`Playing English: ${englishText} with voice:`, englishVoice);
+                window.speechSynthesis.speak(englishUtterance);
+            };
             
-            // If there are specific voices available, we can try to use them
-            const voices = window.speechSynthesis.getVoices();
-            if (voices.length > 0) {
-                if (isHebrew) {
-                    // Try to find a Hebrew voice or any voice that might work for Hebrew
-                    const hebrewVoice = voices.find(v => v.lang === 'he-IL') || 
-                        voices.find(v => v.lang.startsWith('he')) ||
-                        voices.find(v => v.name.includes('Hebrew'));
-                        
-                    if (hebrewVoice) {
-                        utterance.voice = hebrewVoice;
-                        console.log("Using Hebrew voice:", hebrewVoice);
-                    }
-                } else {
-                    // For English, find an English voice
-                    const englishVoice = voices.find(v => v.lang === 'en-US') || 
-                        voices.find(v => v.lang.startsWith('en'));
-                        
-                    if (englishVoice) {
-                        utterance.voice = englishVoice;
-                        console.log("Using English voice:", englishVoice);
-                    }
-                }
-            }
-            
-            // Speak the word
-            window.speechSynthesis.speak(utterance);
+            window.speechSynthesis.speak(hebrewUtterance);
         }
 
         function addConfetti() {
