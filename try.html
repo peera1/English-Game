@@ -58,7 +58,7 @@
             color: white;
             padding: 8px;
             border-radius: 5px;
-            cursor: pointer;
+础            cursor: pointer;
             font-size: 1.1em;
             transition: all 0.3s;
             z-index: 2;
@@ -100,6 +100,13 @@
             font-size: 1.2em;
             color: #2196f3;
             margin-bottom: 10px;
+        }
+
+        #combo {
+            font-size: 1.2em;
+            color: #ff9800;
+            margin-bottom: 10px;
+            display: none;
         }
 
         #result {
@@ -166,6 +173,7 @@
             .platform { font-size: 1.2em; }
             #score { font-size: 1.5em; }
             #height { font-size: 1.4em; }
+            #combo { font-size: 1.3em; }
             #play-again { padding: 10px 20px; font-size: 1.2em; }
             #result h2 { font-size: 2.5em; }
         }
@@ -176,6 +184,7 @@
         <h1>מגדל המילים</h1>
         <div id="score">ניקוד: 0</div>
         <div id="height">גובה: 0 מטר</div>
+        <div id="combo"></div>
         <div id="tower">
             <div id="player"></div>
         </div>
@@ -185,6 +194,7 @@
         <p>ניקוד סופי: <span id="final-score"></span></p>
         <p>גובה מרבי: <span id="max-height"></span> מטר</p>
         <p>זמן כולל: <span id="total-time"></span> שניות</p>
+        <p>רצף מרבי: <span id="max-combo"></span></p>
         <button id="play-again">שחק שוב</button>
     </div>
 
@@ -295,23 +305,29 @@ const words = [
         const player = document.getElementById('player');
         const scoreDisplay = document.getElementById('score');
         const heightDisplay = document.getElementById('height');
+        const comboDisplay = document.getElementById('combo');
         const resultDiv = document.getElementById('result');
         const finalScoreDisplay = document.getElementById('final-score');
         const maxHeightDisplay = document.getElementById('max-height');
         const totalTimeDisplay = document.getElementById('total-time');
+        const maxComboDisplay = document.getElementById('max-combo');
         const playAgainButton = document.getElementById('play-again');
 
         let score = 0;
         let height = 0;
+        let combo = 0;
+        let maxCombo = 0;
         let platforms = [];
         let selectedHebrew = null;
         let selectedEnglish = null;
         let startTime = null;
+        let lastMatchTime = null;
         let gameInterval = null;
         let playerY = 20;
         let velocity = 0;
         const gravity = 0.5;
         const jumpPower = 15;
+        const platformSpeed = 1;
 
         function shuffle(array) {
             for (let i = array.length - 1; i > 0; i--) {
@@ -324,25 +340,32 @@ const words = [
         function initGame() {
             score = 0;
             height = 0;
+            combo = 0;
+            maxCombo = 0;
             platforms = [];
             selectedHebrew = null;
             selectedEnglish = null;
             startTime = Date.now();
+            lastMatchTime = null;
             playerY = 20;
             velocity = 0;
             scoreDisplay.textContent = `ניקוד: ${score}`;
             heightDisplay.textContent = `גובה: ${height} מטר`;
+            comboDisplay.style.display = 'none';
             resultDiv.style.display = 'none';
             tower.innerHTML = '<div id="player"></div>';
 
-            const shuffledWords = shuffle([...words]).slice(0, 20);
-            generatePlatforms(shuffledWords);
-
+            generateInitialPlatforms();
             if (gameInterval) clearInterval(gameInterval);
             gameInterval = setInterval(updateGame, 1000 / 60);
         }
 
-        function generatePlatforms(wordList) {
+        function generateInitialPlatforms() {
+            const shuffledWords = shuffle([...words]).slice(0, 10);
+            generatePlatforms(shuffledWords, 0);
+        }
+
+        function generatePlatforms(wordList, startHeight) {
             const towerHeight = tower.clientHeight;
             wordList.forEach((word, index) => {
                 const hebrewPlatform = document.createElement('div');
@@ -350,7 +373,7 @@ const words = [
                 hebrewPlatform.textContent = word.hebrew;
                 hebrewPlatform.dataset.english = word.english;
                 hebrewPlatform.style.left = '5%';
-                hebrewPlatform.style.bottom = `${50 + index * 100}px`;
+                hebrewPlatform.style.bottom = `${startHeight + 50 + index * 100}px`;
                 hebrewPlatform.addEventListener('click', () => selectPlatform(hebrewPlatform, 'hebrew'));
 
                 const englishPlatform = document.createElement('div');
@@ -358,7 +381,7 @@ const words = [
                 englishPlatform.textContent = word.english;
                 englishPlatform.dataset.english = word.english;
                 englishPlatform.style.right = '5%';
-                englishPlatform.style.bottom = `${50 + index * 100 + 50}px`;
+                englishPlatform.style.bottom = `${startHeight + 50 + index * 100 + 50}px`;
                 englishPlatform.addEventListener('click', () => selectPlatform(englishPlatform, 'english'));
 
                 tower.appendChild(hebrewPlatform);
@@ -384,28 +407,43 @@ const words = [
         }
 
         function checkMatch() {
+            const currentTime = Date.now();
+            const timeSinceLastMatch = lastMatchTime ? (currentTime - lastMatchTime) / 1000 : 999;
+
             if (selectedHebrew.dataset.english === selectedEnglish.dataset.english) {
-                score += 10;
+                score += 10 + combo * 5; // בונוס לרצף
                 height += 5;
+                combo = timeSinceLastMatch < 3 ? combo + 1 : 1; // רצף נמשך אם פחות מ-3 שניות
+                maxCombo = Math.max(maxCombo, combo);
                 scoreDisplay.textContent = `ניקוד: ${score}`;
                 heightDisplay.textContent = `גובה: ${height} מטר`;
+
+                if (combo > 1) {
+                    comboDisplay.textContent = `רצף: x${combo} 🔥`;
+                    comboDisplay.style.display = 'block';
+                    playComboSound(combo);
+                } else {
+                    comboDisplay.style.display = 'none';
+                }
 
                 selectedHebrew.classList.add('matched');
                 selectedEnglish.classList.add('matched');
                 selectedHebrew.style.pointerEvents = 'none';
                 selectedEnglish.style.pointerEvents = 'none';
 
-                velocity = jumpPower; // קפיצה לאחר התאמה
+                velocity = jumpPower;
                 addConfetti();
+                lastMatchTime = currentTime;
 
                 setTimeout(() => {
                     platforms = platforms.filter(p => p !== selectedHebrew && p !== selectedEnglish);
                     selectedHebrew.remove();
                     selectedEnglish.remove();
-                    if (platforms.length === 0) endGame();
                 }, 500);
             } else {
                 score -= 5;
+                combo = 0;
+                comboDisplay.style.display = 'none';
                 scoreDisplay.textContent = `ניקוד: ${score}`;
                 alert('אופס! נסה שוב!');
             }
@@ -414,6 +452,13 @@ const words = [
             selectedEnglish.classList.remove('selected');
             selectedHebrew = null;
             selectedEnglish = null;
+        }
+
+        function playComboSound(combo) {
+            const utterance = new SpeechSynthesisUtterance(combo > 3 ? "מדהים!" : "כל הכבוד!");
+            utterance.lang = 'he-IL';
+            utterance.rate = 1.2;
+            window.speechSynthesis.speak(utterance);
         }
 
         function updateGame() {
@@ -426,27 +471,33 @@ const words = [
             }
             player.style.bottom = `${playerY}px`;
 
-            // גלילה של המגדל כשהשחקן עולה
+            // גלילה של המגדל
             const towerBottom = parseInt(tower.scrollTop);
             const playerScreenY = playerY + towerBottom;
             if (playerScreenY > tower.clientHeight * 0.7) {
                 tower.scrollTop += playerScreenY - tower.clientHeight * 0.7;
             }
 
-            // סיום משחק אם השחקן נופל מתחת למסך
+            // סיום משחק אם השחקן נופל
             if (playerScreenY < -50) {
                 endGame();
             }
 
-            // הזזת פלטפורמות כלפי מטה
+            // הזזת פלטפורמות והוספת חדשות
             platforms.forEach(platform => {
-                const bottom = parseInt(platform.style.bottom) - 1;
+                const bottom = parseInt(platform.style.bottom) - platformSpeed;
                 platform.style.bottom = `${bottom}px`;
                 if (bottom < -50) {
                     platform.remove();
                     platforms = platforms.filter(p => p !== platform);
                 }
             });
+
+            // יצירת פלטפורמות חדשות כשאין מספיק
+            if (platforms.length < 10) {
+                const newWords = shuffle([...words]).slice(0, 5);
+                generatePlatforms(newWords, tower.scrollTop + tower.clientHeight);
+            }
         }
 
         function addConfetti() {
@@ -467,6 +518,7 @@ const words = [
             finalScoreDisplay.textContent = score;
             maxHeightDisplay.textContent = height;
             totalTimeDisplay.textContent = totalTime.toFixed(1);
+            maxComboDisplay.textContent = maxCombo;
         }
 
         playAgainButton.addEventListener('click', initGame);
