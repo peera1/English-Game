@@ -3,23 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>משחק התאמת מילים לילדים</title>
+    <title>משחק התאמת מילים - מגדל המילים</title>
     <style>
         body {
             font-family: 'Comic Sans MS', Arial, 'Noto Sans Hebrew', sans-serif;
-            background: linear-gradient(to bottom, #ffeb3b, #ff9800);
+            background: linear-gradient(to bottom, #87ceeb, #1e90ff);
             display: flex;
             justify-content: center;
             align-items: flex-start;
             min-height: 100vh;
             margin: 0;
             padding: 10px;
-            overflow-y: auto;
+            overflow: hidden;
             position: relative;
         }
 
         .game-container {
-            background: #fff;
+            background: rgba(255, 255, 255, 0.9);
             border-radius: 20px;
             padding: 15px;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
@@ -29,91 +29,77 @@
             position: relative;
             z-index: 1;
             box-sizing: border-box;
+            height: 90vh;
+            overflow: hidden;
         }
 
         h1 {
             color: #ff5722;
             font-size: 2em;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
         }
 
-        .columns {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            margin-bottom: 15px;
-        }
-
-        .column {
-            width: 100%;
-            background: #e0f7fa;
+        #tower {
+            position: relative;
+            height: 70vh;
+            overflow-y: auto;
+            overflow-x: hidden;
+            background: linear-gradient(to bottom, #e0f7fa, #b0e0e6);
             border-radius: 10px;
             padding: 10px;
-            min-height: 200px;
-            max-height: 50vh;
-            overflow-y: auto;
-            margin-bottom: 10px;
-            box-sizing: border-box;
+            transition: all 0.5s ease;
         }
 
-        .word {
+        .platform {
+            position: absolute;
+            width: 40%;
             background: #4caf50;
             color: white;
             padding: 8px;
-            margin: 5px 0;
             border-radius: 5px;
             cursor: pointer;
             font-size: 1.1em;
-            transition: transform 0.2s;
+            transition: all 0.3s;
+            z-index: 2;
         }
 
-        .word:hover {
+        .platform:hover {
             transform: scale(1.05);
         }
 
-        .word.selected {
+        .platform.selected {
             background: #ff9800;
         }
 
-        .matched-pair {
+        .platform.matched {
             background: #ffeb3b;
             color: #333;
-            padding: 8px;
-            margin: 5px 0;
-            border-radius: 5px;
-            font-size: 1.1em;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        }
+
+        #player {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 40px;
+            background: url('https://img.icons8.com/emoji/48/000000/boy.png') no-repeat center;
+            background-size: contain;
+            transition: all 0.3s ease;
+            z-index: 3;
         }
 
         #score {
             font-size: 1.3em;
             color: #d81b60;
+            margin: 10px 0;
+        }
+
+        #height {
+            font-size: 1.2em;
+            color: #2196f3;
             margin-bottom: 10px;
-        }
-
-        #check-button {
-            padding: 8px 16px;
-            font-size: 1.1em;
-            color: #fff;
-            background: #2196f3;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            margin: 10px auto;
-            display: block;
-            transition: background 0.3s;
-        }
-
-        #check-button:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-        }
-
-        #check-button:hover:not(:disabled) {
-            background: #1976d2;
         }
 
         #result {
@@ -129,9 +115,7 @@
             text-align: center;
             width: 90%;
             max-width: 700px;
-            max-height: 80vh;
-            overflow-y: auto;
-            z-index: 2;
+            z-index: 4;
             animation: popIn 0.5s ease-out;
         }
 
@@ -145,26 +129,6 @@
             color: #fff;
             font-size: 2em;
             margin-bottom: 15px;
-        }
-
-        #result table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 15px 0;
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 10px;
-            font-size: 0.9em;
-        }
-
-        #result th, #result td {
-            padding: 8px;
-            border: 1px solid #ddd;
-            color: #333;
-        }
-
-        #result th {
-            background: #4caf50;
-            color: white;
         }
 
         #play-again {
@@ -198,104 +162,156 @@
         }
 
         @media (min-width: 768px) {
-            .columns {
-                flex-direction: row;
-            }
-            .column {
-                width: 45%;
-                margin-bottom: 0;
-            }
-            h1 {
-                font-size: 2.5em;
-            }
-            .word, .matched-pair {
-                font-size: 1.2em;
-            }
-            #score {
-                font-size: 1.5em;
-            }
-            #check-button, #play-again {
-                padding: 10px 20px;
-                font-size: 1.2em;
-            }
-            #result h2 {
-                font-size: 2.5em;
-            }
-            #result table {
-                font-size: 1em;
-            }
+            h1 { font-size: 2.5em; }
+            .platform { font-size: 1.2em; }
+            #score { font-size: 1.5em; }
+            #height { font-size: 1.4em; }
+            #play-again { padding: 10px 20px; font-size: 1.2em; }
+            #result h2 { font-size: 2.5em; }
         }
     </style>
 </head>
 <body>
     <div class="game-container">
-        <h1>משחק התאמת מילים לילדים</h1>
+        <h1>מגדל המילים</h1>
         <div id="score">ניקוד: 0</div>
-        <div class="columns">
-            <div class="column" id="hebrew-words">
-                <h2>מילים בעברית</h2>
-            </div>
-            <div class="column" id="english-words">
-                <h2>מילים באנגלית</h2>
-            </div>
+        <div id="height">גובה: 0 מטר</div>
+        <div id="tower">
+            <div id="player"></div>
         </div>
-        <button id="check-button" disabled>בדוק התאמה</button>
     </div>
     <div id="result">
         <h2>כל הכבוד! 🎉</h2>
         <p>ניקוד סופי: <span id="final-score"></span></p>
+        <p>גובה מרבי: <span id="max-height"></span> מטר</p>
         <p>זמן כולל: <span id="total-time"></span> שניות</p>
-        <p>סה"כ טעויות: <span id="total-mistakes"></span></p>
-        <table>
-            <thead>
-                <tr>
-                    <th>מילה (עברית - אנגלית)</th>
-                    <th>זמן (שניות)</th>
-                    <th>ניסיונות</th>
-                    <th>טעויות</th>
-                </tr>
-            </thead>
-            <tbody id="match-details"></tbody>
-        </table>
         <button id="play-again">שחק שוב</button>
     </div>
 
     <script>
-        const words = [
-            { hebrew: "חתול", english: "Cat" },
-            { hebrew: "דג", english: "Fish" },
-            { hebrew: "ציפור", english: "Bird" },
-            { hebrew: "אריה", english: "Lion" },
-            { hebrew: "פיל", english: "Elephant" },
-            { hebrew: "סוס", english: "Horse" },
-            { hebrew: "פרה", english: "Cow" },
-            { hebrew: "תרנגולת", english: "Chicken" },
-            { hebrew: "ברווז", english: "Duck" },
-            { hebrew: "עכבר", english: "Mouse" }
-        ];
+const words = [
+    { hebrew: "חתול", english: "Cat" },
+    { hebrew: "דג", english: "Fish" },
+    { hebrew: "ציפור", english: "Bird" },
+    { hebrew: "אריה", english: "Lion" },
+    { hebrew: "פיל", english: "Elephant" },
+    { hebrew: "סוס", english: "Horse" },
+    { hebrew: "פרה", english: "Cow" },
+    { hebrew: "תרנגולת", english: "Chicken" },
+    { hebrew: "ברווז", english: "Duck" },
+    { hebrew: "עכבר", english: "Mouse" },
+    { hebrew: "כלב", english: "Dog" },
+    { hebrew: "נמר", english: "Tiger" },
+    { hebrew: "זאב", english: "Wolf" },
+    { hebrew: "שועל", english: "Fox" },
+    { hebrew: "חמור", english: "Donkey" },
+    { hebrew: "עז", english: "Goat" },
+    { hebrew: "כבש", english: "Sheep" },
+    { hebrew: "חזיר", english: "Pig" },
+    { hebrew: "צב", english: "Turtle" },
+    { hebrew: "נחש", english: "Snake" },
+    { hebrew: "תנין", english: "Crocodile" },
+    { hebrew: "קוף", english: "Monkey" },
+    { hebrew: "גמל", english: "Camel" },
+    { hebrew: "דב", english: "Bear" },
+    { hebrew: "עטלף", english: "Bat" },
+    { hebrew: "ארנב", english: "Rabbit" },
+    { hebrew: "סנאי", english: "Squirrel" },
+    { hebrew: "צפרדע", english: "Frog" },
+    { hebrew: "פרפר", english: "Butterfly" },
+    { hebrew: "דבורה", english: "Bee" },
+    { hebrew: "נמלה", english: "Ant" },
+    { hebrew: "זבוב", english: "Fly" },
+    { hebrew: "יתוש", english: "Mosquito" },
+    { hebrew: "עכביש", english: "Spider" },
+    { hebrew: "תולעת", english: "Worm" },
+    { hebrew: "חיפושית", english: "Beetle" },
+    { hebrew: "שמש", english: "Sun" },
+    { hebrew: "ירח", english: "Moon" },
+    { hebrew: "כוכב", english: "Star" },
+    { hebrew: "ענן", english: "Cloud" },
+    { hebrew: "גשם", english: "Rain" },
+    { hebrew: "שלג", english: "Snow" },
+    { hebrew: "רוח", english: "Wind" },
+    { hebrew: "ים", english: "Sea" },
+    { hebrew: "נהר", english: "River" },
+    { hebrew: "אגם", english: "Lake" },
+    { hebrew: "הר", english: "Mountain" },
+    { hebrew: "יער", english: "Forest" },
+    { hebrew: "שדה", english: "Field" },
+    { hebrew: "פרח", english: "Flower" },
+    { hebrew: "עץ", english: "Tree" },
+    { hebrew: "שולחן", english: "Table" },
+    { hebrew: "כיסא", english: "Chair" },
+    { hebrew: "מיטה", english: "Bed" },
+    { hebrew: "חלון", english: "Window" },
+    { hebrew: "דלת", english: "Door" },
+    { hebrew: "בית", english: "House" },
+    { hebrew: "מכונית", english: "Car" },
+    { hebrew: "אופניים", english: "Bicycle" },
+    { hebrew: "אוטובוס", english: "Bus" },
+    { hebrew: "רכבת", english: "Train" },
+    { hebrew: "מטוס", english: "Airplane" },
+    { hebrew: "סירה", english: "Boat" },
+    { hebrew: "כדור", english: "Ball" },
+    { hebrew: "ספר", english: "Book" },
+    { hebrew: "עיפרון", english: "Pencil" },
+    { hebrew: "מחברת", english: "Notebook" },
+    { hebrew: "תיק", english: "Bag" },
+    { hebrew: "שעון", english: "Clock" },
+    { hebrew: "טלפון", english: "Phone" },
+    { hebrew: "מחשב", english: "Computer" },
+    { hebrew: "טלוויזיה", english: "Television" },
+    { hebrew: "מקרר", english: "Refrigerator" },
+    { hebrew: "תנור", english: "Oven" },
+    { hebrew: "כוס", english: "Cup" },
+    { hebrew: "צלחת", english: "Plate" },
+    { hebrew: "סכין", english: "Knife" },
+    { hebrew: "מזלג", english: "Fork" },
+    { hebrew: "כף", english: "Spoon" },
+    { hebrew: "לחם", english: "Bread" },
+    { hebrew: "גבינה", english: "Cheese" },
+    { hebrew: "חלב", english: "Milk" },
+    { hebrew: "מיץ", english: "Juice" },
+    { hebrew: "תפוח", english: "Apple" },
+    { hebrew: "בננה", english: "Banana" },
+    { hebrew: "תפוז", english: "Orange" },
+    { hebrew: "ענבים", english: "Grapes" },
+    { hebrew: "מלון", english: "Melon" },
+    { hebrew: "אבטיח", english: "Watermelon" },
+    { hebrew: "עגבנייה", english: "Tomato" },
+    { hebrew: "מלפפון", english: "Cucumber" },
+    { hebrew: "גזר", english: "Carrot" },
+    { hebrew: "תפוד", english: "Potato" },
+    { hebrew: "בצל", english: "Onion" },
+    { hebrew: "שום", english: "Garlic" },
+    { hebrew: "מלח", english: "Salt" },
+    { hebrew: "פלפל", english: "Pepper" },
+    { hebrew: "סוכר", english: "Sugar" },
+    { hebrew: "שוקולד", english: "Chocolate" }
+];
 
-        const hebrewColumn = document.getElementById('hebrew-words');
-        const englishColumn = document.getElementById('english-words');
+        const tower = document.getElementById('tower');
+        const player = document.getElementById('player');
         const scoreDisplay = document.getElementById('score');
-        const checkButton = document.getElementById('check-button');
+        const heightDisplay = document.getElementById('height');
         const resultDiv = document.getElementById('result');
         const finalScoreDisplay = document.getElementById('final-score');
+        const maxHeightDisplay = document.getElementById('max-height');
         const totalTimeDisplay = document.getElementById('total-time');
-        const totalMistakesDisplay = document.getElementById('total-mistakes');
-        const matchDetails = document.getElementById('match-details');
         const playAgainButton = document.getElementById('play-again');
 
         let score = 0;
-        let matches = 0;
-        let totalMistakes = 0;
-        let matchTimes = [];
-        let matchAttempts = [];
-        let matchMistakes = [];
+        let height = 0;
+        let platforms = [];
         let selectedHebrew = null;
         let selectedEnglish = null;
         let startTime = null;
-        let wordStartTime = null;
-        let currentWords = [];
+        let gameInterval = null;
+        let playerY = 20;
+        let velocity = 0;
+        const gravity = 0.5;
+        const jumpPower = 15;
 
         function shuffle(array) {
             for (let i = array.length - 1; i > 0; i--) {
@@ -306,56 +322,52 @@
         }
 
         function initGame() {
-            console.log("Initializing game...");
-            hebrewColumn.innerHTML = '<h2>מילים בעברית</h2>';
-            englishColumn.innerHTML = '<h2>מילים באנגלית</h2>';
             score = 0;
-            matches = 0;
-            totalMistakes = 0;
-            matchTimes = [];
-            matchAttempts = new Array(10).fill(0);
-            matchMistakes = new Array(10).fill(0);
+            height = 0;
+            platforms = [];
             selectedHebrew = null;
             selectedEnglish = null;
             startTime = Date.now();
-            wordStartTime = null;
+            playerY = 20;
+            velocity = 0;
             scoreDisplay.textContent = `ניקוד: ${score}`;
+            heightDisplay.textContent = `גובה: ${height} מטר`;
             resultDiv.style.display = 'none';
-            checkButton.disabled = true;
+            tower.innerHTML = '<div id="player"></div>';
 
-            const shuffledWords = shuffle([...words]);
-            currentWords = shuffledWords.slice(0, 10);
-            console.log("Selected 10 words:", currentWords);
+            const shuffledWords = shuffle([...words]).slice(0, 20);
+            generatePlatforms(shuffledWords);
 
-            const shuffledHebrew = shuffle([...currentWords]);
-            const shuffledEnglish = shuffle([...currentWords]);
-
-            shuffledHebrew.forEach((word, index) => {
-                const div = document.createElement('div');
-                div.className = 'word';
-                div.textContent = word.hebrew;
-                div.dataset.english = word.english;
-                div.dataset.hebrew = word.hebrew;
-                div.addEventListener('click', () => selectWord(div, 'hebrew'));
-                hebrewColumn.appendChild(div);
-                console.log(`Added Hebrew word ${index + 1}: ${word.hebrew}`);
-            });
-
-            shuffledEnglish.forEach((word, index) => {
-                const div = document.createElement('div');
-                div.className = 'word';
-                div.textContent = word.english;
-                div.dataset.english = word.english;
-                div.dataset.hebrew = word.hebrew;
-                div.addEventListener('click', () => selectWord(div, 'english'));
-                englishColumn.appendChild(div);
-                console.log(`Added English word ${index + 1}: ${word.english}`);
-            });
-
-            checkVoices(); // בדיקת קולות בהתחלה
+            if (gameInterval) clearInterval(gameInterval);
+            gameInterval = setInterval(updateGame, 1000 / 60);
         }
 
-        function selectWord(element, type) {
+        function generatePlatforms(wordList) {
+            const towerHeight = tower.clientHeight;
+            wordList.forEach((word, index) => {
+                const hebrewPlatform = document.createElement('div');
+                hebrewPlatform.className = 'platform';
+                hebrewPlatform.textContent = word.hebrew;
+                hebrewPlatform.dataset.english = word.english;
+                hebrewPlatform.style.left = '5%';
+                hebrewPlatform.style.bottom = `${50 + index * 100}px`;
+                hebrewPlatform.addEventListener('click', () => selectPlatform(hebrewPlatform, 'hebrew'));
+
+                const englishPlatform = document.createElement('div');
+                englishPlatform.className = 'platform';
+                englishPlatform.textContent = word.english;
+                englishPlatform.dataset.english = word.english;
+                englishPlatform.style.right = '5%';
+                englishPlatform.style.bottom = `${50 + index * 100 + 50}px`;
+                englishPlatform.addEventListener('click', () => selectPlatform(englishPlatform, 'english'));
+
+                tower.appendChild(hebrewPlatform);
+                tower.appendChild(englishPlatform);
+                platforms.push(hebrewPlatform, englishPlatform);
+            });
+        }
+
+        function selectPlatform(element, type) {
             if (type === 'hebrew') {
                 if (selectedHebrew) selectedHebrew.classList.remove('selected');
                 selectedHebrew = element;
@@ -366,63 +378,35 @@
                 selectedEnglish.classList.add('selected');
             }
 
-            if (!wordStartTime) wordStartTime = Date.now();
-            checkButton.disabled = !(selectedHebrew && selectedEnglish);
-        }
-
-        function checkVoices() {
-            const voices = window.speechSynthesis.getVoices();
-            console.log("Available voices:", voices);
-            if (voices.length === 0) {
-                console.log("No voices available yet, waiting for voices to load...");
-                window.speechSynthesis.onvoiceschanged = () => {
-                    const loadedVoices = window.speechSynthesis.getVoices();
-                    console.log("Voices loaded:", loadedVoices);
-                };
-            } else {
-                console.log("Voices are ready!");
+            if (selectedHebrew && selectedEnglish) {
+                checkMatch();
             }
         }
 
         function checkMatch() {
-            if (!selectedHebrew || !selectedEnglish) return;
-
-            const wordIndex = currentWords.findIndex(w => w.english === selectedEnglish.dataset.english);
-            matchAttempts[wordIndex]++;
-            const timeTaken = (Date.now() - wordStartTime) / 1000;
-            const isMatch = selectedHebrew.dataset.english === selectedEnglish.dataset.english;
-
-            if (isMatch) {
-                matches++;
-                matchTimes.push(timeTaken);
-
-                score += matchAttempts[wordIndex] === 1 ? 10 : 5;
+            if (selectedHebrew.dataset.english === selectedEnglish.dataset.english) {
+                score += 10;
+                height += 5;
                 scoreDisplay.textContent = `ניקוד: ${score}`;
+                heightDisplay.textContent = `גובה: ${height} מטר`;
 
-                const matchedDiv = document.createElement('div');
-                matchedDiv.className = 'matched-pair';
-                matchedDiv.innerHTML = `${selectedHebrew.textContent} - ${selectedEnglish.textContent} 😊`;
-                englishColumn.appendChild(matchedDiv);
+                selectedHebrew.classList.add('matched');
+                selectedEnglish.classList.add('matched');
+                selectedHebrew.style.pointerEvents = 'none';
+                selectedEnglish.style.pointerEvents = 'none';
 
-                // Store the selected words before removing them from the DOM
-                // This fixes the error where we try to access the textContent after the elements are removed
-                const hebrewText = selectedHebrew.textContent;
-                const englishText = selectedEnglish.textContent;
-
-                // השמעת המילים
-                playWords(hebrewText, englishText);
-
-                // Remove words from the game board after storing their text content
-                selectedHebrew.remove();
-                selectedEnglish.remove();
+                velocity = jumpPower; // קפיצה לאחר התאמה
                 addConfetti();
 
-                if (matches === 10) {
-                    endGame();
-                }
+                setTimeout(() => {
+                    platforms = platforms.filter(p => p !== selectedHebrew && p !== selectedEnglish);
+                    selectedHebrew.remove();
+                    selectedEnglish.remove();
+                    if (platforms.length === 0) endGame();
+                }, 500);
             } else {
-                totalMistakes++;
-                matchMistakes[wordIndex]++;
+                score -= 5;
+                scoreDisplay.textContent = `ניקוד: ${score}`;
                 alert('אופס! נסה שוב!');
             }
 
@@ -430,46 +414,39 @@
             selectedEnglish.classList.remove('selected');
             selectedHebrew = null;
             selectedEnglish = null;
-            wordStartTime = null;
-            checkButton.disabled = true;
         }
 
-        function playWords(hebrewText, englishText) {
-            let voices = window.speechSynthesis.getVoices();
-            if (voices.length === 0) {
-                console.log("Voices not loaded yet, waiting...");
-                window.speechSynthesis.onvoiceschanged = () => {
-                    voices = window.speechSynthesis.getVoices();
-                    playWordsWithVoices(hebrewText, englishText, voices);
-                };
-            } else {
-                playWordsWithVoices(hebrewText, englishText, voices);
+        function updateGame() {
+            // עדכון תנועת השחקן
+            velocity -= gravity;
+            playerY += velocity;
+            if (playerY < 20) {
+                playerY = 20;
+                velocity = 0;
             }
-        }
+            player.style.bottom = `${playerY}px`;
 
-        function playWordsWithVoices(hebrewText, englishText, voices) {
-            console.log("Playing words with voices:", voices);
+            // גלילה של המגדל כשהשחקן עולה
+            const towerBottom = parseInt(tower.scrollTop);
+            const playerScreenY = playerY + towerBottom;
+            if (playerScreenY > tower.clientHeight * 0.7) {
+                tower.scrollTop += playerScreenY - tower.clientHeight * 0.7;
+            }
 
-            const hebrewVoice = voices.find(v => v.lang === 'he-IL') || voices[0];
-            const hebrewUtterance = new SpeechSynthesisUtterance(hebrewText);
-            hebrewUtterance.lang = 'he-IL';
-            hebrewUtterance.rate = 0.9;
-            hebrewUtterance.voice = hebrewVoice;
-            console.log(`Playing Hebrew: ${hebrewText} with voice:`, hebrewVoice);
-            
-            const englishVoice = voices.find(v => v.lang === 'en-US') || voices[0];
-            const englishUtterance = new SpeechSynthesisUtterance(englishText);
-            englishUtterance.lang = 'en-US';
-            englishUtterance.rate = 0.9;
-            englishUtterance.voice = englishVoice;
-            
-            // Play Hebrew first, then English
-            hebrewUtterance.onend = () => {
-                console.log(`Playing English: ${englishText} with voice:`, englishVoice);
-                window.speechSynthesis.speak(englishUtterance);
-            };
-            
-            window.speechSynthesis.speak(hebrewUtterance);
+            // סיום משחק אם השחקן נופל מתחת למסך
+            if (playerScreenY < -50) {
+                endGame();
+            }
+
+            // הזזת פלטפורמות כלפי מטה
+            platforms.forEach(platform => {
+                const bottom = parseInt(platform.style.bottom) - 1;
+                platform.style.bottom = `${bottom}px`;
+                if (bottom < -50) {
+                    platform.remove();
+                    platforms = platforms.filter(p => p !== platform);
+                }
+            });
         }
 
         function addConfetti() {
@@ -484,26 +461,14 @@
         }
 
         function endGame() {
+            clearInterval(gameInterval);
             const totalTime = (Date.now() - startTime) / 1000;
             resultDiv.style.display = 'block';
             finalScoreDisplay.textContent = score;
+            maxHeightDisplay.textContent = height;
             totalTimeDisplay.textContent = totalTime.toFixed(1);
-            totalMistakesDisplay.textContent = totalMistakes;
-
-            matchDetails.innerHTML = '';
-            currentWords.forEach((word, index) => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${word.hebrew} - ${word.english}</td>
-                    <td>${matchTimes[index] ? matchTimes[index].toFixed(1) : '-'}</td>
-                    <td>${matchAttempts[index]}</td>
-                    <td>${matchMistakes[index]}</td>
-                `;
-                matchDetails.appendChild(tr);
-            });
         }
 
-        checkButton.addEventListener('click', checkMatch);
         playAgainButton.addEventListener('click', initGame);
 
         initGame();
