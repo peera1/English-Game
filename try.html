@@ -687,8 +687,8 @@ const words = [
         let level = 1;
         let totalMatches = 0;
 
-        // Create sound for successful match
-        const successSound = new Audio('https://www.myinstants.com/media/sounds/success.mp3');
+        // Create sound for end game celebration
+        const endGameSound = new Audio('https://www.myinstants.com/media/sounds/success.mp3');
 
         function shuffle(array) {
             for (let i = array.length - 1; i > 0; i--) {
@@ -824,10 +824,7 @@ const words = [
 
                 playMatch(hebrewText, englishText, sentenceText);
 
-                // Play success sound
-                successSound.play();
-
-                // Add confetti
+                // Add confetti (visual celebration without sound)
                 addConfetti();
 
                 // Show random encouragement message
@@ -973,6 +970,12 @@ const words = [
             finalScoreDisplay.textContent = score;
             totalTimeDisplay.textContent = totalTime.toFixed(1);
             totalMistakesDisplay.textContent = totalMistakes;
+
+            // Play celebration sound at the end
+            endGameSound.play();
+
+            // Add confetti for end game celebration
+            addConfetti();
 
             matchDetails.innerHTML = '';
             currentWords.forEach((word, index) => {
