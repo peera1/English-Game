@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>משחק התאמת מילים ומשפטים לילדים</title>
+    <title>משחק התאמת מילים לילדים</title>
     <style>
         body {
             font-family: 'Comic Sans MS', Arial, 'Noto Sans Hebrew', sans-serif;
@@ -38,6 +38,13 @@
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
         }
 
+        #level {
+            font-size: 1.3em;
+            color: #2196f3;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
         .columns {
             display: flex;
             flex-direction: column;
@@ -57,7 +64,7 @@
             box-sizing: border-box;
         }
 
-        .word, .sentence-option {
+        .word {
             background: #4caf50;
             color: white;
             padding: 8px;
@@ -65,16 +72,25 @@
             border-radius: 5px;
             cursor: pointer;
             font-size: 1.1em;
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: transform 0.2s, box-shadow 0.3s;
         }
 
-        .word:hover, .sentence-option:hover {
+        .word:hover {
             transform: scale(1.05);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
         }
 
-        .word.selected, .sentence-option.selected {
+        .word.selected {
             background: #ff9800;
+        }
+
+        .word.matched {
+            animation: glow 0.5s ease-in-out;
+        }
+
+        @keyframes glow {
+            0% { box-shadow: 0 0 5px #ffd700; }
+            50% { box-shadow: 0 0 20px #ffd700; }
+            100% { box-shadow: 0 0 5px #ffd700; }
         }
 
         .matched-pair {
@@ -112,9 +128,8 @@
         }
 
         .matched-pair .emoji {
-            font-size: 2em;
+            font-size: 1.5em;
             margin-top: 5px;
-            animation: bounce 1s infinite;
         }
 
         @keyframes slideIn {
@@ -122,16 +137,23 @@
             100% { transform: translateY(0); opacity: 1; }
         }
 
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-
         #score {
             font-size: 1.3em;
             color: #d81b60;
             margin-bottom: 10px;
             font-weight: bold;
+            display: inline-block;
+            transition: transform 0.3s;
+        }
+
+        #score.bounce {
+            animation: bounce 0.5s ease-in-out;
+        }
+
+        @keyframes bounce {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
         }
 
         #check-button {
@@ -144,7 +166,7 @@
             cursor: pointer;
             margin: 10px auto;
             display: block;
-            transition: background 0.3s, transform 0.2s;
+            transition: background 0.3s;
         }
 
         #check-button:disabled {
@@ -154,7 +176,6 @@
 
         #check-button:hover:not(:disabled) {
             background: #1976d2;
-            transform: scale(1.1);
         }
 
         #result {
@@ -187,6 +208,28 @@
             font-size: 2em;
             margin-bottom: 15px;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+
+        #result h2::before, #result h2::after {
+            content: '⭐';
+            position: absolute;
+            font-size: 1.5em;
+            animation: starTwinkle 1.5s infinite;
+        }
+
+        #result h2::before {
+            left: -30px;
+        }
+
+        #result h2::after {
+            right: -30px;
+        }
+
+        @keyframes starTwinkle {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+            100% { opacity: 1; transform: scale(1); }
         }
 
         #result p {
@@ -286,20 +329,55 @@
         }
 
         .confetti {
-            position: absolute;
-            width: 12px;
-            height: 12px;
-            background: hsl(${Math.random() * 360}, 100%, 50%);
-            border-radius: 50%;
-            animation: fall 3s ease-in-out infinite;
+            position: fixed;
+            width: 10px;
+            height: 10px;
             z-index: 0;
-            box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+            pointer-events: none;
+            animation: confettiBurst 2s ease-out forwards;
         }
 
-        @keyframes fall {
-            0% { transform: translateY(-100vh) rotate(0deg) scale(1); opacity: 1; }
-            50% { transform: translateY(0vh) rotate(180deg) scale(1.2); opacity: 0.8; }
-            100% { transform: translateY(100vh) rotate(360deg) scale(0.8); opacity: 0; }
+        .confetti.star {
+            font-size: 12px;
+            line-height: 10px;
+            text-align: center;
+            color: #ffd700;
+        }
+
+        .confetti.circle {
+            border-radius: 50%;
+        }
+
+        @keyframes confettiBurst {
+            0% {
+                transform: translate(-50%, -50%) scale(1) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y))) scale(0.5) rotate(var(--rotate));
+                opacity: 0;
+            }
+        }
+
+        .encouragement {
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #ff69b4;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 1em;
+            font-weight: bold;
+            animation: encouragementPop 1s ease-in-out forwards;
+            z-index: 2;
+        }
+
+        @keyframes encouragementPop {
+            0% { transform: translateX(-50%) scale(0); opacity: 0; }
+            50% { transform: translateX(-50%) scale(1.2); opacity: 1; }
+            100% { transform: translateX(-50%) scale(1); opacity: 0; }
         }
 
         @media (min-width: 768px) {
@@ -313,13 +391,13 @@
             h1 {
                 font-size: 2.5em;
             }
-            .word, .matched-pair, .sentence-option {
+            .word, .matched-pair {
                 font-size: 1.2em;
             }
             .matched-pair .sentence {
                 font-size: 1.1em;
             }
-            #score {
+            #score, #level {
                 font-size: 1.5em;
             }
             #check-button, #play-again {
@@ -342,7 +420,8 @@
 </head>
 <body>
     <div class="game-container">
-        <h1>משחק התאמת מילים ומשפטים לילדים</h1>
+        <h1>משחק התאמת מילים לילדים</h1>
+        <div id="level">רמה: 1</div>
         <div id="score">ניקוד: 0</div>
         <div class="columns">
             <div class="column" id="hebrew-words">
@@ -356,10 +435,10 @@
     </div>
     <div id="result">
         <h2>כל הכבוד! 🎉</h2>
+        <p id="final-level"></p>
         <p>ניקוד סופי: <span id="final-score"></span></p>
         <p>זמן כולל: <span id="total-time"></span> שניות</p>
         <p>סה"כ טעויות: <span id="total-mistakes"></span></p>
-        <h3>סיכום התאמת מילים</h3>
         <table>
             <thead>
                 <tr>
@@ -372,157 +451,244 @@
             </thead>
             <tbody id="match-details"></tbody>
         </table>
-        <h3>סיכום התאמת משפטים</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>משפט (אנגלית - עברית)</th>
-                    <th>זמן (שניות)</th>
-                    <th>ניסיונות</th>
-                    <th>טעויות</th>
-                    <th>משפט באנגלית</th>
-                </tr>
-            </thead>
-            <tbody id="sentence-match-details"></tbody>
-        </table>
         <button id="play-again">שחק שוב</button>
     </div>
 
     <script>
 const words = [
-    { 
-        hebrew: "חתול", 
-        english: "Cat", 
-        sentence: "The cat is on the mat.", 
-        translations: [
-            "החתול נמצא על המחצלת.", // Correct
-            "החתול רץ מהר.", 
-            "החתול שוחה במים."
-        ]
-    },
-    { 
-        hebrew: "דג", 
-        english: "Fish", 
-        sentence: "I see a fish in the water.", 
-        translations: [
-            "אני רואה דג במים.", // Correct
-            "הדג עף בשמיים.", 
-            "הדג אוכל עשב."
-        ]
-    },
-    { 
-        hebrew: "ציפור", 
-        english: "Bird", 
-        sentence: "A bird flies in the sky.", 
-        translations: [
-            "ציפור עפה בשמיים.", // Correct
-            "הציפור שוחה בים.", 
-            "הציפור חיה ביער."
-        ]
-    },
-    { 
-        hebrew: "אריה", 
-        english: "Lion", 
-        sentence: "The lion is very strong.", 
-        translations: [
-            "האריה חזק מאוד.", // Correct
-            "האריה קטן וחלש.", 
-            "האריה שר בשקט."
-        ]
-    },
-    { 
-        hebrew: "פיל", 
-        english: "Elephant", 
-        sentence: "An elephant has big ears.", 
-        translations: [
-            "לפיל יש אוזניים גדולות.", // Correct
-            "הפיל קטן וזריז.", 
-            "הפיל טס בשמיים."
-        ]
-    },
-    { 
-        hebrew: "סוס", 
-        english: "Horse", 
-        sentence: "The horse runs fast.", 
-        translations: [
-            "הסוס רץ מהר.", // Correct
-            "הסוס שוחה לאט.", 
-            "הסוס אוכל דגים."
-        ]
-    },
-    { 
-        hebrew: "פרה", 
-        english: "Cow", 
-        sentence: "The cow gives us milk.", 
-        translations: [
-            "הפרה נותנת לנו חלב.", // Correct
-            "הפרה שוחה בים.", 
-            "הפרה עפה גבוה."
-        ]
-    },
-    { 
-        hebrew: "תרנגולת", 
-        english: "Chicken", 
-        sentence: "The chicken lays eggs.", 
-        translations: [
-            "התרנגולת מטילה ביצים.", // Correct
-            "התרנגולת שרה שירים.", 
-            "התרנגולת רצה מהר."
-        ]
-    },
-    { 
-        hebrew: "ברווז", 
-        english: "Duck", 
-        sentence: "A duck swims in the pond.", 
-        translations: [
-            "ברווז שוחה בבריכה.", // Correct
-            "הברווז עף בשמיים.", 
-            "הברווז אוכל עץ."
-        ]
-    },
-    { 
-        hebrew: "עכבר", 
-        english: "Mouse", 
-        sentence: "The mouse is small and quick.", 
-        translations: [
-            "העכבר קטן ומהיר.", // Correct
-            "העכבר גדול ואיטי.", 
-            "העכבר שוחה בנהר."
-        ]
-    }
+    { hebrew: "חתול", english: "Cat", sentence: "The cat is on the mat." },
+    { hebrew: "דג", english: "Fish", sentence: "I see a fish in the water." },
+    { hebrew: "ציפור", english: "Bird", sentence: "A bird flies in the sky." },
+    { hebrew: "אריה", english: "Lion", sentence: "The lion is very strong." },
+    { hebrew: "פיל", english: "Elephant", sentence: "An elephant has big ears." },
+    { hebrew: "סוס", english: "Horse", sentence: "The horse runs fast." },
+    { hebrew: "פרה", english: "Cow", sentence: "The cow gives us milk." },
+    { hebrew: "תרנגולת", english: "Chicken", sentence: "The chicken lays eggs." },
+    { hebrew: "ברווז", english: "Duck", sentence: "A duck swims in the pond." },
+    { hebrew: "עכבר", english: "Mouse", sentence: "The mouse is small and quick." },
+    { hebrew: "כלב", english: "Dog", sentence: "My dog likes to play." },
+    { hebrew: "נמר", english: "Tiger", sentence: "The tiger has stripes." },
+    { hebrew: "זאב", english: "Wolf", sentence: "A wolf howls at night." },
+    { hebrew: "שועל", english: "Fox", sentence: "The fox is smart and fast." },
+    { hebrew: "חמור", english: "Donkey", sentence: "The donkey carries bags." },
+    { hebrew: "עז", english: "Goat", sentence: "The goat eats grass." },
+    { hebrew: "כבש", english: "Sheep", sentence: "The sheep has soft wool." },
+    { hebrew: "חזיר", english: "Pig", sentence: "The pig plays in the mud." },
+    { hebrew: "צב", english: "Turtle", sentence: "The turtle walks slowly." },
+    { hebrew: "נחש", english: "Snake", sentence: "A snake moves on the ground." },
+    { hebrew: "תנין", english: "Crocodile", sentence: "The crocodile lives in water." },
+    { hebrew: "קוף", english: "Monkey", sentence: "The monkey climbs trees." },
+    { hebrew: "גמל", english: "Camel", sentence: "The camel walks in the desert." },
+    { hebrew: "דב", english: "Bear", sentence: "The bear likes honey." },
+    { hebrew: "עטלף", english: "Bat", sentence: "A bat flies at night." },
+    { hebrew: "ארנב", english: "Rabbit", sentence: "The rabbit hops in the field." },
+    { hebrew: "סנאי", english: "Squirrel", sentence: "The squirrel collects nuts." },
+    { hebrew: "צפרדע", english: "Frog", sentence: "The frog jumps near the water." },
+    { hebrew: "פרפר", english: "Butterfly", sentence: "A butterfly has pretty wings." },
+    { hebrew: "דבורה", english: "Bee", sentence: "The bee makes honey." },
+    { hebrew: "נמלה", english: "Ant", sentence: "The ant works hard." },
+    { hebrew: "זבוב", english: "Fly", sentence: "A fly buzzes around." },
+    { hebrew: "יתוש", english: "Mosquito", sentence: "The mosquito bites at night." },
+    { hebrew: "עכביש", english: "Spider", sentence: "The spider makes a web." },
+    { hebrew: "תולעת", english: "Worm", sentence: "The worm lives in the soil." },
+    { hebrew: "חיפושית", english: "Beetle", sentence: "The beetle has a hard shell." },
+    { hebrew: "שמש", english: "Sun", sentence: "The sun shines in the day." },
+    { hebrew: "ירח", english: "Moon", sentence: "The moon glows at night." },
+    { hebrew: "כוכב", english: "Star", sentence: "A star twinkles in the sky." },
+    { hebrew: "ענן", english: "Cloud", sentence: "The cloud is white and fluffy." },
+    { hebrew: "גשם", english: "Rain", sentence: "The rain falls from the sky." },
+    { hebrew: "שלג", english: "Snow", sentence: "The snow is cold and white." },
+    { hebrew: "רוח", english: "Wind", sentence: "The wind blows the trees." },
+    { hebrew: "ים", english: "Sea", sentence: "The sea is big and blue." },
+    { hebrew: "נהר", english: "River", sentence: "The river flows fast." },
+    { hebrew: "אגם", english: "Lake", sentence: "The lake is calm and pretty." },
+    { hebrew: "הר", english: "Mountain", sentence: "The mountain is very tall." },
+    { hebrew: "יער", english: "Forest", sentence: "The forest has many trees." },
+    { hebrew: "שדה", english: "Field", sentence: "The field is full of flowers." },
+    { hebrew: "פרח", english: "Flower", sentence: "The flower smells nice." },
+    { hebrew: "עץ", english: "Tree", sentence: "The tree is big and green." },
+    { hebrew: "שולחן", english: "Table", sentence: "The table is in the room." },
+    { hebrew: "כיסא", english: "Chair", sentence: "I sit on the chair." },
+    { hebrew: "מיטה", english: "Bed", sentence: "The bed is soft and cozy." },
+    { hebrew: "חלון", english: "Window", sentence: "The window is open." },
+    { hebrew: "דלת", english: "Door", sentence: "The door is red." },
+    { hebrew: "בית", english: "House", sentence: "My house is big." },
+    { hebrew: "מכונית", english: "Car", sentence: "The car is fast." },
+    { hebrew: "אופניים", english: "Bicycle", sentence: "I ride my bicycle." },
+    { hebrew: "אוטובוס", english: "Bus", sentence: "The bus is yellow." },
+    { hebrew: "רכבת", english: "Train", sentence: "The train goes on tracks." },
+    { hebrew: "מטוס", english: "Airplane", sentence: "The airplane flies high." },
+    { hebrew: "סירה", english: "Boat", sentence: "The boat is on the water." },
+    { hebrew: "כדור", english: "Ball", sentence: "I kick the ball." },
+    { hebrew: "ספר", english: "Book", sentence: "I read a book." },
+    { hebrew: "עיפרון", english: "Pencil", sentence: "I write with a pencil." },
+    { hebrew: "מחברת", english: "Notebook", sentence: "My notebook is blue." },
+    { hebrew: "תיק", english: "Bag", sentence: "I carry my bag." },
+    { hebrew: "שעון", english: "Clock", sentence: "The clock shows the time." },
+    { hebrew: "טלפון", english: "Phone", sentence: "I call on the phone." },
+    { hebrew: "מחשב", english: "Computer", sentence: "I play on the computer." },
+    { hebrew: "טלוויזיה", english: "Television", sentence: "I watch television." },
+    { hebrew: "מקרר", english: "Refrigerator", sentence: "The refrigerator is cold." },
+    { hebrew: "תנור", english: "Oven", sentence: "The oven bakes food." },
+    { hebrew: "כוס", english: "Cup", sentence: "I drink from a cup." },
+    { hebrew: "צלחת", english: "Plate", sentence: "The plate is on the table." },
+    { hebrew: "סכין", english: "Knife", sentence: "The knife cuts food." },
+    { hebrew: "מזלג", english: "Fork", sentence: "I eat with a fork." },
+    { hebrew: "כף", english: "Spoon", sentence: "I use a spoon for soup." },
+    { hebrew: "לחם", english: "Bread", sentence: "The bread is fresh." },
+    { hebrew: "גבינה", english: "Cheese", sentence: "I like cheese on bread." },
+    { hebrew: "חלב", english: "Milk", sentence: "I drink milk every day." },
+    { hebrew: "מיץ", english: "Juice", sentence: "The juice is sweet." },
+    { hebrew: "תפוח", english: "Apple", sentence: "I eat an apple." },
+    { hebrew: "בננה", english: "Banana", sentence: "The banana is yellow." },
+    { hebrew: "תפוז", english: "Orange", sentence: "The orange is juicy." },
+    { hebrew: "ענבים", english: "Grapes", sentence: "I like green grapes." },
+    { hebrew: "מלון", english: "Melon", sentence: "The melon is big." },
+    { hebrew: "אבטיח", english: "Watermelon", sentence: "The watermelon is red." },
+    { hebrew: "עגבנייה", english: "Tomato", sentence: "The tomato is red." },
+    { hebrew: "מלפפון", english: "Cucumber", sentence: "I eat a cucumber." },
+    { hebrew: "גזר", english: "Carrot", sentence: "The carrot is orange." },
+    { hebrew: "תפוד", english: "Potato", sentence: "The potato is in the soup." },
+    { hebrew: "בצל", english: "Onion", sentence: "The onion makes me cry." },
+    { hebrew: "שום", english: "Garlic", sentence: "The garlic smells strong." },
+    { hebrew: "מלח", english: "Salt", sentence: "The salt is white." },
+    { hebrew: "פלפל", english: "Pepper", sentence: "The pepper is spicy." },
+    { hebrew: "סוכר", english: "Sugar", sentence: "The sugar is sweet." },
+    { hebrew: "שוקולד", english: "Chocolate", sentence: "I love chocolate." },
+    { hebrew: "אבא", english: "Father", sentence: "My father drives a car." },
+    { hebrew: "אמא", english: "Mother", sentence: "My mother cooks dinner." },
+    { hebrew: "אח", english: "Brother", sentence: "My brother plays soccer." },
+    { hebrew: "אחות", english: "Sister", sentence: "My sister likes to dance." },
+    { hebrew: "סבא", english: "Grandfather", sentence: "My grandfather tells stories." },
+    { hebrew: "סבתא", english: "Grandmother", sentence: "My grandmother bakes cookies." },
+    { hebrew: "חבר", english: "Friend", sentence: "My friend is very funny." },
+    { hebrew: "מורה", english: "Teacher", sentence: "The teacher writes on the board." },
+    { hebrew: "תלמיד", english: "Student", sentence: "The student reads a book." },
+    { hebrew: "כיתה", english: "Classroom", sentence: "The classroom is big and bright." },
+    { hebrew: "לוח", english: "Board", sentence: "The board is green." },
+    { hebrew: "שולחן עבודה", english: "Desk", sentence: "I sit at my desk." },
+    { hebrew: "מספריים", english: "Scissors", sentence: "I cut paper with scissors." },
+    { hebrew: "דבק", english: "Glue", sentence: "I use glue for my project." },
+    { hebrew: "צבעים", english: "Colors", sentence: "I paint with many colors." },
+    { hebrew: "מכחול", english: "Paintbrush", sentence: "The paintbrush is soft." },
+    { hebrew: "נייר", english: "Paper", sentence: "I draw on the paper." },
+    { hebrew: "ציור", english: "Drawing", sentence: "My drawing is beautiful." },
+    { hebrew: "שיר", english: "Song", sentence: "I sing a happy song." },
+    { hebrew: "מוזיקה", english: "Music", sentence: "I listen to music." },
+    { hebrew: "ריקוד", english: "Dance", sentence: "I love to dance with friends." },
+    { hebrew: "משחק", english: "Game", sentence: "We play a fun game." },
+    { hebrew: "חבל", english: "Rope", sentence: "I jump with a rope." },
+    { hebrew: "גינה", english: "Garden", sentence: "The garden has many flowers." },
+    { hebrew: "צמח", english: "Plant", sentence: "I water the plant." },
+    { hebrew: "זרע", english: "Seed", sentence: "I plant a seed in the soil." },
+    { hebrew: "שורש", english: "Root", sentence: "The root grows in the ground." },
+    { hebrew: "עלה", english: "Leaf", sentence: "The leaf is green and shiny." },
+    { hebrew: "פרי", english: "Fruit", sentence: "I eat a sweet fruit." },
+    { hebrew: "ירק", english: "Vegetable", sentence: "I like to eat vegetables." },
+    { hebrew: "תות", english: "Strawberry", sentence: "The strawberry is red and sweet." },
+    { hebrew: "לימון", english: "Lemon", sentence: "The lemon is yellow and sour." },
+    { hebrew: "אגס", english: "Pear", sentence: "I eat a juicy pear." },
+    { hebrew: "מנגו", english: "Mango", sentence: "The mango is orange and tasty." },
+    { hebrew: "אננס", english: "Pineapple", sentence: "The pineapple is big and yellow." },
+    { hebrew: "תירס", english: "Corn", sentence: "I like to eat corn." },
+    { hebrew: "חסה", english: "Lettuce", sentence: "The lettuce is green and fresh." },
+    { hebrew: "פטרייה", english: "Mushroom", sentence: "The mushroom is small and brown." },
+    { hebrew: "שעועית", english: "Bean", sentence: "I eat beans with rice." },
+    { hebrew: "אפונה", english: "Pea", sentence: "The pea is small and green." },
+    { hebrew: "בוטן", english: "Peanut", sentence: "I like to eat peanuts." },
+    { hebrew: "שקד", english: "Almond", sentence: "The almond is hard and tasty." },
+    { hebrew: "אגוז", english: "Nut", sentence: "I crack the nut to eat it." },
+    { hebrew: "דגנים", english: "Cereal", sentence: "I eat cereal for breakfast." },
+    { hebrew: "ביצה", english: "Egg", sentence: "I fry an egg for lunch." },
+    { hebrew: "עוף", english: "Chicken", sentence: "The chicken is on the plate." },
+    { hebrew: "דג מטוגן", english: "Fish", sentence: "I eat fish with lemon." },
+    { hebrew: "פסטה", english: "Pasta", sentence: "I like pasta with sauce." },
+    { hebrew: "אורז", english: "Rice", sentence: "The rice is white and soft." },
+    { hebrew: "מרק", english: "Soup", sentence: "The soup is hot and yummy." },
+    { hebrew: "סלט", english: "Salad", sentence: "I make a fresh salad." },
+    { hebrew: "עוגה", english: "Cake", sentence: "The cake is sweet and big." },
+    { hebrew: "עוגייה", english: "Cookie", sentence: "I eat a chocolate cookie." },
+    { hebrew: "גלידה", english: "Ice Cream", sentence: "The ice cream is cold." },
+    { hebrew: "ממתק", english: "Candy", sentence: "I like to eat candy." },
+    { hebrew: "מילקשייק", english: "Milkshake", sentence: "I drink a strawberry milkshake." },
+    { hebrew: "מים", english: "Water", sentence: "I drink water every day." },
+    { hebrew: "תה", english: "Tea", sentence: "The tea is hot and sweet." },
+    { hebrew: "קפה", english: "Coffee", sentence: "My dad drinks coffee." },
+    { hebrew: "חולצה", english: "Shirt", sentence: "I wear a blue shirt." },
+    { hebrew: "מכנסיים", english: "Pants", sentence: "My pants are black." },
+    { hebrew: "נעליים", english: "Shoes", sentence: "I wear my shoes to school." },
+    { hebrew: "גרביים", english: "Socks", sentence: "My socks are white." },
+    { hebrew: "כובע", english: "Hat", sentence: "I wear a hat in the sun." },
+    { hebrew: "מעיל", english: "Coat", sentence: "I wear a coat in winter." },
+    { hebrew: "צעיף", english: "Scarf", sentence: "The scarf is warm and soft." },
+    { hebrew: "כפפות", english: "Gloves", sentence: "I wear gloves in the cold." },
+    { hebrew: "חגורה", english: "Belt", sentence: "My belt is brown." },
+    { hebrew: "שמלה", english: "Dress", sentence: "My sister wears a dress." },
+    { hebrew: "חצאית", english: "Skirt", sentence: "The skirt is pink." },
+    { hebrew: "תיק גב", english: "Backpack", sentence: "I carry my backpack to school." },
+    { hebrew: "משקפיים", english: "Glasses", sentence: "I wear glasses to read." },
+    { hebrew: "שעון יד", english: "Watch", sentence: "My watch is on my hand." },
+    { hebrew: "מטריה", english: "Umbrella", sentence: "I use an umbrella in the rain." },
+    { hebrew: "בוקר", english: "Morning", sentence: "I wake up in the morning." },
+    { hebrew: "צהריים", english: "Noon", sentence: "I eat lunch at noon." },
+    { hebrew: "ערב", english: "Evening", sentence: "I play in the evening." },
+    { hebrew: "לילה", english: "Night", sentence: "I sleep at night." },
+    { hebrew: "שני", english: "Monday", sentence: "Monday is the first day." },
+    { hebrew: "שלישי", english: "Tuesday", sentence: "I go to school on Tuesday." },
+    { hebrew: "רביעי", english: "Wednesday", sentence: "Wednesday is in the middle." },
+    { hebrew: "חמישי", english: "Thursday", sentence: "I play on Thursday." },
+    { hebrew: "שישי", english: "Friday", sentence: "Friday is a fun day." },
+    { hebrew: "שבת", english: "Saturday", sentence: "I rest on Saturday." },
+    { hebrew: "ראשון", english: "Sunday", sentence: "Sunday is a new week." },
+    { hebrew: "קיץ", english: "Summer", sentence: "Summer is hot and sunny." },
+    { hebrew: "חורף", english: "Winter", sentence: "Winter is cold and snowy." },
+    { hebrew: "סתיו", english: "Autumn", sentence: "Autumn leaves are orange." },
+    { hebrew: "אביב", english: "Spring", sentence: "Spring flowers bloom." },
+    { hebrew: "חם", english: "Hot", sentence: "The day is very hot." },
+    { hebrew: "קר", english: "Cold", sentence: "The water is cold." },
+    { hebrew: "רטוב", english: "Wet", sentence: "My clothes are wet." },
+    { hebrew: "יבש", english: "Dry", sentence: "The towel is dry." },
+    { hebrew: "מהיר", english: "Fast", sentence: "The car is fast." },
+    { hebrew: "איטי", english: "Slow", sentence: "The turtle is slow." },
+    { hebrew: "גבוה", english: "Tall", sentence: "The tree is tall." },
+    { hebrew: "נמוך", english: "Short", sentence: "The chair is short." },
+    { hebrew: "כבד", english: "Heavy", sentence: "The bag is heavy." },
+    { hebrew: "קל", english: "Light", sentence: "The feather is light." },
+    { hebrew: "שמח", english: "Happy", sentence: "I am happy today." },
+    { hebrew: "עצוב", english: "Sad", sentence: "The boy is sad." },
+    { hebrew: "חזק", english: "Strong", sentence: "The lion is strong." },
+    { hebrew: "חלש", english: "Weak", sentence: "I feel weak today." }
 ];
 
         const hebrewColumn = document.getElementById('hebrew-words');
         const englishColumn = document.getElementById('english-words');
         const scoreDisplay = document.getElementById('score');
+        const levelDisplay = document.getElementById('level');
         const checkButton = document.getElementById('check-button');
         const resultDiv = document.getElementById('result');
         const finalScoreDisplay = document.getElementById('final-score');
+        const finalLevelDisplay = document.getElementById('final-level');
         const totalTimeDisplay = document.getElementById('total-time');
         const totalMistakesDisplay = document.getElementById('total-mistakes');
         const matchDetails = document.getElementById('match-details');
-        const sentenceMatchDetails = document.getElementById('sentence-match-details');
         const playAgainButton = document.getElementById('play-again');
 
         let score = 0;
         let matches = 0;
-        let sentenceMatches = 0;
         let totalMistakes = 0;
         let matchTimes = [];
         let matchAttempts = [];
         let matchMistakes = [];
-        let sentenceTimes = [];
-        let sentenceAttempts = [];
-        let sentenceMistakes = [];
         let selectedHebrew = null;
         let selectedEnglish = null;
-        let selectedSentence = null;
-        let selectedTranslation = null;
         let startTime = null;
         let wordStartTime = null;
-        let sentenceStartTime = null;
         let currentWords = [];
-        let gameStage = 'words'; // 'words' or 'sentences'
+        let level = 1;
+        let totalMatches = 0;
+
+        // Create sound for successful match
+        const successSound = new Audio('https://www.myinstants.com/media/sounds/success.mp3');
 
         function shuffle(array) {
             for (let i = array.length - 1; i > 0; i--) {
@@ -533,27 +699,22 @@ const words = [
         }
 
         function initGame() {
-            gameStage = 'words';
             hebrewColumn.innerHTML = '<h2>מילים בעברית</h2>';
             englishColumn.innerHTML = '<h2>מילים באנגלית</h2>';
             score = 0;
             matches = 0;
-            sentenceMatches = 0;
+            totalMatches = 0;
             totalMistakes = 0;
             matchTimes = [];
             matchAttempts = new Array(10).fill(0);
             matchMistakes = new Array(10).fill(0);
-            sentenceTimes = [];
-            sentenceAttempts = new Array(10).fill(0);
-            sentenceMistakes = new Array(10).fill(0);
             selectedHebrew = null;
             selectedEnglish = null;
-            selectedSentence = null;
-            selectedTranslation = null;
             startTime = Date.now();
             wordStartTime = null;
-            sentenceStartTime = null;
+            level = 1;
             scoreDisplay.textContent = `ניקוד: ${score}`;
+            levelDisplay.textContent = `רמה: ${level}`;
             resultDiv.style.display = 'none';
             checkButton.disabled = true;
 
@@ -589,7 +750,6 @@ const words = [
         }
 
         function selectWord(element, type) {
-            if (gameStage !== 'words') return;
             if (type === 'hebrew') {
                 if (selectedHebrew) selectedHebrew.classList.remove('selected');
                 selectedHebrew = element;
@@ -604,22 +764,6 @@ const words = [
             checkButton.disabled = !(selectedHebrew && selectedEnglish);
         }
 
-        function selectSentence(element, type) {
-            if (gameStage !== 'sentences') return;
-            if (type === 'sentence') {
-                if (selectedSentence) selectedSentence.classList.remove('selected');
-                selectedSentence = element;
-                selectedSentence.classList.add('selected');
-            } else {
-                if (selectedTranslation) selectedTranslation.classList.remove('selected');
-                selectedTranslation = element;
-                selectedTranslation.classList.add('selected');
-            }
-
-            if (!sentenceStartTime) sentenceStartTime = Date.now();
-            checkButton.disabled = !(selectedSentence && selectedTranslation);
-        }
-
         function checkVoices() {
             const voices = window.speechSynthesis.getVoices();
             if (voices.length === 0) {
@@ -630,14 +774,6 @@ const words = [
         }
 
         function checkMatch() {
-            if (gameStage === 'words') {
-                checkWordMatch();
-            } else if (gameStage === 'sentences') {
-                checkSentenceMatch();
-            }
-        }
-
-        function checkWordMatch() {
             if (!selectedHebrew || !selectedEnglish) return;
 
             const wordIndex = currentWords.findIndex(w => w.english === selectedEnglish.dataset.english);
@@ -647,10 +783,31 @@ const words = [
 
             if (isMatch) {
                 matches++;
+                totalMatches++;
                 matchTimes.push(timeTaken);
 
-                score += matchAttempts[wordIndex] === 1 ? 10 : 5;
+                // Base score
+                let points = matchAttempts[wordIndex] === 1 ? 10 : 5;
+
+                // Speed bonus: +5 points if matched in under 3 seconds
+                if (timeTaken < 3) {
+                    points += 5;
+                    showEncouragement("בונוס מהירות! 🚀", selectedEnglish);
+                }
+
+                // Accuracy bonus: +2 points if matched on first attempt
+                if (matchAttempts[wordIndex] === 1) {
+                    points += 2;
+                    showEncouragement("בונוס דיוק! 🎯", selectedEnglish);
+                }
+
+                score += points;
                 scoreDisplay.textContent = `ניקוד: ${score}`;
+                scoreDisplay.classList.add('bounce');
+
+                // Add glow effect to matched words
+                selectedHebrew.classList.add('matched');
+                selectedEnglish.classList.add('matched');
 
                 const matchedDiv = document.createElement('div');
                 matchedDiv.className = 'matched-pair';
@@ -666,13 +823,27 @@ const words = [
                 const sentenceText = selectedEnglish.dataset.sentence;
 
                 playMatch(hebrewText, englishText, sentenceText);
+
+                // Play success sound
+                successSound.play();
+
+                // Add confetti
                 addConfetti();
+
+                // Show random encouragement message
+                const messages = ["כל הכבוד!", "מצוין!", "יופי!", "מעולה!", "תמשיך ככה!"];
+                showEncouragement(messages[Math.floor(Math.random() * messages.length)], matchedDiv);
 
                 selectedHebrew.remove();
                 selectedEnglish.remove();
 
+                // Check for level up
+                if (totalMatches % 10 === 0) {
+                    levelUp();
+                }
+
                 if (matches === 10) {
-                    startSentenceStage();
+                    endGame();
                 }
             } else {
                 totalMistakes++;
@@ -688,82 +859,19 @@ const words = [
             checkButton.disabled = true;
         }
 
-        function startSentenceStage() {
-            gameStage = 'sentences';
-            hebrewColumn.innerHTML = '<h2>תרגומים בעברית</h2>';
-            englishColumn.innerHTML = '<h2>משפטים באנגלית</h2>';
-
-            const shuffledSentences = shuffle([...currentWords]);
-            const allTranslations = [];
-            currentWords.forEach(word => {
-                allTranslations.push(...word.translations);
-            });
-            const shuffledTranslations = shuffle([...allTranslations]);
-
-            shuffledSentences.forEach((word) => {
-                const div = document.createElement('div');
-                div.className = 'sentence-option';
-                div.textContent = word.sentence;
-                div.dataset.sentence = word.sentence;
-                div.dataset.correctTranslation = word.translations[0];
-                div.addEventListener('click', () => selectSentence(div, 'sentence'));
-                englishColumn.appendChild(div);
-            });
-
-            shuffledTranslations.slice(0, 10).forEach((translation) => {
-                const div = document.createElement('div');
-                div.className = 'sentence-option';
-                div.textContent = translation;
-                div.dataset.translation = translation;
-                div.addEventListener('click', () => selectSentence(div, 'translation'));
-                hebrewColumn.appendChild(div);
-            });
+        function levelUp() {
+            level++;
+            levelDisplay.textContent = `רמה: ${level}`;
+            showEncouragement(`עלית לרמה ${level}! 🎉`, document.querySelector('.game-container'));
+            addConfetti();
         }
 
-        function checkSentenceMatch() {
-            if (!selectedSentence || !selectedTranslation) return;
-
-            const sentenceIndex = currentWords.findIndex(w => w.sentence === selectedSentence.dataset.sentence);
-            sentenceAttempts[sentenceIndex]++;
-            const timeTaken = (Date.now() - sentenceStartTime) / 1000;
-            const isMatch = selectedTranslation.dataset.translation === selectedSentence.dataset.correctTranslation;
-
-            if (isMatch) {
-                sentenceMatches++;
-                sentenceTimes.push(timeTaken);
-
-                score += sentenceAttempts[sentenceIndex] === 1 ? 10 : 5;
-                scoreDisplay.textContent = `ניקוד: ${score}`;
-
-                const matchedDiv = document.createElement('div');
-                matchedDiv.className = 'matched-pair';
-                matchedDiv.innerHTML = `
-                    <div class="pair-text">${selectedSentence.textContent} - ${selectedTranslation.textContent}</div>
-                    <div class="emoji">🏆</div>
-                `;
-                englishColumn.appendChild(matchedDiv);
-
-                playSentence(selectedSentence.textContent);
-                addConfetti();
-
-                selectedSentence.remove();
-                selectedTranslation.remove();
-
-                if (sentenceMatches === 10) {
-                    endGame();
-                }
-            } else {
-                totalMistakes++;
-                sentenceMistakes[sentenceIndex]++;
-                alert('אופס! נסה שוב!');
-            }
-
-            selectedSentence.classList.remove('selected');
-            selectedTranslation.classList.remove('selected');
-            selectedSentence = null;
-            selectedTranslation = null;
-            sentenceStartTime = null;
-            checkButton.disabled = true;
+        function showEncouragement(message, element) {
+            const encouragement = document.createElement('div');
+            encouragement.className = 'encouragement';
+            encouragement.textContent = message;
+            element.style.position = 'relative';
+            element.appendChild(encouragement);
         }
 
         function playMatch(hebrewText, englishText, sentenceText) {
@@ -818,20 +926,50 @@ const words = [
         }
 
         function addConfetti() {
+            const shapes = ['square', 'circle', 'star'];
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+
             for (let i = 0; i < 100; i++) {
-                const confetti = document.createElement('div');
-                confetti.className = 'confetti';
-                confetti.style.left = `${Math.random() * 100}vw`;
-                confetti.style.background = `hsl(${Math.random() * 360}, 100%, 50%)`;
-                confetti.style.animationDuration = `${2 + Math.random() * 2}s`;
-                document.body.appendChild(confetti);
-                setTimeout(() => confetti.remove(), 4000);
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    const shape = shapes[Math.floor(Math.random() * shapes.length)];
+                    if (shape === 'star') {
+                        confetti.classList.add('star');
+                        confetti.textContent = '★';
+                    } else {
+                        confetti.classList.add(shape);
+                    }
+
+                    const angle = Math.random() * 360;
+                    const distance = Math.random() * 300 + 100;
+                    const x = Math.cos(angle * Math.PI / 180) * distance;
+                    const y = Math.sin(angle * Math.PI / 180) * distance;
+                    const rotate = Math.random() * 720 - 360;
+
+                    confetti.style.left = `${centerX}px`;
+                    confetti.style.top = `${centerY}px`;
+                    confetti.style.setProperty('--x', `${x}px`);
+                    confetti.style.setProperty('--y', `${y}px`);
+                    confetti.style.setProperty('--rotate', `${rotate}deg`);
+
+                    if (shape !== 'star') {
+                        confetti.style.background = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                        confetti.style.width = `${Math.random() * 10 + 5}px`;
+                        confetti.style.height = `${Math.random() * 10 + 5}px`;
+                    }
+
+                    document.body.appendChild(confetti);
+                    setTimeout(() => confetti.remove(), 2000);
+                }, i * 10);
             }
         }
 
         function endGame() {
             const totalTime = (Date.now() - startTime) / 1000;
             resultDiv.style.display = 'block';
+            finalLevelDisplay.textContent = `הגעת לרמה ${level}!`;
             finalScoreDisplay.textContent = score;
             totalTimeDisplay.textContent = totalTime.toFixed(1);
             totalMistakesDisplay.textContent = totalMistakes;
@@ -852,30 +990,12 @@ const words = [
                 matchDetails.appendChild(tr);
             });
 
-            sentenceMatchDetails.innerHTML = '';
-            currentWords.forEach((word, index) => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${word.sentence} - ${word.translations[0]}</td>
-                    <td>${sentenceTimes[index] ? sentenceTimes[index].toFixed(1) : '-'}</td>
-                    <td>${sentenceAttempts[index]}</td>
-                    <td>${sentenceMistakes[index]}</td>
-                    <td class="sentence-cell">
-                        ${word.sentence}
-                        <button class="play-sentence-btn" data-sentence="${word.sentence}">🔊</button>
-                    </td>
-                `;
-                sentenceMatchDetails.appendChild(tr);
-            });
-
             document.querySelectorAll('.play-sentence-btn').forEach(button => {
                 button.addEventListener('click', () => {
                     const sentence = button.dataset.sentence;
                     playSentence(sentence);
                 });
             });
-
-            addConfetti();
         }
 
         checkButton.addEventListener('click', checkMatch);
