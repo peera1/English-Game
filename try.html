@@ -686,9 +686,7 @@ const words = [
         let currentWords = [];
         let level = 1;
         let totalMatches = 0;
-
-        // Create sound for end game celebration
-        const endGameSound = new Audio('https://www.myinstants.com/media/sounds/success.mp3');
+        let voicesLoaded = false;
 
         function shuffle(array) {
             for (let i = array.length - 1; i > 0; i--) {
@@ -746,7 +744,7 @@ const words = [
                 englishColumn.appendChild(div);
             });
 
-            checkVoices();
+            loadVoices();
         }
 
         function selectWord(element, type) {
@@ -764,12 +762,15 @@ const words = [
             checkButton.disabled = !(selectedHebrew && selectedEnglish);
         }
 
-        function checkVoices() {
-            const voices = window.speechSynthesis.getVoices();
-            if (voices.length === 0) {
+        function loadVoices() {
+            let voices = window.speechSynthesis.getVoices();
+            if (voices.length === 0 || !voices.find(v => v.lang === 'he-IL')) {
                 window.speechSynthesis.onvoiceschanged = () => {
-                    const loadedVoices = window.speechSynthesis.getVoices();
+                    voices = window.speechSynthesis.getVoices();
+                    voicesLoaded = true;
                 };
+            } else {
+                voicesLoaded = true;
             }
         }
 
@@ -824,7 +825,7 @@ const words = [
 
                 playMatch(hebrewText, englishText, sentenceText);
 
-                // Add confetti (visual celebration without sound)
+                // Add confetti
                 addConfetti();
 
                 // Show random encouragement message
@@ -872,20 +873,14 @@ const words = [
         }
 
         function playMatch(hebrewText, englishText, sentenceText) {
-            let voices = window.speechSynthesis.getVoices();
-            if (voices.length === 0) {
-                window.speechSynthesis.onvoiceschanged = () => {
-                    voices = window.speechSynthesis.getVoices();
-                    playMatchWithVoices(hebrewText, englishText, sentenceText, voices);
-                };
-            } else {
-                playMatchWithVoices(hebrewText, englishText, sentenceText, voices);
+            if (!voicesLoaded) {
+                setTimeout(() => playMatch(hebrewText, englishText, sentenceText), 100);
+                return;
             }
-        }
 
-        function playMatchWithVoices(hebrewText, englishText, sentenceText, voices) {
-            const hebrewVoice = voices.find(v => v.lang === 'he-IL') || voices[0];
-            const englishVoice = voices.find(v => v.lang === 'en-US') || voices[0];
+            const voices = window.speechSynthesis.getVoices();
+            const hebrewVoice = voices.find(v => v.lang === 'he-IL') || voices.find(v => v.lang.includes('he')) || voices[0];
+            const englishVoice = voices.find(v => v.lang === 'en-US') || voices.find(v => v.lang.includes('en')) || voices[0];
 
             const hebrewUtterance = new SpeechSynthesisUtterance(hebrewText);
             hebrewUtterance.lang = 'he-IL';
@@ -913,8 +908,13 @@ const words = [
         }
 
         function playSentence(sentence) {
-            let voices = window.speechSynthesis.getVoices();
-            const englishVoice = voices.find(v => v.lang === 'en-US') || voices[0];
+            if (!voicesLoaded) {
+                setTimeout(() => playSentence(sentence), 100);
+                return;
+            }
+
+            const voices = window.speechSynthesis.getVoices();
+            const englishVoice = voices.find(v => v.lang === 'en-US') || voices.find(v => v.lang.includes('en')) || voices[0];
             const utterance = new SpeechSynthesisUtterance(sentence);
             utterance.lang = 'en-US';
             utterance.rate = 0.8;
@@ -970,9 +970,6 @@ const words = [
             finalScoreDisplay.textContent = score;
             totalTimeDisplay.textContent = totalTime.toFixed(1);
             totalMistakesDisplay.textContent = totalMistakes;
-
-            // Play celebration sound at the end
-            endGameSound.play();
 
             // Add confetti for end game celebration
             addConfetti();
