@@ -7,9 +7,7 @@
     <style>
         body {
             font-family: 'Comic Sans MS', Arial, 'Noto Sans Hebrew', sans-serif;
-            background: linear-gradient(45deg, #ffeb3b, #ff9800, #f44336, #2196f3);
-            background-size: 400% 400%;
-            animation: gradientBG 10s ease infinite;
+            background: linear-gradient(135deg, #f3e7ff, #c8b6ff);
             display: flex;
             justify-content: center;
             align-items: flex-start;
@@ -20,37 +18,117 @@
             position: relative;
         }
 
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
         .game-container {
-            background: #fff;
+            background: rgba(255, 255, 255, 0.95);
             border-radius: 20px;
             padding: 15px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
             width: 100%;
             max-width: 900px;
             text-align: center;
             position: relative;
             z-index: 1;
             box-sizing: border-box;
+            border: 3px solid #9370DB;
         }
 
         h1 {
-            color: #ff5722;
-            font-size: 2em;
+            color: #6a3093;
+            font-size: 2.2em;
             margin-bottom: 15px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            position: relative;
+            display: inline-block;
         }
 
-        #level {
-            font-size: 1.3em;
-            color: #2196f3;
+        h1::after {
+            content: "";
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            height: 3px;
+            width: 100%;
+            background: linear-gradient(to right, #6a3093, #a044ff);
+            border-radius: 2px;
+        }
+
+        .game-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            background: #f0f0f7;
+            border-radius: 15px;
+            padding: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .progress-container {
+            flex-grow: 1;
+            height: 20px;
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            margin: 0 15px;
+            overflow: hidden;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(to right, #4776E6, #8E54E9);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+            position: relative;
+            box-shadow: 0 0 5px rgba(142, 84, 233, 0.5);
+        }
+
+        .progress-bar::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(
+                45deg,
+                rgba(255,255,255,0.2) 25%,
+                transparent 25%,
+                transparent 50%,
+                rgba(255,255,255,0.2) 50%,
+                rgba(255,255,255,0.2) 75%,
+                transparent 75%,
+                transparent
+            );
+            background-size: 15px 15px;
+            animation: progressAnimation 1s linear infinite;
+            border-radius: 10px;
+        }
+
+        @keyframes progressAnimation {
+            0% { background-position: 0 0; }
+            100% { background-position: 15px 0; }
+        }
+
+        .stats {
+            display: flex;
             margin-bottom: 10px;
+        }
+
+        .stat-box {
+            flex: 1;
+            padding: 8px;
+            background: rgba(106, 48, 147, 0.1);
+            border-radius: 10px;
+            margin: 0 5px;
             font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .stat-box:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 10px rgba(0,0,0,0.2);
         }
 
         .columns {
@@ -62,7 +140,7 @@
 
         .column {
             width: 100%;
-            background: #e0f7fa;
+            background: #f8f8ff;
             border-radius: 10px;
             padding: 10px;
             min-height: 200px;
@@ -70,122 +148,329 @@
             overflow-y: auto;
             margin-bottom: 10px;
             box-sizing: border-box;
+            border: 2px dashed #d8bfd8;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .column h2 {
+            color: #6a3093;
+            margin-top: 0;
+            position: relative;
+            display: inline-block;
+        }
+
+        .column h2::after {
+            content: "";
+            position: absolute;
+            bottom: -3px;
+            left: 25%;
+            width: 50%;
+            height: 2px;
+            background: linear-gradient(to right, #6a3093, #a044ff);
+            border-radius: 2px;
         }
 
         .word {
-            background: linear-gradient(135deg, #4caf50, #2e7d32);
+            background: linear-gradient(135deg, #4776E6, #8E54E9);
             color: white;
-            padding: 8px;
-            margin: 5px 0;
-            border-radius: 5px;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 10px;
             cursor: pointer;
             font-size: 1.1em;
-            transition: transform 0.2s, box-shadow 0.3s;
+            transition: all 0.3s;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+            border: 2px solid transparent;
         }
 
         .word:hover {
-            transform: scale(1.05);
+            transform: translateY(-3px) scale(1.03);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
 
         .word.selected {
-            background: linear-gradient(135deg, #ff9800, #f57c00);
+            background: linear-gradient(135deg, #FFB347, #FFCC33);
+            transform: translateY(-5px);
+            box-shadow: 0 7px 15px rgba(255, 179, 71, 0.5);
+            animation: pulse 1.5s infinite;
+            border: 2px solid #FFB347;
         }
 
-        .word.matched {
-            animation: glow 0.5s ease-in-out;
-        }
-
-        @keyframes glow {
-            0% { box-shadow: 0 0 5px #ffd700; }
-            50% { box-shadow: 0 0 20px #ffd700; }
-            100% { box-shadow: 0 0 5px #ffd700; }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 179, 71, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(255, 179, 71, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 179, 71, 0); }
         }
 
         .matched-pair {
-            background: linear-gradient(135deg, #ffeb3b, #fdd835);
-            color: #333;
-            padding: 10px;
-            margin: 8px 0;
-            border-radius: 10px;
+            background: linear-gradient(135deg, #E8F5E9, #A5D6A7);
+            padding: 15px;
+            margin: 12px 0;
+            border-radius: 15px;
             font-size: 1.1em;
             display: flex;
             flex-direction: column;
             align-items: center;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             position: relative;
-            animation: slideIn 0.5s ease-in-out;
+            animation: matchAnimation 0.7s ease-in-out;
+            border-left: 5px solid #4CAF50;
+        }
+
+        @keyframes matchAnimation {
+            0% { transform: scale(0.5); opacity: 0; }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
         }
 
         .matched-pair .pair-text {
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             width: 100%;
             font-weight: bold;
-            color: #d81b60;
+            color: #2E7D32;
+            font-size: 1.2em;
+            gap: 15px;
         }
 
         .matched-pair .sentence {
             margin-top: 8px;
             font-size: 1em;
-            color: #2196f3;
+            color: #1565C0;
             font-style: italic;
             background: rgba(255, 255, 255, 0.8);
-            padding: 5px 10px;
-            border-radius: 5px;
+            padding: 8px 12px;
+            border-radius: 8px;
             border: 1px dashed #4caf50;
+            width: 90%;
         }
 
         .matched-pair .emoji {
-            font-size: 1.5em;
+            font-size: 1.8em;
             margin-top: 5px;
+            animation: spin 1s ease-out;
         }
 
-        @keyframes slideIn {
-            0% { transform: translateY(-20px); opacity: 0; }
-            100% { transform: translateY(0); opacity: 1; }
+        @keyframes spin {
+            0% { transform: rotate(0deg) scale(0); }
+            60% { transform: rotate(360deg) scale(1.2); }
+            100% { transform: rotate(360deg) scale(1); }
         }
 
         #score {
-            font-size: 1.3em;
-            color: #d81b60;
-            margin-bottom: 10px;
+            font-size: 1.5em;
+            color: #6a3093;
             font-weight: bold;
+            background: rgba(106, 48, 147, 0.1);
+            padding: 8px 15px;
+            border-radius: 15px;
             display: inline-block;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
             transition: transform 0.3s;
         }
 
-        #score.bounce {
-            animation: bounce 0.5s ease-in-out;
+        #score:hover {
+            transform: scale(1.05);
         }
 
-        @keyframes bounce {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-            100% { transform: scale(1); }
+        #streak-bonus {
+            font-size: 1.2em;
+            color: #FF6F00;
+            margin: 10px 0;
+            font-weight: bold;
+            animation: fadeInOut 3s ease-in-out;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: scale(0.8); }
+            10% { opacity: 1; transform: scale(1.1); }
+            20% { opacity: 1; transform: scale(1); }
+            80% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        .time-bonus {
+            position: absolute;
+            color: #4CAF50;
+            font-weight: bold;
+            font-size: 1.2em;
+            pointer-events: none;
+            animation: floatUp 2s forwards;
+            z-index: 10;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(0); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-50px); opacity: 0; }
         }
 
         #check-button {
-            padding: 8px 16px;
-            font-size: 1.1em;
+            padding: 12px 24px;
+            font-size: 1.2em;
             color: #fff;
-            background: linear-gradient(135deg, #2196f3, #1976d2);
+            background: linear-gradient(135deg, #6a3093, #a044ff);
             border: none;
-            border-radius: 10px;
+            border-radius: 50px;
             cursor: pointer;
-            margin: 10px auto;
+            margin: 15px auto;
             display: block;
-            transition: background 0.3s, transform 0.2s;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(106, 48, 147, 0.4);
+            position: relative;
+            overflow: hidden;
         }
 
         #check-button:disabled {
-            background: #ccc;
+            background: linear-gradient(135deg, #9e9e9e, #757575);
             cursor: not-allowed;
+            box-shadow: none;
         }
 
         #check-button:hover:not(:disabled) {
-            background: linear-gradient(135deg, #42a5f5, #1e88e5);
-            transform: scale(1.05);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(106, 48, 147, 0.6);
         }
+
+        #check-button:active:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 10px rgba(106, 48, 147, 0.4);
+        }
+
+        #check-button::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.5s, height 0.5s;
+        }
+
+        #check-button:hover::after:not(:disabled) {
+            width: 200px;
+            height: 200px;
+            opacity: 0;
+        }
+
+        .difficulty-select {
+            margin: 10px 0;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .difficulty-option {
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .difficulty-option.easy {
+            background: rgba(76, 175, 80, 0.2);
+            color: #2E7D32;
+        }
+
+        .difficulty-option.medium {
+            background: rgba(255, 152, 0, 0.2);
+            color: #EF6C00;
+        }
+
+        .difficulty-option.hard {
+            background: rgba(244, 67, 54, 0.2);
+            color: #C62828;
+        }
+
+        .difficulty-option.selected {
+            transform: scale(1.05);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+            border: 2px solid currentColor;
+        }
+
+        .difficulty-option:hover:not(.selected) {
+            transform: translateY(-2px);
+        }
+
+        /* Badges container */
+        .badges-earned {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 10px 0;
+            gap: 10px;
+        }
+
+        .badge {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+            font-size: 1.5em;
+            position: relative;
+            transition: all 0.3s;
+            opacity: 0.3;
+            filter: grayscale(100%);
+            cursor: help;
+        }
+
+        .badge.earned {
+            opacity: 1;
+            filter: grayscale(0%);
+            animation: badgeEarned 1s ease-in-out;
+        }
+
+        @keyframes badgeEarned {
+            0% { transform: scale(0.8); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+
+        .badge:hover {
+            transform: scale(1.15);
+        }
+
+        .badge::after {
+            content: attr(data-title);
+            position: absolute;
+            bottom: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            width: max-content;
+            max-width: 150px;
+            z-index: 10;
+        }
+
+        .badge:hover::after {
+            opacity: 1;
+            visibility: visible;
+            bottom: -40px;
+        }
+
+        .speed-badge { background: linear-gradient(135deg, #FF9800, #FF5722); }
+        .perfect-badge { background: linear-gradient(135deg, #FFC107, #FFEB3B); }
+        .streak-badge { background: linear-gradient(135deg, #3F51B5, #2196F3); }
+        .master-badge { background: linear-gradient(135deg, #9C27B0, #E91E63); }
+        .explorer-badge { background: linear-gradient(135deg, #009688, #4CAF50); }
 
         #result {
             display: none;
@@ -193,98 +478,118 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: linear-gradient(135deg, #ffebcd, #afeeee);
-            padding: 20px;
+            background: linear-gradient(135deg, #f5f7ff, #c3cfe2);
+            padding: 25px;
             border-radius: 20px;
-            box-shadow: 0 0 30px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.5);
             text-align: center;
             width: 90%;
             max-width: 700px;
-            max-height: 80vh;
+            max-height: 85vh;
             overflow-y: auto;
-            z-index: 2;
-            animation: popIn 0.5s ease-out;
+            z-index: 100;
+            animation: bounceIn 0.8s ease-out;
+            border: 3px solid rgba(106, 48, 147, 0.5);
         }
 
-        @keyframes popIn {
-            0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
-            80% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+        @keyframes bounceIn {
+            0% { transform: translate(-50%, -50%) scale(0.3); opacity: 0; }
+            50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.8; }
+            70% { transform: translate(-50%, -50%) scale(0.9); opacity: 1; }
             100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
         }
 
         #result h2 {
-            color: #ff69b4;
-            font-size: 2em;
+            color: #6a3093;
+            font-size: 2.2em;
             margin-bottom: 15px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
             position: relative;
-        }
-
-        #result h2::before, #result h2::after {
-            content: '⭐';
-            position: absolute;
-            font-size: 1.5em;
-            animation: starTwinkle 1.5s infinite;
-        }
-
-        #result h2::before {
-            left: -30px;
+            display: inline-block;
         }
 
         #result h2::after {
-            right: -30px;
-        }
-
-        @keyframes starTwinkle {
-            0% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.5; transform: scale(1.2); }
-            100% { opacity: 1; transform: scale(1); }
+            content: "";
+            position: absolute;
+            bottom: -5px;
+            left: 25%;
+            width: 50%;
+            height: 3px;
+            background: linear-gradient(to right, #6a3093, #a044ff);
+            border-radius: 2px;
         }
 
         #result p {
             color: #333;
-            font-size: 1.1em;
+            font-size: 1.2em;
             margin: 10px 0;
             font-weight: bold;
+        }
+
+        #result .score-container {
+            background: linear-gradient(135deg, rgba(106, 48, 147, 0.1), rgba(160, 68, 255, 0.1));
+            padding: 15px;
+            border-radius: 15px;
+            margin: 15px 0;
+            display: flex;
+            justify-content: space-around;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        #result .score-item {
+            text-align: center;
+        }
+
+        #result .score-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #6a3093;
+            display: block;
+        }
+
+        #result .score-label {
+            font-size: 0.9em;
+            color: #666;
         }
 
         #result table {
             width: 100%;
             border-collapse: separate;
             border-spacing: 0;
-            margin: 15px 0;
+            margin: 20px 0;
             background: rgba(255, 255, 255, 0.9);
             border-radius: 15px;
-            font-size: 0.9em;
-            box-shadow: 0 5px 15px rgba(0, 0, 0mano, 0.1);
+            font-size: 0.95em;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
         }
 
         #result th, #result td {
-            padding: 10px;
-            border: 1px solid #ddd;
+            padding: 12px;
+            border: 1px solid #e0e0e0;
             color: #333;
             text-align: center;
         }
 
         #result th {
-            background: #ff69b4;
+            background: linear-gradient(135deg, #6a3093, #a044ff);
             color: white;
             font-weight: bold;
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
         }
 
         #result td {
-            background: #f0f8ff;
+            background: #f5f5f5;
             color: #555;
+            transition: background 0.3s;
         }
 
         #result tr:nth-child(even) td {
-            background: #e6f3fa;
+            background: #eef1f7;
         }
 
         #result tr:hover td {
-            background: #ffebcd;
-            transition: background 0.3s;
+            background: #e6f7ff;
         }
 
         .sentence-cell {
@@ -293,94 +598,143 @@
             justify-content: center;
             gap: 8px;
             font-style: italic;
-            color: #2196f3;
-        }
-
-        .play-sentence-btn {
-            background: #90ee90;
-            border: none;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 1em;
-            transition: transform 0.2s, background 0.3s;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-        }
-
-        .play-sentence-btn:hover {
-            background: #32cd32;
-            transform: scale(1.1);
-        }
-
-        .play-sentence-btn:active {
-            transform: scale(0.95);
+            color: #1565C0;
         }
 
         #play-again {
-            padding: 8px 16px;
-            font-size: 1.1em;
+            padding: 12px 24px;
+            font-size: 1.2em;
             color: #fff;
-            background: linear-gradient(135deg, #ff69b4, #ec407a);
+            background: linear-gradient(135deg, #6a3093, #a044ff);
             border: none;
-            border-radius: 10px;
+            border-radius: 50px;
             cursor: pointer;
-            transition: transform 0.2s, background 0.3s;
-            margin-top: 15px;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(106, 48, 147, 0.4);
+            margin-top: 20px;
         }
 
         #play-again:hover {
-            background: linear-gradient(135deg, #f06292, #e91e63);
-            transform: scale(1.1);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(106, 48, 147, 0.6);
         }
 
-        .firework {
-            position: fixed;
+        #play-again:active {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 10px rgba(106, 48, 147, 0.4);
+        }
+
+        .confetti {
+            position: absolute;
             width: 10px;
             height: 10px;
-            border-radius: 50%;
+            opacity: 0.7;
+            animation: fall 4s linear;
             z-index: 0;
-            pointer-events: none;
-            animation: fireworkBurst 1.5s ease-out forwards;
         }
 
-        @keyframes fireworkBurst {
-            0% {
-                transform: translate(-50%, -50%) scale(0);
-                opacity: 1;
-            }
-            50% {
-                transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y))) scale(1.5);
-                opacity: 1;
-            }
-            100% {
-                transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y))) scale(0);
-                opacity: 0;
-            }
+        @keyframes fall {
+            0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
         }
 
-        .encouragement {
+        /* Hints system */
+        .hint-button {
+            font-size: 1em;
+            background: rgba(106, 48, 147, 0.1);
+            color: #6a3093;
+            border: none;
+            border-radius: 20px;
+            padding: 5px 15px;
+            cursor: pointer;
+            margin: 5px;
+            transition: all 0.3s;
+        }
+
+        .hint-button:hover {
+            background: rgba(106, 48, 147, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .hint-highlight {
+            animation: hintPulse 2s infinite;
+        }
+
+        @keyframes hintPulse {
+            0% { box-shadow: 0 0 0 0 rgba(106, 48, 147, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(106, 48, 147, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(106, 48, 147, 0); }
+        }
+
+        #level-indicator {
             position: absolute;
-            top: -30px;
+            top: 15px;
+            right: 15px;
+            background: linear-gradient(135deg, #6a3093, #a044ff);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9em;
+            box-shadow: 0 3px 10px rgba(106, 48, 147, 0.4);
+        }
+
+        .power-ups {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+
+        .power-up {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+            background: #e0e0e0;
+            cursor: pointer;
+            opacity: 0.6;
+            transition: all 0.3s;
+            position: relative;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .power-up.available {
+            opacity: 1;
+            background: linear-gradient(135deg, #6a3093, #a044ff);
+            color: white;
+        }
+
+        .power-up.available:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 10px rgba(106, 48, 147, 0.6);
+        }
+
+        .power-up::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: -30px;
             left: 50%;
             transform: translateX(-50%);
-            background: #ff69b4;
+            background: rgba(0,0,0,0.8);
             color: white;
             padding: 5px 10px;
             border-radius: 5px;
-            font-size: 1em;
-            font-weight: bold;
-            animation: encouragementPop 1s ease-in-out forwards;
-            z-index: 2;
+            font-size: 12px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            width: max-content;
+            z-index: 10;
         }
 
-        @keyframes encouragementPop {
-            0% { transform: translateX(-50%) scale(0); opacity: 0; }
-            50% { transform: translateX(-50%) scale(1.2); opacity: 1; }
-            100% { transform: translateX(-50%) scale(1); opacity: 0; }
+        .power-up:hover::after {
+            opacity: 1;
+            visibility: visible;
+            bottom: -40px;
         }
 
         @media (min-width: 768px) {
@@ -388,7 +742,7 @@
                 flex-direction: row;
             }
             .column {
-                width: 45%;
+                width: 48%;
                 margin-bottom: 0;
             }
             h1 {
@@ -400,582 +754,129 @@
             .matched-pair .sentence {
                 font-size: 1.1em;
             }
-            #score, #level {
+            #score {
                 font-size: 1.5em;
             }
             #check-button, #play-again {
-                padding: 10px 20px;
-                font-size: 1.2em;
+                padding: 15px 30px;
+                font-size: 1.3em;
             }
             #result h2 {
                 font-size: 2.5em;
             }
-            #result table {
-                font-size: 1em;
-            }
-            .play-sentence-btn {
-                width: 35px;
-                height: 35px;
-                font-size: 1.2em;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="game-container">
-        <h1>משחק התאמת מילים לילדים</h1>
-        <div id="level">רמה: 1</div>
-        <div id="score">ניקוד: 0</div>
-        <div class="columns">
-            <div class="column" id="hebrew-words">
-                <h2>מילים בעברית</h2>
-            </div>
-            <div class="column" id="english-words">
-                <h2>מילים באנגלית</h2>
-            </div>
-        </div>
-        <button id="check-button" disabled>בדוק התאמה</button>
-    </div>
-    <div id="result">
-        <h2>כל הכבוד! 🎉</h2>
-        <p id="final-level"></p>
-        <p>ניקוד סופי: <span id="final-score"></span></p>
-        <p>זמן כולל: <span id="total-time"></span> שניות</p>
-        <p>סה"כ טעויות: <span id="total-mistakes"></span></p>
-        <table>
-            <thead>
-                <tr>
-                    <th>מילה (עברית - אנגלית)</th>
-                    <th>זמן (שניות)</th>
-                    <th>ניסיונות</th>
-                    <th>טעויות</th>
-                    <th>משפט באנגלית</th>
-                </tr>
-            </thead>
-            <tbody id="match-details"></tbody>
-        </table>
-        <button id="play-again">שחק שוב</button>
-    </div>
-
-    <script>
-        const words = [
-    { hebrew: "חתול", english: "Cat", sentence: "The cat is on the mat." },
-    { hebrew: "דג", english: "Fish", sentence: "I see a fish in the water." },
-    { hebrew: "ציפור", english: "Bird", sentence: "A bird flies in the sky." },
-    { hebrew: "אריה", english: "Lion", sentence: "The lion is very strong." },
-    { hebrew: "פיל", english: "Elephant", sentence: "An elephant has big ears." },
-    { hebrew: "סוס", english: "Horse", sentence: "The horse runs fast." },
-    { hebrew: "פרה", english: "Cow", sentence: "The cow gives us milk." },
-    { hebrew: "תרנגולת", english: "Chicken", sentence: "The chicken lays eggs." },
-    { hebrew: "ברווז", english: "Duck", sentence: "A duck swims in the pond." },
-    { hebrew: "עכבר", english: "Mouse", sentence: "The mouse is small and quick." },
-    { hebrew: "כלב", english: "Dog", sentence: "My dog likes to play." },
-    { hebrew: "נמר", english: "Tiger", sentence: "The tiger has stripes." },
-    { hebrew: "זאב", english: "Wolf", sentence: "A wolf howls at night." },
-    { hebrew: "שועל", english: "Fox", sentence: "The fox is smart and fast." },
-    { hebrew: "חמור", english: "Donkey", sentence: "The donkey carries bags." },
-    { hebrew: "עז", english: "Goat", sentence: "The goat eats grass." },
-    { hebrew: "כבש", english: "Sheep", sentence: "The sheep has soft wool." },
-    { hebrew: "חזיר", english: "Pig", sentence: "The pig plays in the mud." },
-    { hebrew: "צב", english: "Turtle", sentence: "The turtle walks slowly." },
-    { hebrew: "נחש", english: "Snake", sentence: "A snake moves on the ground." },
-    { hebrew: "תנין", english: "Crocodile", sentence: "The crocodile lives in water." },
-    { hebrew: "קוף", english: "Monkey", sentence: "The monkey climbs trees." },
-    { hebrew: "גמל", english: "Camel", sentence: "The camel walks in the desert." },
-    { hebrew: "דב", english: "Bear", sentence: "The bear likes honey." },
-    { hebrew: "עטלף", english: "Bat", sentence: "A bat flies at night." },
-    { hebrew: "ארנב", english: "Rabbit", sentence: "The rabbit hops in the field." },
-    { hebrew: "סנאי", english: "Squirrel", sentence: "The squirrel collects nuts." },
-    { hebrew: "צפרדע", english: "Frog", sentence: "The frog jumps near the water." },
-    { hebrew: "פרפר", english: "Butterfly", sentence: "A butterfly has pretty wings." },
-    { hebrew: "דבורה", english: "Bee", sentence: "The bee makes honey." },
-    { hebrew: "נמלה", english: "Ant", sentence: "The ant works hard." },
-    { hebrew: "זבוב", english: "Fly", sentence: "A fly buzzes around." },
-    { hebrew: "יתוש", english: "Mosquito", sentence: "The mosquito bites at night." },
-    { hebrew: "עכביש", english: "Spider", sentence: "The spider makes a web." },
-    { hebrew: "תולעת", english: "Worm", sentence: "The worm lives in the soil." },
-    { hebrew: "חיפושית", english: "Beetle", sentence: "The beetle has a hard shell." },
-    { hebrew: "שמש", english: "Sun", sentence: "The sun shines in the day." },
-    { hebrew: "ירח", english: "Moon", sentence: "The moon glows at night." },
-    { hebrew: "כוכב", english: "Star", sentence: "A star twinkles in the sky." },
-    { hebrew: "ענן", english: "Cloud", sentence: "The cloud is white and fluffy." },
-    { hebrew: "גשם", english: "Rain", sentence: "The rain falls from the sky." },
-    { hebrew: "שלג", english: "Snow", sentence: "The snow is cold and white." },
-    { hebrew: "רוח", english: "Wind", sentence: "The wind blows the trees." },
-    { hebrew: "ים", english: "Sea", sentence: "The sea is big and blue." },
-    { hebrew: "נהר", english: "River", sentence: "The river flows fast." },
-    { hebrew: "אגם", english: "Lake", sentence: "The lake is calm and pretty." },
-    { hebrew: "הר", english: "Mountain", sentence: "The mountain is very tall." },
-    { hebrew: "יער", english: "Forest", sentence: "The forest has many trees." },
-    { hebrew: "שדה", english: "Field", sentence: "The field is full of flowers." },
-    { hebrew: "פרח", english: "Flower", sentence: "The flower smells nice." },
-    { hebrew: "עץ", english: "Tree", sentence: "The tree is big and green." },
-    { hebrew: "שולחן", english: "Table", sentence: "The table is in the room." },
-    { hebrew: "כיסא", english: "Chair", sentence: "I sit on the chair." },
-    { hebrew: "מיטה", english: "Bed", sentence: "The bed is soft and cozy." },
-    { hebrew: "חלון", english: "Window", sentence: "The window is open." },
-    { hebrew: "דלת", english: "Door", sentence: "The door is red." },
-    { hebrew: "בית", english: "House", sentence: "My house is big." },
-    { hebrew: "מכונית", english: "Car", sentence: "The car is fast." },
-    { hebrew: "אופניים", english: "Bicycle", sentence: "I ride my bicycle." },
-    { hebrew: "אוטובוס", english: "Bus", sentence: "The bus is yellow." },
-    { hebrew: "רכבת", english: "Train", sentence: "The train goes on tracks." },
-    { hebrew: "מטוס", english: "Airplane", sentence: "The airplane flies high." },
-    { hebrew: "סירה", english: "Boat", sentence: "The boat is on the water." },
-    { hebrew: "כדור", english: "Ball", sentence: "I kick the ball." },
-    { hebrew: "ספר", english: "Book", sentence: "I read a book." },
-    { hebrew: "עיפרון", english: "Pencil", sentence: "I write with a pencil." },
-    { hebrew: "מחברת", english: "Notebook", sentence: "My notebook is blue." },
-    { hebrew: "תיק", english: "Bag", sentence: "I carry my bag." },
-    { hebrew: "שעון", english: "Clock", sentence: "The clock shows the time." },
-    { hebrew: "טלפון", english: "Phone", sentence: "I call on the phone." },
-    { hebrew: "מחשב", english: "Computer", sentence: "I play on the computer." },
-    { hebrew: "טלוויזיה", english: "Television", sentence: "I watch television." },
-    { hebrew: "מקרר", english: "Refrigerator", sentence: "The refrigerator is cold." },
-    { hebrew: "תנור", english: "Oven", sentence: "The oven bakes food." },
-    { hebrew: "כוס", english: "Cup", sentence: "I drink from a cup." },
-    { hebrew: "צלחת", english: "Plate", sentence: "The plate is on the table." },
-    { hebrew: "סכין", english: "Knife", sentence: "The knife cuts food." },
-    { hebrew: "מזלג", english: "Fork", sentence: "I eat with a fork." },
-    { hebrew: "כף", english: "Spoon", sentence: "I use a spoon for soup." },
-    { hebrew: "לחם", english: "Bread", sentence: "The bread is fresh." },
-    { hebrew: "גבינה", english: "Cheese", sentence: "I like cheese on bread." },
-    { hebrew: "חלב", english: "Milk", sentence: "I drink milk every day." },
-    { hebrew: "מיץ", english: "Juice", sentence: "The juice is sweet." },
-    { hebrew: "תפוח", english: "Apple", sentence: "I eat an apple." },
-    { hebrew: "בננה", english: "Banana", sentence: "The banana is yellow." },
-    { hebrew: "תפוז", english: "Orange", sentence: "The orange is juicy." },
-    { hebrew: "ענבים", english: "Grapes", sentence: "I like green grapes." },
-    { hebrew: "מלון", english: "Melon", sentence: "The melon is big." },
-    { hebrew: "אבטיח", english: "Watermelon", sentence: "The watermelon is red." },
-    { hebrew: "עגבנייה", english: "Tomato", sentence: "The tomato is red." },
-    { hebrew: "מלפפון", english: "Cucumber", sentence: "I eat a cucumber." },
-    { hebrew: "גזר", english: "Carrot", sentence: "The carrot is orange." },
-    { hebrew: "תפוד", english: "Potato", sentence: "The potato is in the soup." },
-    { hebrew: "בצל", english: "Onion", sentence: "The onion makes me cry." },
-    { hebrew: "שום", english: "Garlic", sentence: "The garlic smells strong." },
-    { hebrew: "מלח", english: "Salt", sentence: "The salt is white." },
-    { hebrew: "פלפל", english: "Pepper", sentence: "The pepper is spicy." },
-    { hebrew: "סוכר", english: "Sugar", sentence: "The sugar is sweet." },
-    { hebrew: "שוקולד", english: "Chocolate", sentence: "I love chocolate." },
-    { hebrew: "אבא", english: "Father", sentence: "My father drives a car." },
-    { hebrew: "אמא", english: "Mother", sentence: "My mother cooks dinner." },
-    { hebrew: "אח", english: "Brother", sentence: "My brother plays soccer." },
-    { hebrew: "אחות", english: "Sister", sentence: "My sister likes to dance." },
-    { hebrew: "סבא", english: "Grandfather", sentence: "My grandfather tells stories." },
-    { hebrew: "סבתא", english: "Grandmother", sentence: "My grandmother bakes cookies." },
-    { hebrew: "חבר", english: "Friend", sentence: "My friend is very funny." },
-    { hebrew: "מורה", english: "Teacher", sentence: "The teacher writes on the board." },
-    { hebrew: "תלמיד", english: "Student", sentence: "The student reads a book." },
-    { hebrew: "כיתה", english: "Classroom", sentence: "The classroom is big and bright." },
-    { hebrew: "לוח", english: "Board", sentence: "The board is green." },
-    { hebrew: "שולחן עבודה", english: "Desk", sentence: "I sit at my desk." },
-    { hebrew: "מספריים", english: "Scissors", sentence: "I cut paper with scissors." },
-    { hebrew: "דבק", english: "Glue", sentence: "I use glue for my project." },
-    { hebrew: "צבעים", english: "Colors", sentence: "I paint with many colors." },
-    { hebrew: "מכחול", english: "Paintbrush", sentence: "The paintbrush is soft." },
-    { hebrew: "נייר", english: "Paper", sentence: "I draw on the paper." },
-    { hebrew: "ציור", english: "Drawing", sentence: "My drawing is beautiful." },
-    { hebrew: "שיר", english: "Song", sentence: "I sing a happy song." },
-    { hebrew: "מוזיקה", english: "Music", sentence: "I listen to music." },
-    { hebrew: "ריקוד", english: "Dance", sentence: "I love to dance with friends." },
-    { hebrew: "משחק", english: "Game", sentence: "We play a fun game." },
-    { hebrew: "חבל", english: "Rope", sentence: "I jump with a rope." },
-    { hebrew: "גינה", english: "Garden", sentence: "The garden has many flowers." },
-    { hebrew: "צמח", english: "Plant", sentence: "I water the plant." },
-    { hebrew: "זרע", english: "Seed", sentence: "I plant a seed in the soil." },
-    { hebrew: "שורש", english: "Root", sentence: "The root grows in the ground." },
-    { hebrew: "עלה", english: "Leaf", sentence: "The leaf is green and shiny." },
-    { hebrew: "פרי", english: "Fruit", sentence: "I eat a sweet fruit." },
-    { hebrew: "ירק", english: "Vegetable", sentence: "I like to eat vegetables." },
-    { hebrew: "תות", english: "Strawberry", sentence: "The strawberry is red and sweet." },
-    { hebrew: "לימון", english: "Lemon", sentence: "The lemon is yellow and sour." },
-    { hebrew: "אגס", english: "Pear", sentence: "I eat a juicy pear." },
-    { hebrew: "מנגו", english: "Mango", sentence: "The mango is orange and tasty." },
-    { hebrew: "אננס", english: "Pineapple", sentence: "The pineapple is big and yellow." },
-    { hebrew: "תירס", english: "Corn", sentence: "I like to eat corn." },
-    { hebrew: "חסה", english: "Lettuce", sentence: "The lettuce is green and fresh." },
-    { hebrew: "פטרייה", english: "Mushroom", sentence: "The mushroom is small and brown." },
-    { hebrew: "שעועית", english: "Bean", sentence: "I eat beans with rice." },
-    { hebrew: "אפונה", english: "Pea", sentence: "The pea is small and green." },
-    { hebrew: "בוטן", english: "Peanut", sentence: "I like to eat peanuts." },
-    { hebrew: "שקד", english: "Almond", sentence: "The almond is hard and tasty." },
-    { hebrew: "אגוז", english: "Nut", sentence: "I crack the nut to eat it." },
-    { hebrew: "דגנים", english: "Cereal", sentence: "I eat cereal for breakfast." },
-    { hebrew: "ביצה", english: "Egg", sentence: "I fry an egg for lunch." },
-    { hebrew: "עוף", english: "Chicken", sentence: "The chicken is on the plate." },
-    { hebrew: "דג מטוגן", english: "Fish", sentence: "I eat fish with lemon." },
-    { hebrew: "פסטה", english: "Pasta", sentence: "I like pasta with sauce." },
-    { hebrew: "אורז", english: "Rice", sentence: "The rice is white and soft." },
-    { hebrew: "מרק", english: "Soup", sentence: "The soup is hot and yummy." },
-    { hebrew: "סלט", english: "Salad", sentence: "I make a fresh salad." },
-    { hebrew: "עוגה", english: "Cake", sentence: "The cake is sweet and big." },
-    { hebrew: "עוגייה", english: "Cookie", sentence: "I eat a chocolate cookie." },
-    { hebrew: "גלידה", english: "Ice Cream", sentence: "The ice cream is cold." },
-    { hebrew: "ממתק", english: "Candy", sentence: "I like to eat candy." },
-    { hebrew: "מילקשייק", english: "Milkshake", sentence: "I drink a strawberry milkshake." },
-    { hebrew: "מים", english: "Water", sentence: "I drink water every day." },
-    { hebrew: "תה", english: "Tea", sentence: "The tea is hot and sweet." },
-    { hebrew: "קפה", english: "Coffee", sentence: "My dad drinks coffee." },
-    { hebrew: "חולצה", english: "Shirt", sentence: "I wear a blue shirt." },
-    { hebrew: "מכנסיים", english: "Pants", sentence: "My pants are black." },
-    { hebrew: "נעליים", english: "Shoes", sentence: "I wear my shoes to school." },
-    { hebrew: "גרביים", english: "Socks", sentence: "My socks are white." },
-    { hebrew: "כובע", english: "Hat", sentence: "I wear a hat in the sun." },
-    { hebrew: "מעיל", english: "Coat", sentence: "I wear a coat in winter." },
-    { hebrew: "צעיף", english: "Scarf", sentence: "The scarf is warm and soft." },
-    { hebrew: "כפפות", english: "Gloves", sentence: "I wear gloves in the cold." },
-    { hebrew: "חגורה", english: "Belt", sentence: "My belt is brown." },
-    { hebrew: "שמלה", english: "Dress", sentence: "My sister wears a dress." },
-    { hebrew: "חצאית", english: "Skirt", sentence: "The skirt is pink." },
-    { hebrew: "תיק גב", english: "Backpack", sentence: "I carry my backpack to school." },
-    { hebrew: "משקפיים", english: "Glasses", sentence: "I wear glasses to read." },
-    { hebrew: "שעון יד", english: "Watch", sentence: "My watch is on my hand." },
-    { hebrew: "מטריה", english: "Umbrella", sentence: "I use an umbrella in the rain." },
-    { hebrew: "בוקר", english: "Morning", sentence: "I wake up in the morning." },
-    { hebrew: "צהריים", english: "Noon", sentence: "I eat lunch at noon." },
-    { hebrew: "ערב", english: "Evening", sentence: "I play in the evening." },
-    { hebrew: "לילה", english: "Night", sentence: "I sleep at night." },
-    { hebrew: "שני", english: "Monday", sentence: "Monday is the first day." },
-    { hebrew: "שלישי", english: "Tuesday", sentence: "I go to school on Tuesday." },
-    { hebrew: "רביעי", english: "Wednesday", sentence: "Wednesday is in the middle." },
-    { hebrew: "חמישי", english: "Thursday", sentence: "I play on Thursday." },
-    { hebrew: "שישי", english: "Friday", sentence: "Friday is a fun day." },
-    { hebrew: "שבת", english: "Saturday", sentence: "I rest on Saturday." },
-    { hebrew: "ראשון", english: "Sunday", sentence: "Sunday is a new week." },
-    { hebrew: "קיץ", english: "Summer", sentence: "Summer is hot and sunny." },
-    { hebrew: "חורף", english: "Winter", sentence: "Winter is cold and snowy." },
-    { hebrew: "סתיו", english: "Autumn", sentence: "Autumn leaves are orange." },
-    { hebrew: "אביב", english: "Spring", sentence: "Spring flowers bloom." },
-    { hebrew: "חם", english: "Hot", sentence: "The day is very hot." },
-    { hebrew: "קר", english: "Cold", sentence: "The water is cold." },
-    { hebrew: "רטוב", english: "Wet", sentence: "My clothes are wet." },
-    { hebrew: "יבש", english: "Dry", sentence: "The towel is dry." },
-    { hebrew: "מהיר", english: "Fast", sentence: "The car is fast." },
-    { hebrew: "איטי", english: "Slow", sentence: "The turtle is slow." },
-    { hebrew: "גבוה", english: "Tall", sentence: "The tree is tall." },
-    { hebrew: "נמוך", english: "Short", sentence: "The chair is short." },
-    { hebrew: "כבד", english: "Heavy", sentence: "The bag is heavy." },
-    { hebrew: "קל", english: "Light", sentence: "The feather is light." },
-    { hebrew: "שמח", english: "Happy", sentence: "I am happy today." },
-    { hebrew: "עצוב", english: "Sad", sentence: "The boy is sad." },
-    { hebrew: "חזק", english: "Strong", sentence: "The lion is strong." },
-    { hebrew: "חלש", english: "Weak", sentence: "I feel weak today." }
-];
-
-        const hebrewColumn = document.getElementById('hebrew-words');
-        const englishColumn = document.getElementById('english-words');
-        const scoreDisplay = document.getElementById('score');
-        const levelDisplay = document.getElementById('level');
-        const checkButton = document.getElementById('check-button');
-        const resultDiv = document.getElementById('result');
-        const finalScoreDisplay = document.getElementById('final-score');
-        const finalLevelDisplay = document.getElementById('final-level');
-        const totalTimeDisplay = document.getElementById('total-time');
-        const totalMistakesDisplay = document.getElementById('total-mistakes');
-        const matchDetails = document.getElementById('match-details');
-        const playAgainButton = document.getElementById('play-again');
-
-        let score = 0;
-        let matches = 0;
-        let totalMistakes = 0;
-        let matchTimes = [];
-        let matchAttempts = [];
-        let matchMistakes = [];
-        let selectedHebrew = null;
-        let selectedEnglish = null;
-        let startTime = null;
-        let wordStartTime = null;
-        let currentWords = [];
-        let level = 1;
-        let totalMatches = 0;
-        let voicesLoaded = false;
-
-        function shuffle(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-            return array;
-        }
-
-        function initGame() {
-            hebrewColumn.innerHTML = '<h2>מילים בעברית</h2>';
-            englishColumn.innerHTML = '<h2>מילים באנגלית</h2>';
-            score = 0;
-            matches = 0;
-            totalMatches = 0;
-            totalMistakes = 0;
-            matchTimes = [];
-            matchAttempts = new Array(10).fill(0);
-            matchMistakes = new Array(10).fill(0);
-            selectedHebrew = null;
-            selectedEnglish = null;
-            startTime = Date.now();
-            wordStartTime = null;
-            level = 1;
-            scoreDisplay.textContent = `ניקוד: ${score}`;
-            levelDisplay.textContent = `רמה: ${level}`;
-            resultDiv.style.display = 'none';
-            checkButton.disabled = true;
-
-            const shuffledWords = shuffle([...words]);
-            currentWords = shuffledWords.slice(0, 10);
-
-            const shuffledHebrew = shuffle([...currentWords]);
-            const shuffledEnglish = shuffle([...currentWords]);
-
-            shuffledHebrew.forEach((word) => {
-                const div = document.createElement('div');
-                div.className = 'word';
-                div.textContent = word.hebrew;
-                div.dataset.english = word.english;
-                div.dataset.hebrew = word.hebrew;
-                div.dataset.sentence = word.sentence;
-                div.addEventListener('click', () => selectWord(div, 'hebrew'));
-                hebrewColumn.appendChild(div);
-            });
-
-            shuffledEnglish.forEach((word) => {
-                const div = document.createElement('div');
-                div.className = 'word';
-                div.textContent = word.english;
-                div.dataset.english = word.english;
-                div.dataset.hebrew = word.hebrew;
-                div.dataset.sentence = word.sentence;
-                div.addEventListener('click', () => selectWord(div, 'english'));
-                englishColumn.appendChild(div);
-            });
-
-            loadVoices();
-        }
-
-        function selectWord(element, type) {
-            if (type === 'hebrew') {
-                if (selectedHebrew) selectedHebrew.classList.remove('selected');
-                selectedHebrew = element;
-                selectedHebrew.classList.add('selected');
-            } else {
-                if (selectedEnglish) selectedEnglish.classList.remove('selected');
-                selectedEnglish = element;
-                selectedEnglish.classList.add('selected');
-            }
-
-            if (!wordStartTime) wordStartTime = Date.now();
-            checkButton.disabled = !(selectedHebrew && selectedEnglish);
-        }
-
-        function loadVoices() {
-            let voices = window.speechSynthesis.getVoices();
-            if (voices.length === 0 || !voices.find(v => v.lang === 'he-IL')) {
-                window.speechSynthesis.onvoiceschanged = () => {
-                    voices = window.speechSynthesis.getVoices();
-                    voicesLoaded = true;
-                };
-            } else {
-                voicesLoaded = true;
+            .badge {
+                width: 70px;
+                height: 70px;
+                font-size: 1.8em;
             }
         }
 
-        function checkMatch() {
-            if (!selectedHebrew || !selectedEnglish) return;
-
-            const wordIndex = currentWords.findIndex(w => w.english === selectedEnglish.dataset.english);
-            matchAttempts[wordIndex]++;
-            const timeTaken = (Date.now() - wordStartTime) / 1000;
-            const isMatch = selectedHebrew.dataset.english === selectedEnglish.dataset.english;
-
-            if (isMatch) {
-                matches++;
-                totalMatches++;
-                matchTimes.push(timeTaken);
-
-                let points = matchAttempts[wordIndex] === 1 ? 10 : 5;
-
-                if (matchAttempts[wordIndex] === 1) {
-                    points += 2;
-                    showEncouragement("בונוס דיוק! 🎯", selectedEnglish);
-                }
-
-                score += points;
-                scoreDisplay.textContent = `ניקוד: ${score}`;
-                scoreDisplay.classList.add('bounce');
-
-                selectedHebrew.classList.add('matched');
-                selectedEnglish.classList.add('matched');
-
-                const matchedDiv = document.createElement('div');
-                matchedDiv.className = 'matched-pair';
-                matchedDiv.innerHTML = `
-                    <div class="pair-text">${selectedHebrew.textContent} - ${selectedEnglish.textContent}</div>
-                    <div class="sentence">${selectedEnglish.dataset.sentence}</div>
-                    <div class="emoji">🌟</div>
-                `;
-                englishColumn.appendChild(matchedDiv);
-
-                const hebrewText = selectedHebrew.textContent;
-                const englishText = selectedEnglish.textContent;
-                const sentenceText = selectedEnglish.dataset.sentence;
-
-                playMatch(hebrewText, englishText, sentenceText);
-
-                addFireworks();
-
-                const messages = ["כל הכבוד!", "מצוין!", "יופי!", "מעולה!", "תמשיך ככה!"];
-                showEncouragement(messages[Math.floor(Math.random() * messages.length)], matchedDiv);
-
-                selectedHebrew.remove();
-                selectedEnglish.remove();
-
-                if (totalMatches % 10 === 0) {
-                    levelUp();
-                }
-
-                if (matches === 10) {
-                    endGame();
-                }
-            } else {
-                totalMistakes++;
-                matchMistakes[wordIndex]++;
-                alert('אופס! נסה שוב!');
-            }
-
-            selectedHebrew.classList.remove('selected');
-            selectedEnglish.classList.remove('selected');
-            selectedHebrew = null;
-            selectedEnglish = null;
-            wordStartTime = null;
-            checkButton.disabled = true;
+        /* Before game starts */
+        .start-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
         }
 
-        function levelUp() {
-            level++;
-            levelDisplay.textContent = `רמה: ${level}`;
-            showEncouragement(`עלית לרמה ${level}! 🎉`, document.querySelector('.game-container'));
-            addFireworks();
+        .start-screen h2 {
+            color: #6a3093;
+            font-size: 1.8em;
+            margin-bottom: 20px;
         }
 
-        function showEncouragement(message, element) {
-            const encouragement = document.createElement('div');
-            encouragement.className = 'encouragement';
-            encouragement.textContent = message;
-            element.style.position = 'relative';
-            element.appendChild(encouragement);
+        .character-selection {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
         }
 
-        function playMatch(hebrewText, englishText, sentenceText) {
-            if (!voicesLoaded) {
-                setTimeout(() => playMatch(hebrewText, englishText, sentenceText), 100);
-                return;
-            }
-
-            const voices = window.speechSynthesis.getVoices();
-            const hebrewVoice = voices.find(v => v.lang === 'he-IL') || voices.find(v => v.lang.includes('he')) || voices[0];
-            const englishVoice = voices.find(v => v.lang === 'en-US') || voices.find(v => v.lang.includes('en')) || voices[0];
-
-            const hebrewUtterance = new SpeechSynthesisUtterance(hebrewText);
-            hebrewUtterance.lang = 'he-IL';
-            hebrewUtterance.rate = 0.9;
-            hebrewUtterance.voice = hebrewVoice;
-
-            const englishUtterance = new SpeechSynthesisUtterance(englishText);
-            englishUtterance.lang = 'en-US';
-            englishUtterance.rate = 0.9;
-            englishUtterance.voice = englishVoice;
-
-            const sentenceUtterance = new SpeechSynthesisUtterance(sentenceText);
-            sentenceUtterance.lang = 'en-US';
-            sentenceUtterance.rate = 0.8;
-            sentenceUtterance.voice = englishVoice;
-
-            hebrewUtterance.onend = () => {
-                window.speechSynthesis.speak(englishUtterance);
-            };
-            englishUtterance.onend = () => {
-                window.speechSynthesis.speak(sentenceUtterance);
-            };
-
-            window.speechSynthesis.speak(hebrewUtterance);
+        .character {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5em;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #f0f0f7;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            border: 3px solid transparent;
         }
 
-        function playSentence(sentence) {
-            if (!voicesLoaded) {
-                setTimeout(() => playSentence(sentence), 100);
-                return;
-            }
-
-            const voices = window.speechSynthesis.getVoices();
-            const englishVoice = voices.find(v => v.lang === 'en-US') || voices.find(v => v.lang.includes('en')) || voices[0];
-            const utterance = new SpeechSynthesisUtterance(sentence);
-            utterance.lang = 'en-US';
-            utterance.rate = 0.8;
-            utterance.voice = englishVoice;
-            window.speechSynthesis.speak(utterance);
+        .character:hover {
+            transform: translateY(-5px) scale(1.1);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
 
-        function addFireworks() {
-            for (let i = 0; i < 50; i++) {
-                setTimeout(() => {
-                    const firework = document.createElement('div');
-                    firework.className = 'firework';
-
-                    const x = Math.random() * window.innerWidth;
-                    const y = Math.random() * window.innerHeight;
-                    const angle = Math.random() * 360;
-                    const distance = Math.random() * 200 + 50;
-                    const moveX = Math.cos(angle * Math.PI / 180) * distance;
-                    const moveY = Math.sin(angle * Math.PI / 180) * distance;
-
-                    firework.style.left = `${x}px`;
-                    firework.style.top = `${y}px`;
-                    firework.style.setProperty('--x', `${moveX}px`);
-                    firework.style.setProperty('--y', `${moveY}px`);
-                    firework.style.background = `hsl(${Math.random() * 360}, 100%, 50%)`;
-
-                    document.body.appendChild(firework);
-                    setTimeout(() => firework.remove(), 1500);
-                }, i * 20);
-            }
+        .character.selected {
+            border-color: #6a3093;
+            background: rgba(106, 48, 147, 0.1);
+            animation: pulse 2s infinite;
         }
 
-        function endGame() {
-            const totalTime = (Date.now() - startTime) / 1000;
-            resultDiv.style.display = 'block';
-            finalLevelDisplay.textContent = `הגעת לרמה ${level}!`;
-            finalScoreDisplay.textContent = score;
-            totalTimeDisplay.textContent = totalTime.toFixed(1);
-            totalMistakesDisplay.textContent = totalMistakes;
-
-            addFireworks();
-
-            matchDetails.innerHTML = '';
-            currentWords.forEach((word, index) => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${word.hebrew} - ${word.english}</td>
-                    <td>${matchTimes[index] ? matchTimes[index].toFixed(1) : '-'}</td>
-                    <td>${matchAttempts[index]}</td>
-                    <td>${matchMistakes[index]}</td>
-                    <td class="sentence-cell">
-                        ${word.sentence}
-                        <button class="play-sentence-btn" data-sentence="${word.sentence}">🔊</button>
-                    </td>
-                `;
-                matchDetails.appendChild(tr);
-            });
-
-            document.querySelectorAll('.play-sentence-btn').forEach(button => {
-                button.addEventListener('click', () => {
-                    const sentence = button.dataset.sentence;
-                    playSentence(sentence);
-                });
-            });
+        .start-button {
+            padding: 12px 30px;
+            font-size: 1.3em;
+            color: white;
+            background: linear-gradient(135deg, #6a3093, #a044ff);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(106, 48, 147, 0.4);
+            margin-top: 20px;
         }
 
-        checkButton.addEventListener('click', checkMatch);
-        playAgainButton.addEventListener('click', initGame);
+        .start-button:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 20px rgba(106, 48, 147, 0.6);
+        }
 
-        initGame();
-    </script>
-</body>
-</html>
+        /* Leaderboard */
+        .leaderboard {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 15px;
+            margin-top: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .leaderboard h3 {
+            color: #6a3093;
+            margin-top: 0;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .leaderboard h3::after {
+            content: "";
+            position: absolute;
+            bottom: -3px;
+            left: 25%;
+            width: 50%;
+            height: 2px;
+            background: linear-gradient(to right, #6a3093, #a044ff);
+            border-radius: 2px;
+        }
+        
+        .leaderboard-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 5px;
+        }
+        
+        .leaderboard-table th {
+            padding: 8px;
+            background: rgba(106, 48, 147, 0.1);
+            color: #6a3093;
+        }
+        
+        .leaderboard-table td {
+            padding: 8px;
+            background: #
