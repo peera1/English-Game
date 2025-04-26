@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentence Completion Game - Grade 4</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', Arial, sans-serif;
+            background: linear-gradient(135deg, #ffeb3b, #ff9800);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #333;
+            overflow-y: auto;
+        }
+
+        #game-container {
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            padding: 30px;
+            width: 90%;
+            max-width: 600px;
+            text-align: center;
+            position: relative;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: #ff5722;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        #progress-container {
+            width: 100%;
+            background-color: #b0bec5;
+            border-radius: 15px;
+            margin: 20px auto;
+            height: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #progress-bar {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(to right, #4CAF50, #81C784);
+            border-radius: 15px;
+            text-align: center;
+            line-height: 30px;
+            color: white;
+            font-weight: bold;
+            transition: width 0.5s ease;
+        }
+
+        #score {
+            font-size: 1.5rem;
+            color: #f57c00;
+            margin: 15px 0;
+        }
+
+        #sentence {
+            font-size: 1.8rem;
+            color: #d81b60;
+            margin: 20px 0;
+            min-height: 50px;
+        }
+
+        #options {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .option-btn {
+            padding: 10px 20px;
+            font-size: 1.2rem;
+            background: linear-gradient(to right, #2196F3, #42A5F5);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .option-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .option-btn:disabled {
+            background: #b0bec5;
+            cursor: not-allowed;
+        }
+
+        #check-btn {
+            padding: 12px 30px;
+            font-size: 1.2rem;
+            background: linear-gradient(to right, #4CAF50, #81C784);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        #check-btn:hover {
+            transform: scale(1.05);
+        }
+
+        #check-btn:disabled {
+            background: #b0bec5;
+            cursor: not-allowed;
+        }
+
+        #feedback {
+            font-size: 1.3rem;
+            margin-top: 15px;
+            min-height: 30px;
+        }
+
+        #summary {
+            margin-top: 20px;
+        }
+
+        #summary-message {
+            font-size: 1.3rem;
+            color: #2c3e50;
+            margin: 20px 0;
+            line-height: 1.6;
+            background: #e8f5e9;
+            padding: 20px;
+            border-radius: 15px;
+            border: 2px dashed #4CAF50;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <h1>Sentence Completion Game</h1>
+        <div id="progress-container">
+            <div id="progress-bar">0%</div>
+        </div>
+        <p id="score">Score: 0</p>
+        <p id="sentence"></p>
+        <div id="options"></div>
+        <button id="check-btn" onclick="checkAnswer()">Check</button>
+        <p id="feedback"></p>
+        <div id="summary" class="hidden">
+            <h2>Well Done, Champion!</h2>
+            <div id="summary-message">
+                You completed the game! Your final score is <span id="final-score"></span>. Great job on practicing your English! Keep learning and having fun!
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const sentencePool = [
+            { sentence: "I ___ to school every day.", options: ["go", "eat", "play"], answer: "go" },
+            { sentence: "She ___ a beautiful song.", options: ["sings", "draws", "runs"], answer: "sings" },
+            { sentence: "We ___ in the park on weekends.", options: ["play", "sleep", "read"], answer: "play" },
+            { sentence: "The dog ___ when it sees a cat.", options: ["barks", "flies", "swims"], answer: "barks" },
+            { sentence: "My mom ___ delicious cookies.", options: ["bakes", "writes", "jumps"], answer: "bakes" },
+            { sentence: "He ___ his homework after school.", options: ["does", "eats", "watches"], answer: "does" },
+            { sentence: "They ___ to the zoo last weekend.", options: ["went", "sit", "drink"], answer: "went" },
+            { sentence: "I ___ a new book yesterday.", options: ["read", "build", "kick"], answer: "read" },
+            { sentence: "The sun ___ in the morning.", options: ["rises", "sleeps", "hides"], answer: "rises" },
+            { sentence: "We ___ a big tree in our garden.", options: ["have", "run", "sing"], answer: "have" },
+            { sentence: "She ___ her bike to school.", options: ["rides", "eats", "draws"], answer: "rides" },
+            { sentence: "I ___ my friend at the park.", options: ["meet", "sleep", "cook"], answer: "meet" },
+            { sentence: "He ___ a funny joke.", options: ["tells", "swims", "paints"], answer: "tells" },
+            { sentence: "They ___ a kite on the beach.", options: ["fly", "eat", "read"], answer: "fly" },
+            { sentence: "My teacher ___ us new words.", options: ["teaches", "jumps", "flies"], answer: "teaches" },
+            { sentence: "We ___ to music every evening.", options: ["listen", "write", "kick"], answer: "listen" },
+            { sentence: "The cat ___ on the sofa.", options: ["sits", "runs", "sings"], answer: "sits" },
+            { sentence: "I ___ my room every Saturday.", options: ["clean", "eat", "play"], answer: "clean" },
+            { sentence: "She ___ a picture of a flower.", options: ["draws", "swims", "barks"], answer: "draws" },
+            { sentence: "We ___ a picnic in the forest.", options: ["had", "jump", "read"], answer: "had" },
+            { sentence: "He ___ his new toy.", options: ["likes", "sleeps", "cooks"], answer: "likes" },
+            { sentence: "I ___ a letter to my friend.", options: ["write", "fly", "eat"], answer: "write" },
+            { sentence: "They ___ in the pool every summer.", options: ["swim", "read", "build"], answer: "swim" },
+            { sentence: "My dad ___ the car.", options: ["drives", "sings", "jumps"], answer: "drives" },
+            { sentence: "She ___ a cake for the party.", options: ["makes", "flies", "kicks"], answer: "makes" },
+            { sentence: "We ___ a new game at school.", options: ["learned", "eat", "sleep"], answer: "learned" },
+            { sentence: "The bird ___ in the sky.", options: ["flies", "runs", "sits"], answer: "flies" },
+            { sentence: "I ___ my favorite movie.", options: ["watch", "cook", "draw"], answer: "watch" },
+            { sentence: "He ___ a tall tower with blocks.", options: ["builds", "sings", "swims"], answer: "builds" },
+            { sentence: "They ___ a song together.", options: ["sing", "eat", "jump"], answer: "sing" },
+            { sentence: "My sister ___ a new dress.", options: ["wears", "flies", "reads"], answer: "wears" },
+            { sentence: "We ___ to the library every week.", options: ["go", "sleep", "kick"], answer: "go" },
+            { sentence: "I ___ my breakfast every morning.", options: ["eat", "fly", "draw"], answer: "eat" },
+            { sentence: "She ___ a story to her brother.", options: ["reads", "swims", "jumps"], answer: "reads" },
+            { sentence: "The teacher ___ a question.", options: ["asks", "eats", "flies"], answer: "asks" },
+            { sentence: "We ___ a new friend at school.", options: ["made", "run", "sing"], answer: "made" },
+            { sentence: "He ___ a picture of his family.", options: ["paints", "swims", "eats"], answer: "paints" },
+            { sentence: "I ___ my shoes before school.", options: ["wear", "fly", "cook"], answer: "wear" },
+            { sentence: "They ___ a tree in the yard.", options: ["plant", "read", "jump"], answer: "plant" },
+            { sentence: "My mom ___ the flowers.", options: ["waters", "sings", "flies"], answer: "waters" },
+            { sentence: "We ___ a fun game outside.", options: ["play", "eat", "sleep"], answer: "play" },
+            { sentence: "I ___ a glass of water.", options: ["drink", "fly", "draw"], answer: "drink" },
+            { sentence: "She ___ her hair every morning.", options: ["brushes", "swims", "jumps"], answer: "brushes" },
+            { sentence: "He ___ a new bike.", options: ["has", "eats", "sings"], answer: "has" },
+            { sentence: "They ___ a big sandcastle.", options: ["build", "read", "fly"], answer: "build" },
+            { sentence: "I ___ to the park with my friends.", options: ["go", "sleep", "cook"], answer: "go" },
+            { sentence: "We ___ a funny movie last night.", options: ["watched", "eat", "jump"], answer: "watched" },
+            { sentence: "She ___ her favorite book.", options: ["reads", "flies", "kicks"], answer: "reads" },
+            { sentence: "He ___ a big smile.", options: ["gives", "swims", "eats"], answer: "gives" },
+            { sentence: "They ___ a new song at school.", options: ["learn", "fly", "read"], answer: "learn" }
+        ];
+
+        let sentences = [];
+        let currentSentence = 0;
+        let score = 0;
+        let firstAttempt = true;
+        let selectedOption = "";
+
+        function startGame() {
+            // Select 10 random sentences from the pool
+            sentences = sentencePool.sort(() => Math.random() - 0.5).slice(0, 10);
+            currentSentence = 0;
+            score = 0;
+            updateScore();
+            showSentence();
+        }
+
+        function showSentence() {
+            if (currentSentence >= sentences.length) {
+                showSummary();
+                return;
+            }
+
+            const sentenceObj = sentences[currentSentence];
+            document.getElementById("sentence").innerText = sentenceObj.sentence;
+            selectedOption = "";
+            firstAttempt = true;
+
+            // Clear previous options and feedback
+            const optionsDiv = document.getElementById("options");
+            optionsDiv.innerHTML = "";
+            document.getElementById("feedback").innerText = "";
+            document.getElementById("check-btn").disabled = true;
+
+            // Create option buttons
+            sentenceObj.options.forEach(option => {
+                const btn = document.createElement("button");
+                btn.className = "option-btn";
+                btn.innerText = option;
+                btn.onclick = () => selectOption(option, sentenceObj);
+                optionsDiv.appendChild(btn);
+            });
+
+            updateProgress();
+        }
+
+        function selectOption(option, sentenceObj) {
+            selectedOption = option;
+            document.getElementById("sentence").innerText = sentenceObj.sentence.replace("___", option);
+            document.getElementById("check-btn").disabled = false;
+
+            // Disable all option buttons after selection
+            const buttons = document.querySelectorAll(".option-btn");
+            buttons.forEach(btn => btn.disabled = true);
+        }
+
+        function checkAnswer() {
+            const sentenceObj = sentences[currentSentence];
+            if (selectedOption === sentenceObj.answer) {
+                document.getElementById("feedback").innerText = "Great Job!";
+                document.getElementById("feedback").style.color = "#4CAF50";
+                score += firstAttempt ? 15 : 10; // 15 points for first attempt, 10 otherwise
+                updateScore();
+
+                // Show confetti
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 },
+                    colors: ['#FEC260', '#ff9800', '#ff5722']
+                });
+
+                currentSentence++;
+                setTimeout(showSentence, 1000); // Delay for feedback visibility
+            } else {
+                document.getElementById("feedback").innerText = "Try Again!";
+                document.getElementById("feedback").style.color = "#d81b60";
+                firstAttempt = false;
+
+                // Re-enable option buttons
+                const buttons = document.querySelectorAll(".option-btn");
+                buttons.forEach(btn => btn.disabled = false);
+                document.getElementById("sentence").innerText = sentenceObj.sentence;
+                document.getElementById("check-btn").disabled = true;
+            }
+        }
+
+        function updateScore() {
+            document.getElementById("score").innerText = `Score: ${score}`;
+        }
+
+        function updateProgress() {
+            let progress = (currentSentence / sentences.length) * 100;
+            if (currentSentence === sentences.length) progress = 100;
+            document.getElementById("progress-bar").style.width = progress + "%";
+            document.getElementById("progress-bar").innerText = Math.round(progress) + "%";
+        }
+
+        function showSummary() {
+            document.getElementById("sentence").classList.add("hidden");
+            document.getElementById("options").classList.add("hidden");
+            document.getElementById("check-btn").classList.add("hidden");
+            document.getElementById("feedback").classList.add("hidden");
+            document.getElementById("summary").classList.remove("hidden");
+            document.getElementById("final-score").innerText = score;
+
+            // Show confetti multiple times for celebration
+            confetti({
+                particleCount: 150,
+                spread: 80,
+                origin: { y: 0.6 },
+                colors: ['#FEC260', '#ff9800', '#ff5722']
+            });
+            setTimeout(() => confetti({
+                particleCount: 150,
+                spread: 80,
+                origin: { y: 0.6 },
+                colors: ['#FEC260', '#ff9800', '#ff5722']
+            }), 500);
+        }
+
+        document.addEventListener('DOMContentLoaded', startGame);
+    </script>
+</body>
+</html>
