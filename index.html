@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ברוכים הבאים ללומדת חשבון</title>
+    <title>ברוכים הבאים למשחק התאמת מילים</title>
 
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-BPNZZJWSF8"></script>
@@ -17,15 +17,15 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;700&subset=hebrew&display=swap');
         
         :root {
-            --primary-gradient-start: #2A0944; /* סגול כהה עמוק */
-            --primary-gradient-end: #A12568; /* ורוד-סגול אלגנטי */
-            --secondary-color: #FEC260; /* זהב חם */
+            --primary-gradient-start: #ffeb3b; /* Yellow, matching the game */
+            --primary-gradient-end: #ff9800; /* Orange, matching the game */
+            --secondary-color: #FEC260; /* Gold for accents */
             --text-color: #333;
             --background-overlay: rgba(255, 255, 255, 0.15);
-            --button-shadow: rgba(42, 9, 68, 0.3);
+            --button-shadow: rgba(255, 152, 0, 0.3);
         }
 
         * {
@@ -35,7 +35,7 @@
         }
 
         body {
-            font-family: 'Rubik', Arial, sans-serif;
+            font-family: 'Rubik', 'Comic Sans MS', Arial, sans-serif;
             background: linear-gradient(135deg, var(--primary-gradient-start) 0%, var(--primary-gradient-end) 100%);
             min-height: 100vh;
             margin: 0;
@@ -64,7 +64,7 @@
             padding: 50px;
             text-align: center;
             width: 90%;
-            max-width: 600px;
+            max-width: 500px;
             margin: 30px auto;
             position: relative;
             transition: all 0.5s ease;
@@ -73,20 +73,10 @@
         }
 
         h1 {
-            color: var(--primary-gradient-start);
+            color: #ff5722;
             margin-bottom: 30px;
             font-size: 2.8rem;
-            text-shadow: 3px 3px 6px rgba(0,0,0,0.1);
-            background: linear-gradient(to right, var(--primary-gradient-start), var(--secondary-color));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        h2 {
-            font-size: 1.8rem;
-            margin: 20px 0 15px;
-            color: #ff5722;
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
             background: linear-gradient(to right, #ff5722, var(--secondary-color));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -136,6 +126,8 @@
             text-transform: uppercase;
             letter-spacing: 1px;
             color: white;
+            background: linear-gradient(to right, #4caf50, #66bb6a);
+            font-family: 'Rubik', 'Comic Sans MS', Arial, sans-serif;
         }
 
         .button:hover {
@@ -154,73 +146,6 @@
             50% { transform: translateY(-5px); }
         }
 
-        .blue { 
-            background: linear-gradient(to right, #3B4F7D, #6B728E);
-        }
-
-        .green { 
-            background: linear-gradient(to right, #355E3B, #7D9D72);
-        }
-
-        .yellow { 
-            background: linear-gradient(to right, #F4A261, #E9C46A);
-        }
-
-        .red { 
-            background: linear-gradient(to right, #8B1E3F, #C84767);
-        }
-
-        .pink {
-            background: linear-gradient(to right, #A63C6D, #D47B9A);
-        }
-
-        .coral {
-            background: linear-gradient(to right, #D76A03, #F89F5B);
-        }
-
-        .purple {
-            background: linear-gradient(to right, #4A235A, #8E44AD);
-        }
-
-        .radiant {
-            background: linear-gradient(to right, #2A0944, #A12568);
-        }
-
-        .teal {
-            background: linear-gradient(to right, #1A535C, #4ECDC4);
-        }
-
-        .emerald { 
-            background: linear-gradient(to right, #1B4332, #52B788);
-        }
-
-        .indigo { 
-            background: linear-gradient(to right, #2C3E50, #5D8AA8);
-        }
-
-        .lime { 
-            background: linear-gradient(to right, #6A994E, #A3BFFA);
-        }
-
-        .orange { 
-            background: linear-gradient(to right, #ff9800, #ffeb3b);
-        }
-
-        .grade-section {
-            margin-bottom: 30px;
-            padding: 20px;
-            border-radius: 15px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 2px dashed var(--secondary-color);
-            transition: all 0.3s ease;
-        }
-
-        .grade-section:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-        }
-
         .info-text {
             background: linear-gradient(to right, #F6F4E6, #EDE4E0);
             padding: 20px;
@@ -229,6 +154,29 @@
             color: #4A235A;
             font-size: 15px;
             border: 1px solid rgba(254, 194, 96, 0.4);
+        }
+
+        .background-anim {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .star {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: url('https://img.icons8.com/emoji/20/000000/star-emoji.png');
+            animation: fall 5s linear infinite;
+        }
+
+        @keyframes fall {
+            0% { transform: translateY(-100vh); opacity: 1; }
+            100% { transform: translateY(100vh); opacity: 0; }
         }
 
         @media (max-width: 600px) {
@@ -241,10 +189,6 @@
                 font-size: 2rem;
             }
 
-            h2 {
-                font-size: 1.5rem;
-            }
-
             .button {
                 font-size: 16px;
                 padding: 12px;
@@ -254,76 +198,22 @@
 </head>
 <body>
     <div class="background-overlay"></div>
+    <div class="background-anim" id="stars"></div>
     <div class="container">
         <div class="quote">
-            "הַזֹּרְעִים בְּדִמְעָה בְּרִנָּה יִקְצֹרוּ" - תהילים קכ״ו
+            "למידה היא הרפתקה שפותחת דלתות לעולם חדש!" - לא ידוע
         </div>
         
-        <h1>ברוכים הבאים ללומדת חשבון</h1>
+        <h1>ברוכים הבאים למשחק התאמת מילים</h1>
         
         <div class="buttons-container">
-            <!-- כיתה א -->
-            <div class="grade-section">
-                <h2>כיתה א</h2>
-                <button class="button blue" onclick="openLinkWithConfetti('core-1.html')">
-                    <i class="fas fa-plus"></i> חיבור
-                </button>
-                <button class="button teal" onclick="openLinkWithConfetti('core-1-minus.html')">
-                    <i class="fas fa-minus"></i> חיסור
-                </button>
-            </div>
-
-            <!-- כיתה ב -->
-            <div class="grade-section">
-                <h2>כיתה ב</h2>
-                <button class="button green" onclick="openLinkWithConfetti('core-2.html')">
-                    <i class="fas fa-calculator"></i> פעולות יסוד
-                </button>
-                <button class="button emerald" onclick="openLinkWithConfetti('core-2-adding-with-transit.html')">
-                    <i class="fas fa-exchange-alt"></i> חיבור עם המרה
-                </button>
-                <button class="button lime" onclick="openLinkWithConfetti('core-2-decrease-with-transit.html')">
-                    <i class="fas fa-minus"></i> חיסור עם המרה
-                </button>
-                <button class="button pink" onclick="openLinkWithConfetti('Word-Problems.html')">
-                    <i class="fas fa-question"></i> בעיות מילוליות - חיבור וחיסור
-                </button>
-                <button class="button indigo" onclick="openLinkWithConfetti('word-problems-+*:-core2.html')">
-                    <i class="fas fa-brain"></i> בעיות מילוליות - חיבור, חיסור, כפל, חילוק
-                </button>
-            </div>
-
-            <!-- כיתה ג -->
-            <div class="grade-section">
-                <h2>כיתה ג</h2>
-                <button class="button radiant" onclick="openLinkWithConfetti('core-3.html')">
-                    <i class="fas fa-arrow-up-9-1"></i> סדר פעולות חשבון
-                </button>
-            </div>
-
-            <!-- כיתה ד -->
-            <div class="grade-section">
-                <h2>כיתה ד</h2>
-                <button class="button yellow" onclick="openLinkWithConfetti('core-4.html')">
-                    <i class="fas fa-chart-line"></i> חשבון מתקדם
-                </button>
-                <button class="button red" onclick="openLinkWithConfetti('frictions.html')">
-                    <i class="fas fa-divide"></i> שברים
-                </button>
-                <button class="button purple" onclick="openLinkWithConfetti('frictions_simple.html')">
-                    <i class="fas fa-umbrella"></i> שבר פשוט
-                </button>
-                <button class="button coral" onclick="openLinkWithConfetti('Word-Problems-Advanced.html')">
-                    <i class="fas fa-wand-magic-sparkles"></i> בעיות מילוליות - שברים
-                </button>
-                <button class="button orange" onclick="openLinkWithConfetti('connect_words_4.html')">
-                    <i class="fas fa-book-open"></i> התאמת מילים
-                </button>
-            </div>
+            <button class="button" onclick="openLinkWithConfetti('connect_words_4.html')">
+                <i class="fas fa-book-open"></i> כיתה ד - התאמת מילים
+            </button>
         </div>
 
         <div class="info-text">
-            טיפ מהמורה: למידה היא מסע של גילוי. כל תרגיל שאתה פותר מקרב אותך להצלחה גדולה!
+            טיפ מהמורה: גרור את המילים בעברית למילים באנגלית שמתאימות להן, ותלמד תוך כדי משחק!
         </div>
     </div>
 
@@ -333,11 +223,11 @@
                 particleCount: 150,
                 spread: 80,
                 origin: { y: 0.6 },
-                colors: ['#FEC260', '#A12568', '#2A0944', '#8E44AD']
+                colors: ['#FEC260', '#ff9800', '#ff5722', '#4caf50']
             });
 
             setTimeout(() => {
-                window.open(url, '_blank');
+                window.location.href = url; // Navigate to the game page
             }, 500);
         }
 
@@ -349,12 +239,22 @@
                     x: Math.random(),
                     y: Math.random()
                 },
-                colors: ['#FEC260', '#A12568', '#2A0944'],
+                colors: ['#FEC260', '#ff9800', '#ff5722'],
                 opacity: 0.5
             });
         }
 
+        function addBackgroundStars() {
+            setInterval(() => {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = `${Math.random() * 100}vw`;
+                document.getElementById('stars').appendChild(star);
+            }, 500);
+        }
+
         setInterval(createBackgroundConfetti, 5000);
+        addBackgroundStars();
     </script>
 </body>
 </html>
