@@ -91,11 +91,16 @@
             border: none;
             border-radius: 10px;
             cursor: pointer;
-            transition: transform 0.2s;
+            transition: transform 0.2s, background 0.3s;
         }
 
         .option-btn:hover {
             transform: scale(1.05);
+        }
+
+        .option-btn.selected {
+            background: linear-gradient(to right, #ff9800, #ffeb3b);
+            border: 2px solid #ff5722;
         }
 
         .option-btn:disabled {
@@ -229,7 +234,6 @@
         let selectedOption = "";
 
         function startGame() {
-            // Select 10 random sentences from the pool
             sentences = sentencePool.sort(() => Math.random() - 0.5).slice(0, 10);
             currentSentence = 0;
             score = 0;
@@ -248,32 +252,30 @@
             selectedOption = "";
             firstAttempt = true;
 
-            // Clear previous options and feedback
             const optionsDiv = document.getElementById("options");
             optionsDiv.innerHTML = "";
             document.getElementById("feedback").innerText = "";
             document.getElementById("check-btn").disabled = true;
 
-            // Create option buttons
             sentenceObj.options.forEach(option => {
                 const btn = document.createElement("button");
                 btn.className = "option-btn";
                 btn.innerText = option;
-                btn.onclick = () => selectOption(option, sentenceObj);
+                btn.onclick = () => selectOption(option, sentenceObj, btn);
                 optionsDiv.appendChild(btn);
             });
 
             updateProgress();
         }
 
-        function selectOption(option, sentenceObj) {
+        function selectOption(option, sentenceObj, clickedBtn) {
             selectedOption = option;
             document.getElementById("sentence").innerText = sentenceObj.sentence.replace("___", option);
             document.getElementById("check-btn").disabled = false;
 
-            // Disable all option buttons after selection
             const buttons = document.querySelectorAll(".option-btn");
-            buttons.forEach(btn => btn.disabled = true);
+            buttons.forEach(btn => btn.classList.remove("selected"));
+            clickedBtn.classList.add("selected");
         }
 
         function checkAnswer() {
@@ -281,10 +283,16 @@
             if (selectedOption === sentenceObj.answer) {
                 document.getElementById("feedback").innerText = "Great Job!";
                 document.getElementById("feedback").style.color = "#4CAF50";
-                score += firstAttempt ? 15 : 10; // 15 points for first attempt, 10 otherwise
+                score += firstAttempt ? 15 : 10;
                 updateScore();
 
-                // Show confetti
+                const completedSentence = sentenceObj.sentence.replace("___", selectedOption);
+                const utterance = new SpeechSynthesisUtterance(completedSentence);
+                utterance.lang = "en-US";
+                utterance.pitch = 1.2;
+                utterance.rate = 0.9;
+                speechSynthesis.speak(utterance);
+
                 confetti({
                     particleCount: 100,
                     spread: 70,
@@ -292,18 +300,15 @@
                     colors: ['#FEC260', '#ff9800', '#ff5722']
                 });
 
+                const buttons = document.querySelectorAll(".option-btn");
+                buttons.forEach(btn => btn.disabled = true);
+
                 currentSentence++;
-                setTimeout(showSentence, 1000); // Delay for feedback visibility
+                setTimeout(showSentence, 2000);
             } else {
                 document.getElementById("feedback").innerText = "Try Again!";
                 document.getElementById("feedback").style.color = "#d81b60";
                 firstAttempt = false;
-
-                // Re-enable option buttons
-                const buttons = document.querySelectorAll(".option-btn");
-                buttons.forEach(btn => btn.disabled = false);
-                document.getElementById("sentence").innerText = sentenceObj.sentence;
-                document.getElementById("check-btn").disabled = true;
             }
         }
 
@@ -326,7 +331,6 @@
             document.getElementById("summary").classList.remove("hidden");
             document.getElementById("final-score").innerText = score;
 
-            // Show confetti multiple times for celebration
             confetti({
                 particleCount: 150,
                 spread: 80,
