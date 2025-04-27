@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>משחק התאמת אותיות קטנות לגדולות</title>
+    <style>
+        body {
+            font-family: 'Comic Sans MS', Arial, 'Noto Sans Hebrew', sans-serif;
+            background: linear-gradient(to bottom, #ffeb3b, #ff9800);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            margin: 0;
+            padding: 10px;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .game-container {
+            background: #fff;
+            border-radius: 20px;
+            padding: 15px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 900px;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            color: #ff5722;
+            font-size: 2em;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .columns {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .column {
+            width: 100%;
+            background: #e0f7fa;
+            border-radius: 10px;
+            padding: 10px;
+            min-height: 200px;
+            max-height: 50vh;
+            overflow-y: auto;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+        }
+
+        .letter {
+            background: #4caf50;
+            color: white;
+            padding: 8px;
+            margin: 5px 0;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.5em;
+            transition: transform 0.2s;
+        }
+
+        .letter:hover {
+            transform: scale(1.05);
+        }
+
+        .letter.selected {
+            background: #ff9800;
+        }
+
+        .matched-pair {
+            background: #ffeb3b;
+            color: #333;
+            padding: 10px;
+            margin: 8px 0;
+            border-radius: 10px;
+            font-size: 1.5em;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            position: relative;
+            animation: slideIn 0.5s ease-in-out;
+        }
+
+        .matched-pair .pair-text {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            font-weight: bold;
+            color: #d81b60;
+        }
+
+        .matched-pair .words {
+            margin-top: 8px;
+            font-size: 1em;
+            color: #2196f3;
+            font-style: italic;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 5px 10px;
+            border-radius: 5px;
+            border: 1px dashed #4caf50;
+        }
+
+        .matched-pair .emoji {
+            font-size: 1.5em;
+            margin-top: 5px;
+        }
+
+        @keyframes slideIn {
+            0% { transform: translateY(-20px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+
+        #score {
+            font-size: 1.3em;
+            color: #d81b60;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        #check-button {
+            padding: 8px 16px;
+            font-size: 1.1em;
+            color: #fff;
+            background: #2196f3;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 10px auto;
+            display: block;
+            transition: background 0.3s;
+        }
+
+        #check-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        #check-button:hover:not(:disabled) {
+            background: #1976d2;
+        }
+
+        #result {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #ffebcd, #afeeee);
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.4);
+            text-align: center;
+            width: 90%;
+            max-width: 700px;
+            max-height: 80vh;
+            overflow-y: auto;
+            z-index: 2;
+            animation: popIn 0.5s ease-out;
+        }
+
+        @keyframes popIn {
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+            80% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+
+        #result h2 {
+            color: #ff69b4;
+            font-size: 2em;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        #result p {
+            color: #333;
+            font-size: 1.1em;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+
+        #result table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin: 15px 0;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            font-size: 0.9em;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        #result th, #result td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            color: #333;
+            text-align: center;
+        }
+
+        #result th {
+            background: #ff69b4;
+            color: white;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        #result td {
+            background: #f0f8ff;
+            color: #555;
+        }
+
+        #result tr:nth-child(even) td {
+            background: #e6f3fa;
+        }
+
+        #result tr:hover td {
+            background: #ffebcd;
+            transition: background 0.3s;
+        }
+
+        .pair-cell {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 1.2em;
+            color: #2196f3;
+        }
+
+        .play-pair-btn {
+            background: #90ee90;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1em;
+            transition: transform 0.2s, background 0.3s;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .play-pair-btn:hover {
+            background: #32cd32;
+            transform: scale(1.1);
+        }
+
+        .play-pair-btn:active {
+            transform: scale(0.95);
+        }
+
+        #play-again {
+            padding: 8px 16px;
+            font-size: 1.1em;
+            color: #fff;
+            background: #ff69b4;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.3s;
+            margin-top: 15px;
+        }
+
+        #play-again:hover {
+            background: #ff1493;
+            transform: scale(1.1);
+        }
+
+        .confetti {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: #ff0000;
+            animation: fall 2s linear;
+            z-index: 0;
+        }
+
+        @keyframes fall {
+            0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+        }
+
+        @media (min-width: 768px) {
+            .columns {
+                flex-direction: row;
+            }
+            .column {
+                width: 45%;
+                margin-bottom: 0;
+            }
+            h1 {
+                font-size: 2.5em;
+            }
+            .letter, .matched-pair {
+                font-size: 1.8em;
+            }
+            .matched-pair .words {
+                font-size: 1.1em;
+            }
+            #score {
+                font-size: 1.5em;
+            }
+            #check-button, #play-again {
+                padding: 10px 20px;
+                font-size: 1.2em;
+            }
+            #result h2 {
+                font-size: 2.5em;
+            }
+            #result table {
+                font-size: 1em;
+            }
+            .play-pair-btn {
+                width: 35px;
+                height: 35px;
+                font-size: 1.2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>משחק התאמת אותיות קטנות לגדולות</h1>
+        <div id="score">ניקוד: 0</div>
+        <div class="columns">
+            <div class="column" id="lowercase-letters">
+                <h2>אותיות קטנות</h2>
+            </div>
+            <div class="column" id="uppercase-letters">
+                <h2>אותיות גדולות</h2>
+            </div>
+        </div>
+        <button id="check-button" disabled>בדוק התאמה</button>
+    </div>
+    <div id="result">
+        <h2>כל הכבוד! 🎉</h2>
+        <p>ניקוד סופי: <span id="final-score"></span></p>
+        <p>זמן כולל: <span id="total-time"></span> שניות</p>
+        <p>סה"כ טעויות: <span id="total-mistakes"></span></p>
+        <table>
+            <thead>
+                <tr>
+                    <th>זוג אותיות (קטנה - גדולה)</th>
+                    <th>זמן (שניות)</th>
+                    <th>ניסיונות</th>
+                    <th>טעויות</th>
+                    <th>מילים שמתחילות באות</th>
+                    <th>שמע את הזוג</th>
+                    <th>שמע את המילים</th>
+                </tr>
+            </thead>
+            <tbody id="match-details"></tbody>
+        </table>
+        <button id="play-again">שחק שוב</button>
+    </div>
+
+    <script>
+        const letters = Array.from('ABCDEFGHIJKLMNOPQRSTUVWXYZ').map(letter => ({
+            lowercase: letter.toLowerCase(),
+            uppercase: letter,
+            words: {
+                'a': ['Apple', 'Ant', 'Arrow'],
+                'b': ['Ball', 'Bear', 'Boat'],
+                'c': ['Cat', 'Cake', 'Car'],
+                'd': ['Dog', 'Duck', 'Door'],
+                'e': ['Egg', 'Elephant', 'Eye'],
+                'f': ['Fish', 'Fox', 'Frog'],
+                'g': ['Goat', 'Gate', 'Gift'],
+                'h': ['Hat', 'House', 'Horse'],
+                'i': ['Ice', 'Igloo', 'Ink'],
+                'j': ['Jam', 'Jet', 'Juice'],
+                'k': ['Kite', 'King', 'Key'],
+                'l': ['Lion', 'Lamp', 'Leaf'],
+                'm': ['Moon', 'Mouse', 'Milk'],
+                'n': ['Nest', 'Nose', 'Nut'],
+                'o': ['Owl', 'Orange', 'Ocean'],
+                'p': ['Pig', 'Pen', 'Panda'],
+                'q': ['Queen', 'Quilt', 'Quiz'],
+                'r': ['Rabbit', 'Ring', 'Rose'],
+                's': ['Sun', 'Snake', 'Star'],
+                't': ['Tree', 'Tiger', 'Toy'],
+                'u': ['Umbrella', 'Unicorn', 'Up'],
+                'v': ['Van', 'Vest', 'Vine'],
+                'w': ['Wolf', 'Worm', 'Water'],
+                'x': ['X-ray', 'Xylophone', 'Xenops'],
+                'y': ['Yarn', 'Yak', 'Yo-yo'],
+                'z': ['Zebra', 'Zoo', 'Zip']
+            }[letter.toLowerCase()]
+        }));
+
+        const lowercaseColumn = document.getElementById('lowercase-letters');
+        const uppercaseColumn = document.getElementById('uppercase-letters');
+        const scoreDisplay = document.getElementById('score');
+        const checkButton = document.getElementById('check-button');
+        const resultDiv = document.getElementById('result');
+        const finalScoreDisplay = document.getElementById('final-score');
+        const totalTimeDisplay = document.getElementById('total-time');
+        const totalMistakesDisplay = document.getElementById('total-mistakes');
+        const matchDetails = document.getElementById('match-details');
+        const playAgainButton = document.getElementById('play-again');
+
+        let score = 0;
+        let matches = 0;
+        let totalMistakes = 0;
+        let matchTimes = [];
+        let matchAttempts = [];
+        let matchMistakes = [];
+        let matchedWords = [];
+        let selectedLowercase = null;
+        let selectedUppercase = null;
+        let startTime = null;
+        let letterStartTime = null;
+        let currentLetters = [];
+
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function initGame() {
+            lowercaseColumn.innerHTML = '<h2>אותיות קטנות</h2>';
+            uppercaseColumn.innerHTML = '<h2>אותיות גדולות</h2>';
+            score = 0;
+            matches = 0;
+            totalMistakes = 0;
+            matchTimes = [];
+            matchAttempts = new Array(10).fill(0);
+            matchMistakes = new Array(10).fill(0);
+            matchedWords = [];
+            selectedLowercase = null;
+            selectedUppercase = null;
+            startTime = Date.now();
+            letterStartTime = null;
+            scoreDisplay.textContent = `ניקוד: ${score}`;
+            resultDiv.style.display = 'none';
+            checkButton.disabled = true;
+
+            const shuffledLetters = shuffle([...letters]);
+            currentLetters = shuffledLetters.slice(0, 10);
+
+            const shuffledLowercase = shuffle([...currentLetters]);
+            const shuffledUppercase = shuffle([...currentLetters]);
+
+            shuffledLowercase.forEach((letter) => {
+                const div = document.createElement('div');
+                div.className = 'letter';
+                div.textContent = letter.lowercase;
+                div.dataset.lowercase = letter.lowercase;
+                div.dataset.uppercase = letter.uppercase;
+                div.dataset.words = letter.words.join(', ');
+                div.addEventListener('click', () => selectLetter(div, 'lowercase'));
+                lowercaseColumn.appendChild(div);
+            });
+
+            shuffledUppercase.forEach((letter) => {
+                const div = document.createElement('div');
+                div.className = 'letter';
+                div.textContent = letter.uppercase;
+                div.dataset.lowercase = letter.lowercase;
+                div.dataset.uppercase = letter.uppercase;
+                div.dataset.words = letter.words.join(', ');
+                div.addEventListener('click', () => selectLetter(div, 'uppercase'));
+                uppercaseColumn.appendChild(div);
+            });
+
+            checkVoices();
+        }
+
+        function selectLetter(element, type) {
+            if (type === 'lowercase') {
+                if (selectedLowercase) selectedLowercase.classList.remove('selected');
+                selectedLowercase = element;
+                selectedLowercase.classList.add('selected');
+            } else {
+                if (selectedUppercase) selectedUppercase.classList.remove('selected');
+                selectedUppercase = element;
+                selectedUppercase.classList.add('selected');
+            }
+
+            if (!letterStartTime) letterStartTime = Date.now();
+            checkButton.disabled = !(selectedLowercase && selectedUppercase);
+        }
+
+        function checkVoices() {
+            const voices = window.speechSynthesis.getVoices();
+            if (voices.length === 0) {
+                window.speechSynthesis.onvoiceschanged = () => {
+                    const loadedVoices = window.speechSynthesis.getVoices();
+                };
+            }
+        }
+
+        function checkMatch() {
+            if (!selectedLowercase || !selectedUppercase) return;
+
+            const letterIndex = currentLetters.findIndex(l => l.uppercase === selectedUppercase.dataset.uppercase);
+            matchAttempts[letterIndex]++;
+            const timeTaken = (Date.now() - letterStartTime) / 1000;
+            const isMatch = selectedLowercase.dataset.uppercase === selectedUppercase.dataset.uppercase;
+
+            if (isMatch) {
+                matches++;
+                matchTimes.push(timeTaken);
+
+                score += matchAttempts[letterIndex] === 1 ? 10 : 5;
+                scoreDisplay.textContent = `ניקוד: ${score}`;
+
+                const words = selectedLowercase.dataset.words.split(', ');
+                matchedWords.push(words);
+
+                const matchedDiv = document.createElement('div');
+                matchedDiv.className = 'matched-pair';
+                matchedDiv.innerHTML = `
+                    <div class="pair-text">${selectedLowercase.textContent} - ${selectedUppercase.textContent}</div>
+                    <div class="words">${words.join(', ')}</div>
+                    <div class="emoji">🌟</div>
+                `;
+                uppercaseColumn.appendChild(matchedDiv);
+
+                const lowercaseText = selectedLowercase.textContent;
+                const uppercaseText = selectedUppercase.textContent;
+                const wordsText = words;
+
+                playMatch(lowercaseText, uppercaseText, wordsText);
+
+                selectedLowercase.remove();
+                selectedUppercase.remove();
+                addConfetti();
+
+                if (matches === 10) {
+                    endGame();
+                }
+            } else {
+                totalMistakes++;
+                matchMistakes[letterIndex]++;
+                alert('אופס! נסה שוב!');
+            }
+
+            selectedLowercase.classList.remove('selected');
+            selectedUppercase.classList.remove('selected');
+            selectedLowercase = null;
+            selectedUppercase = null;
+            letterStartTime = null;
+            checkButton.disabled = true;
+        }
+
+        function playMatch(lowercaseText, uppercaseText, wordsText) {
+            let voices = window.speechSynthesis.getVoices();
+            if (voices.length === 0) {
+                window.speechSynthesis.onvoiceschanged = () => {
+                    voices = window.speechSynthesis.getVoices();
+                    playMatchWithVoices(lowercaseText, uppercaseText, wordsText, voices);
+                };
+            } else {
+                playMatchWithVoices(lowercaseText, uppercaseText, wordsText, voices);
+            }
+        }
+
+        function playMatchWithVoices(lowercaseText, uppercaseText, wordsText, voices) {
+            const englishVoice = voices.find(v => v.lang === 'en-US') || voices[0];
+
+            const lowercaseUtterance = new SpeechSynthesisUtterance(lowercaseText);
+            lowercaseUtterance.lang = 'en-US';
+            lowercaseUtterance.rate = 0.8;
+            lowercaseUtterance.voice = englishVoice;
+
+            const uppercaseUtterance = new SpeechSynthesisUtterance(uppercaseText);
+            uppercaseUtterance.lang = 'en-US';
+            uppercaseUtterance.rate = 0.8;
+            uppercaseUtterance.voice = englishVoice;
+
+            const word1Utterance = new SpeechSynthesisUtterance(wordsText[0]);
+            word1Utterance.lang = 'en-US';
+            word1Utterance.rate = 0.8;
+            word1Utterance.voice = englishVoice;
+
+            const word2Utterance = new SpeechSynthesisUtterance(wordsText[1]);
+            word2Utterance.lang = 'en-US';
+            word2Utterance.rate = 0.8;
+            word2Utterance.voice = englishVoice;
+
+            const word3Utterance = new SpeechSynthesisUtterance(wordsText[2]);
+            word3Utterance.lang = 'en-US';
+            word3Utterance.rate = 0.8;
+            word3Utterance.voice = englishVoice;
+
+            lowercaseUtterance.onend = () => {
+                window.speechSynthesis.speak(uppercaseUtterance);
+            };
+            uppercaseUtterance.onend = () => {
+                window.speechSynthesis.speak(word1Utterance);
+            };
+            word1Utterance.onend = () => {
+                window.speechSynthesis.speak(word2Utterance);
+            };
+            word2Utterance.onend = () => {
+                window.speechSynthesis.speak(word3Utterance);
+            };
+
+            window.speechSynthesis.speak(lowercaseUtterance);
+        }
+
+        function playPair(lowercaseText, uppercaseText) {
+            let voices = window.speechSynthesis.getVoices();
+            const englishVoice = voices.find(v => v.lang === 'en-US') || voices[0];
+            const lowercaseUtterance = new SpeechSynthesisUtterance(lowercaseText);
+            lowercaseUtterance.lang = 'en-US';
+            lowercaseUtterance.rate = 0.8;
+            lowercaseUtterance.voice = englishVoice;
+
+            const uppercaseUtterance = new SpeechSynthesisUtterance(uppercaseText);
+            uppercaseUtterance.lang = 'en-US';
+            uppercaseUtterance.rate = 0.8;
+            uppercaseUtterance.voice = englishVoice;
+
+            lowercaseUtterance.onend = () => {
+                window.speechSynthesis.speak(uppercaseUtterance);
+            };
+
+            window.speechSynthesis.speak(lowercaseUtterance);
+        }
+
+        function playWords(wordsText) {
+            let voices = window.speechSynthesis.getVoices();
+            const englishVoice = voices.find(v => v.lang === 'en-US') || voices[0];
+
+            const word1Utterance = new SpeechSynthesisUtterance(wordsText[0]);
+            word1Utterance.lang = 'en-US';
+            word1Utterance.rate = 0.8;
+            word1Utterance.voice = englishVoice;
+
+            const word2Utterance = new SpeechSynthesisUtterance(wordsText[1]);
+            word2Utterance.lang = 'en-US';
+            word2Utterance.rate = 0.8;
+            word2Utterance.voice = englishVoice;
+
+            const word3Utterance = new SpeechSynthesisUtterance(wordsText[2]);
+            word3Utterance.lang = 'en-US';
+            word3Utterance.rate = 0.8;
+            word3Utterance.voice = englishVoice;
+
+            word1Utterance.onend = () => {
+                window.speechSynthesis.speak(word2Utterance);
+            };
+            word2Utterance.onend = () => {
+                window.speechSynthesis.speak(word3Utterance);
+            };
+
+            window.speechSynthesis.speak(word1Utterance);
+        }
+
+        function addConfetti() {
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = `${Math.random() * 100}vw`;
+                confetti.style.background = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                document.body.appendChild(confetti);
+                setTimeout(() => confetti.remove(), 2000);
+            }
+        }
+
+        function endGame() {
+            const totalTime = (Date.now() - startTime) / 1000;
+            resultDiv.style.display = 'block';
+            finalScoreDisplay.textContent = score;
+            totalTimeDisplay.textContent = totalTime.toFixed(1);
+            totalMistakesDisplay.textContent = totalMistakes;
+
+            matchDetails.innerHTML = '';
+            currentLetters.forEach((letter, index) => {
+                const words = matchedWords[index];
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="pair-cell">${letter.lowercase} - ${letter.uppercase}</td>
+                    <td>${matchTimes[index] ? matchTimes[index].toFixed(1) : '-'}</td>
+                    <td>${matchAttempts[index]}</td>
+                    <td>${matchMistakes[index]}</td>
+                    <td>${words.join(', ')}</td>
+                    <td class="pair-cell">
+                        <button class="play-pair-btn" data-lowercase="${letter.lowercase}" data-uppercase="${letter.uppercase}">🔊</button>
+                    </td>
+                    <td class="pair-cell">
+                        <button class="play-words-btn" data-words="${words.join(',')}">🔊</button>
+                    </td>
+                `;
+                matchDetails.appendChild(tr);
+            });
+
+            document.querySelectorAll('.play-pair-btn').forEach(button => {
+                button.addEventListener('click', () => {
+                    const lowercase = button.dataset.lowercase;
+                    const uppercase = button.dataset.uppercase;
+                    playPair(lowercase, uppercase);
+                });
+            });
+
+            document.querySelectorAll('.play-words-btn').forEach(button => {
+                button.addEventListener('click', () => {
+                    const words = button.dataset.words.split(',');
+                    playWords(words);
+                });
+            });
+        }
+
+        checkButton.addEventListener('click', checkMatch);
+        playAgainButton.addEventListener('click', initGame);
+
+        initGame();
+    </script>
+</body>
+</html>
