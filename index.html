@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ברוכים הבאים למשחק התאמת מילים</title>
+    <title>ברוכים הבאים למשחקי למידה</title>
 
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-BPNZZJWSF8"></script>
@@ -78,6 +78,16 @@
             font-size: 2.8rem;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
             background: linear-gradient(to right, #ff5722, var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .section-title {
+            color: #d81b60;
+            font-size: 2rem;
+            margin: 30px 0 20px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+            background: linear-gradient(to right, #d81b60, #2196f3);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
@@ -189,6 +199,10 @@
                 font-size: 2rem;
             }
 
+            .section-title {
+                font-size: 1.6rem;
+            }
+
             .button {
                 font-size: 16px;
                 padding: 12px;
@@ -204,19 +218,29 @@
             "למידה היא הרפתקה שפותחת דלתות לעולם חדש!" - לא ידוע
         </div>
         
-        <h1>ברוכים הבאים למשחק התאמת מילים</h1>
-        
+        <h1>ברוכים הבאים למשחקי למידה</h1>
+
+        <!-- Grade 2 Section -->
+        <h2 class="section-title">משחקים לכיתה ב</h2>
+        <div class="buttons-container">
+            <button class="button" onclick="openLinkWithConfetti('bigAndSmall-B.html')">
+                <i class="fas fa-font"></i> התאמת אותיות גדולות וקטנות
+            </button>
+        </div>
+
+        <!-- Grade 4 Section -->
+        <h2 class="section-title">משחקים לכיתה ד</h2>
         <div class="buttons-container">
             <button class="button" onclick="openLinkWithConfetti('connect_words_4.html')">
-                <i class="fas fa-book-open"></i> כיתה ד - התאמת מילים
+                <i class="fas fa-book-open"></i> התאמת מילים
             </button>
             <button class="button" onclick="openLinkWithConfetti('sentence-completion-4.html')">
-                <i class="fas fa-pen"></i> כיתה ד - השלמת משפטים
+                <i class="fas fa-pen"></i> השלמת משפטים
             </button>
         </div>
 
         <div class="info-text">
-            טיפ מהמורה: גרור את המילים בעברית למילים באנגלית שמתאימות להן, ותלמד תוך כדי משחק!
+            טיפ מהמורה: בחרו משחק לפי הכיתה שלכם, ותיהנו תוך כדי למידה!
         </div>
     </div>
 
