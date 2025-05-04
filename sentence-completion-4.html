@@ -279,38 +279,38 @@
         }
 
         function checkAnswer() {
-    const sentenceObj = sentences[currentSentence];
-    if (selectedOption === sentenceObj.answer) {
-        document.getElementById("feedback").innerText = "Great Job!";
-        document.getElementById("feedback").style.color = "#4CAF50";
-        score += firstAttempt ? 15 : 10;
-        updateScore();
-
-        const completedSentence = sentenceObj.sentence.replace("___", selectedOption);
-        const utterance = new SpeechSynthesisUtterance(completedSentence);
-        utterance.lang = "en-US";
-        utterance.pitch = 1.2;
-        utterance.rate = 0.9;
-        speechSynthesis.speak(utterance);
-
-        confetti({
-            particleCount: 100,
-            spread: 70,
-            origin: { y: 0.6 },
-            colors: ['#FEC260', '#ff9800', '#ff5722']
-        });
-
-        const buttons = document.querySelectorAll(".option-btn");
-        buttons.forEach(btn => btn.disabled = true);
-
-        currentSentence++;
-        setTimeout(showSentence, 5000); // Changed from 2000 to 5000 for 5-second delay
-    } else {
-        document.getElementById("feedback").innerText = "Try Again!";
-        document.getElementById("feedback").style.color = "#d81b60";
-        firstAttempt = false;
-    }
-}
+            const sentenceObj = sentences[currentSentence];
+            if (selectedOption === sentenceObj.answer) {
+                document.getElementById("feedback").innerText = "Great Job!";
+                document.getElementById("feedback").style.color = "#4CAF50";
+                score += firstAttempt ? 15 : 10;
+                updateScore();
+        
+                const completedSentence = sentenceObj.sentence.replace("___", selectedOption);
+                const utterance = new SpeechSynthesisUtterance(completedSentence);
+                utterance.lang = "en-US";
+                utterance.pitch = 1.2;
+                utterance.rate = 0.9;
+                speechSynthesis.speak(utterance);
+        
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 },
+                    colors: ['#FEC260', '#ff9800', '#ff5722']
+                });
+        
+                const buttons = document.querySelectorAll(".option-btn");
+                buttons.forEach(btn => btn.disabled = true);
+        
+                currentSentence++;
+                setTimeout(showSentence, 10000); // 10-second delay
+            } else {
+                document.getElementById("feedback").innerText = "Try Again!";
+                document.getElementById("feedback").style.color = "#d81b60";
+                firstAttempt = false;
+            }
+        }
 
         function updateScore() {
             document.getElementById("score").innerText = `Score: ${score}`;
