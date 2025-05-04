@@ -76,48 +76,62 @@
             background: #ff9800;
         }
 
-        .matched-pair {
-            background: #ffeb3b;
-            color: #333;
-            padding: 10px;
-            margin: 8px 0;
-            border-radius: 10px;
-            font-size: 1.5em;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            position: relative;
-            animation: slideIn 0.5s ease-in-out;
+        .letter.disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            pointer-events: none;
         }
 
-        .matched-pair .pair-text {
-            display: flex;
-            justify-content: space-between;
+        .matched-table-container {
+            margin-top: 20px;
+        }
+
+        #matched-table {
             width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        #matched-table th, #matched-table td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            color: #333;
+            text-align: center;
+        }
+
+        #matched-table th {
+            background: #ff69b4;
+            color: white;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        #matched-table td {
+            background: #f0f8ff;
+            color: #555;
+        }
+
+        #matched-table tr:nth-child(even) td {
+            background: #e6f3fa;
+        }
+
+        #matched-table tr:hover td {
+            background: #ffebcd;
+            transition: background 0.3s;
+        }
+
+        #matched-table .pair-text {
             font-weight: bold;
             color: #d81b60;
+            font-size: 1.2em;
         }
 
-        .matched-pair .words {
-            margin-top: 8px;
-            font-size: 1em;
+        #matched-table .words {
             color: #2196f3;
             font-style: italic;
-            background: rgba(255, 255, 255, 0.8);
-            padding: 5px 10px;
-            border-radius: 5px;
-            border: 1px dashed #4caf50;
-        }
-
-        .matched-pair .emoji {
-            font-size: 1.5em;
-            margin-top: 5px;
-        }
-
-        @keyframes slideIn {
-            0% { transform: translateY(-20px); opacity: 0; }
-            100% { transform: translateY(0); opacity: 1; }
         }
 
         #score {
@@ -302,11 +316,11 @@
             h1 {
                 font-size: 2.5em;
             }
-            .letter, .matched-pair {
+            .letter {
                 font-size: 1.8em;
             }
-            .matched-pair .words {
-                font-size: 1.1em;
+            #matched-table {
+                font-size: 1em;
             }
             #score {
                 font-size: 1.5em;
@@ -342,6 +356,17 @@
             </div>
         </div>
         <button id="check-button" disabled>בדוק התאמה</button>
+        <div class="matched-table-container">
+            <table id="matched-table">
+                <thead>
+                    <tr>
+                        <th>זוג אותיות</th>
+                        <th>מילים</th>
+                    </tr>
+                </thead>
+                <tbody id="matched-table-body"></tbody>
+            </table>
+        </div>
     </div>
     <div id="result">
         <h2>כל הכבוד! 🎉</h2>
@@ -399,8 +424,8 @@
             }[letter.toLowerCase()]
         }));
 
-        const lowercaseColumn = document.getElementById('lowercase-letters');
-        const uppercaseColumn = document.getElementById('uppercase-letters');
+        const lowercaseCollection = document.getElementById('lowercase-letters');
+        const uppercaseCollection = document.getElementById('uppercase-letters');
         const scoreDisplay = document.getElementById('score');
         const checkButton = document.getElementById('check-button');
         const resultDiv = document.getElementById('result');
@@ -409,6 +434,7 @@
         const totalMistakesDisplay = document.getElementById('total-mistakes');
         const matchDetails = document.getElementById('match-details');
         const playAgainButton = document.getElementById('play-again');
+        const matchedTableBody = document.getElementById('matched-table-body');
 
         let score = 0;
         let matches = 0;
@@ -422,6 +448,7 @@
         let startTime = null;
         let letterStartTime = null;
         let currentLetters = [];
+        let isInteractionDisabled = false;
 
         function shuffle(array) {
             for (let i = array.length - 1; i > 0; i--) {
@@ -432,8 +459,9 @@
         }
 
         function initGame() {
-            lowercaseColumn.innerHTML = '<h2>אותיות קטנות</h2>';
-            uppercaseColumn.innerHTML = '<h2>אותיות גדולות</h2>';
+            lowercaseCollection.innerHTML = '<h2>אותיות קטנות</h2>';
+            uppercaseCollection.innerHTML = '<h2>אותיות גדולות</h2>';
+            matchedTableBody.innerHTML = '';
             score = 0;
             matches = 0;
             totalMistakes = 0;
@@ -448,6 +476,7 @@
             scoreDisplay.textContent = `ניקוד: ${score}`;
             resultDiv.style.display = 'none';
             checkButton.disabled = true;
+            isInteractionDisabled = false;
 
             const shuffledLetters = shuffle([...letters]);
             currentLetters = shuffledLetters.slice(0, 10);
@@ -463,7 +492,7 @@
                 div.dataset.uppercase = letter.uppercase;
                 div.dataset.words = letter.words.join(', ');
                 div.addEventListener('click', () => selectLetter(div, 'lowercase'));
-                lowercaseColumn.appendChild(div);
+                lowercaseCollection.appendChild(div);
             });
 
             shuffledUppercase.forEach((letter) => {
@@ -474,13 +503,15 @@
                 div.dataset.uppercase = letter.uppercase;
                 div.dataset.words = letter.words.join(', ');
                 div.addEventListener('click', () => selectLetter(div, 'uppercase'));
-                uppercaseColumn.appendChild(div);
+                uppercaseCollection.appendChild(div);
             });
 
             checkVoices();
         }
 
         function selectLetter(element, type) {
+            if (isInteractionDisabled) return;
+
             if (type === 'lowercase') {
                 if (selectedLowercase) selectedLowercase.classList.remove('selected');
                 selectedLowercase = element;
@@ -504,8 +535,24 @@
             }
         }
 
+        function disableInteraction() {
+            isInteractionDisabled = true;
+            checkButton.disabled = true;
+            document.querySelectorAll('.letter').forEach(letter => {
+                letter.classList.add('disabled');
+            });
+        }
+
+        function enableInteraction() {
+            isInteractionDisabled = false;
+            document.querySelectorAll('.letter').forEach(letter => {
+                letter.classList.remove('disabled');
+            });
+            checkButton.disabled = !(selectedLowercase && selectedUppercase);
+        }
+
         function checkMatch() {
-            if (!selectedLowercase || !selectedUppercase) return;
+            if (!selectedLowercase || !selectedUppercase || isInteractionDisabled) return;
 
             const letterIndex = currentLetters.findIndex(l => l.uppercase === selectedUppercase.dataset.uppercase);
             matchAttempts[letterIndex]++;
@@ -522,14 +569,12 @@
                 const words = selectedLowercase.dataset.words.split(', ');
                 matchedWords.push(words);
 
-                const matchedDiv = document.createElement('div');
-                matchedDiv.className = 'matched-pair';
-                matchedDiv.innerHTML = `
-                    <div class="pair-text">${selectedLowercase.textContent} - ${selectedUppercase.textContent}</div>
-                    <div class="words">${words.join(', ')}</div>
-                    <div class="emoji">🌟</div>
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="pair-text">${selectedLowercase.textContent} - ${selectedUppercase.textContent}</td>
+                    <td class="words">${words.join(', ')}</td>
                 `;
-                uppercaseColumn.appendChild(matchedDiv);
+                matchedTableBody.appendChild(tr);
 
                 const lowercaseText = selectedLowercase.textContent;
                 const uppercaseText = selectedUppercase.textContent;
@@ -541,21 +586,25 @@
                 selectedUppercase.remove();
                 addConfetti();
 
-                if (matches === 10) {
-                    endGame();
-                }
+                disableInteraction();
+                setTimeout(() => {
+                    enableInteraction();
+                    if (matches === 10) {
+                        endGame();
+                    }
+                }, 5000);
+
             } else {
                 totalMistakes++;
                 matchMistakes[letterIndex]++;
                 alert('אופס! נסה שוב!');
+                selectedLowercase.classList.remove('selected');
+                selectedUppercase.classList.remove('selected');
+                selectedLowercase = null;
+                selectedUppercase = null;
+                letterStartTime = null;
+                checkButton.disabled = true;
             }
-
-            selectedLowercase.classList.remove('selected');
-            selectedUppercase.classList.remove('selected');
-            selectedLowercase = null;
-            selectedUppercase = null;
-            letterStartTime = null;
-            checkButton.disabled = true;
         }
 
         function playMatch(lowercaseText, uppercaseText, wordsText) {
