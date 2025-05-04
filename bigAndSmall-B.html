@@ -461,7 +461,6 @@
         function initGame() {
             lowercaseCollection.innerHTML = '<h2>אותיות קטנות</h2>';
             uppercaseCollection.innerHTML = '<h2>אותיות גדולות</h2>';
-            matchedTableBody.innerHTML = '';
             score = 0;
             matches = 0;
             totalMistakes = 0;
@@ -574,7 +573,7 @@
                     <td class="pair-text">${selectedLowercase.textContent} - ${selectedUppercase.textContent}</td>
                     <td class="words">${words.join(', ')}</td>
                 `;
-                matchedTableBody.appendChild(tr);
+                matchedTableBody.prepend(tr);
 
                 const lowercaseText = selectedLowercase.textContent;
                 const uppercaseText = selectedUppercase.textContent;
