@@ -152,6 +152,58 @@
         .hidden {
             display: none;
         }
+
+        .completed-table-container {
+            margin-top: 20px;
+        }
+
+        #completed-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        #completed-table th, #completed-table td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            color: #333;
+            text-align: center;
+        }
+
+        #completed-table th {
+            background: #ff69b4;
+            color: white;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        #completed-table td {
+            background: #f0f8ff;
+            color: #555;
+        }
+
+        #completed-table tr:nth-child(even) td {
+            background: #e6f3fa;
+        }
+
+        #completed-table tr:hover td {
+            background: #ffebcd;
+            transition: background 0.3s;
+        }
+
+        #completed-table .completed-sentence {
+            font-style: italic;
+            color: #2196f3;
+        }
+
+        @media (min-width: 768px) {
+            #completed-table {
+                font-size: 1em;
+            }
+        }
     </style>
 </head>
 <body>
@@ -165,6 +217,16 @@
         <div id="options"></div>
         <button id="check-btn" onclick="checkAnswer()">Check</button>
         <p id="feedback"></p>
+        <div class="completed-table-container">
+            <table id="completed-table">
+                <thead>
+                    <tr>
+                        <th>Completed Sentence</th>
+                    </tr>
+                </thead>
+                <tbody id="completed-table-body"></tbody>
+            </table>
+        </div>
         <div id="summary" class="hidden">
             <h2>Well Done, Champion!</h2>
             <div id="summary-message">
@@ -363,24 +425,29 @@ const sentencePool = [
                 document.getElementById("feedback").style.color = "#4CAF50";
                 score += firstAttempt ? 15 : 10;
                 updateScore();
-        
+
                 const completedSentence = sentenceObj.sentence.replace("___", selectedOption);
+                const completedTableBody = document.getElementById("completed-table-body");
+                const tr = document.createElement("tr");
+                tr.innerHTML = `<td class="completed-sentence">${completedSentence}</td>`;
+                completedTableBody.prepend(tr);
+
                 const utterance = new SpeechSynthesisUtterance(completedSentence);
                 utterance.lang = "en-US";
                 utterance.pitch = 1.2;
                 utterance.rate = 0.9;
                 speechSynthesis.speak(utterance);
-        
+
                 confetti({
                     particleCount: 100,
                     spread: 70,
                     origin: { y: 0.6 },
                     colors: ['#FEC260', '#ff9800', '#ff5722']
                 });
-        
+
                 const buttons = document.querySelectorAll(".option-btn");
                 buttons.forEach(btn => btn.disabled = true);
-        
+
                 currentSentence++;
                 setTimeout(showSentence, 10000); // 10-second delay
             } else {
