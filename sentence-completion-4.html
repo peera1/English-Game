@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sentence Completion Game - Grade 4</title>
+    <title>Sentence Completion Game - Grade 4 cerebellum</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
     <style>
         * {
@@ -397,7 +397,9 @@ const sentencePool = [
             document.getElementById("feedback").innerText = "";
             document.getElementById("check-btn").disabled = true;
 
-            sentenceObj.options.forEach(option => {
+            // Shuffle the options array
+            const shuffledOptions = sentenceObj.options.sort(() => Math.random() - 0.5);
+            shuffledOptions.forEach(option => {
                 const btn = document.createElement("button");
                 btn.className = "option-btn";
                 btn.innerText = option;
