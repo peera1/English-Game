@@ -254,7 +254,8 @@
             });
 
             setTimeout(() => {
-                window.location.href = url; // Navigate to the game page
+                // This line was changed to open the link in a new tab
+                window.open(url, '_blank'); 
             }, 500);
         }
 
