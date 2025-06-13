@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>הרפתקת קריאה באנגלית</title>
+    <title>הרפתקת קריאה PRO</title>
     
     <!-- Fonts and Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,18 +13,17 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
 
     <style>
-        /* CSS Styles */
         :root {
-            --primary-color: #3d5af1;
-            --secondary-color: #ffc107;
-            --correct-color: #4caf50;
-            --incorrect-color: #f44336;
-            --bg-color: #f0f4ff;
-            --text-color: #333;
+            --primary-color: #5e35b1; /* Deep Purple */
+            --secondary-color: #ffab00; /* Amber */
+            --correct-color: #43a047; /* Green */
+            --incorrect-color: #e53935; /* Red */
+            --bg-color: #f3e5f5; /* Light Lavender */
+            --text-color: #212121;
             --light-text-color: #fff;
             --container-bg: #ffffff;
             --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            --border-radius: 20px;
+            --border-radius: 24px;
         }
 
         * {
@@ -36,13 +35,12 @@
         body {
             font-family: 'Heebo', 'Nunito', sans-serif;
             background-color: var(--bg-color);
-            background-image: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-image: linear-gradient(135deg, #d1c4e9 0%, #b39ddb 100%);
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             color: var(--text-color);
-            overflow: hidden;
         }
 
         .game-container {
@@ -50,11 +48,11 @@
             border-radius: var(--border-radius);
             box-shadow: var(--shadow);
             width: 95%;
-            max-width: 600px;
-            padding: 40px;
+            max-width: 1000px;
+            padding: 30px;
             position: relative;
-            overflow: hidden;
             text-align: center;
+            transition: all 0.5s ease;
         }
 
         .screen {
@@ -70,36 +68,35 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
         }
 
         .title {
             font-family: 'Nunito', sans-serif;
             font-weight: 800;
-            font-size: 2.8rem;
+            font-size: 2.5rem;
             color: var(--primary-color);
-            margin-bottom: 15px;
-            line-height: 1.2;
+            margin-bottom: 10px;
         }
 
         .title span {
-            font-size: 1.5rem;
-            color: #777;
+            font-size: 1.4rem;
+            color: #757575;
             display: block;
         }
-
+        
         .intro-text, .results-summary {
             font-size: 1.1rem;
-            margin-bottom: 30px;
-            max-width: 400px;
+            margin-bottom: 25px;
+            max-width: 450px;
         }
 
         .btn {
             font-family: 'Heebo', sans-serif;
             font-weight: 700;
             font-size: 1rem;
-            padding: 15px 30px;
+            padding: 14px 28px;
             border: none;
             border-radius: 50px;
             cursor: pointer;
@@ -110,59 +107,85 @@
             color: var(--light-text-color);
         }
 
-        .btn i {
-            margin-inline-end: 10px;
-        }
+        .btn i { margin-inline-end: 10px; }
 
         .btn-start {
-            background-image: linear-gradient(to right, #6a11cb 0%, #2575fc 51%, #6a11cb 100%);
+            background-image: linear-gradient(to right, #651fff 0%, #6200ea 51%, #651fff 100%);
             background-size: 200% auto;
         }
 
-        .btn:not(.answer-btn):hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        .btn-main-action {
+            background-image: linear-gradient(to right, #ffc400 0%, #ffab00 51%, #ffc400 100%);
+            background-size: 200% auto;
+            color: #333;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
             background-position: right center;
         }
 
-        .story-box {
-            background-color: #f8f9fa;
+        /* --- Gameplay Screen Layout --- */
+        #gameplay-screen {
+            width: 100%;
+            display: none;
+            flex-direction: row;
+            gap: 30px;
+            align-items: flex-start;
+        }
+
+        #gameplay-screen.active {
+            display: flex;
+        }
+
+        .story-panel {
+            flex: 1;
+            background-color: #fafafa;
             border: 2px dashed var(--primary-color);
             border-radius: var(--border-radius);
             padding: 25px;
-            margin: 20px 0;
             text-align: left;
             direction: ltr;
+            height: 100%;
         }
 
-        #story-text {
+        .story-panel h2 {
             font-family: 'Nunito', sans-serif;
-            font-size: 1.4rem;
-            line-height: 1.8;
-            color: var(--text-color);
-        }
-
-        #story-title {
-            font-size: 2rem;
+            font-size: 1.8rem;
             color: var(--primary-color);
+            margin-bottom: 15px;
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 10px;
         }
 
-        .story-controls {
+        .story-panel p {
+            font-family: 'Nunito', sans-serif;
+            font-size: 1.3rem;
+            line-height: 1.7;
+        }
+        
+        #read-aloud-btn {
+            background-color: var(--primary-color);
+            margin-top: 20px;
+        }
+
+        .qa-panel {
+            flex: 1;
             display: flex;
-            gap: 15px;
-            margin-top: 10px;
+            flex-direction: column;
+            align-items: center;
         }
 
-        .btn-secondary {
-            background-color: var(--secondary-color);
-        }
-
-        /* Question Screen */
         #question-text {
-            font-size: 1.6rem;
-            margin-bottom: 30px;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
             font-weight: 700;
             direction: ltr;
+            background-color: #f3e5f5;
+            padding: 15px;
+            border-radius: 15px;
+            width: 100%;
         }
 
         .answers-grid {
@@ -174,124 +197,51 @@
 
         .answer-btn {
             width: 100%;
-            padding: 20px;
-            font-size: 1.1rem;
+            padding: 18px;
+            font-size: 1rem;
             background-color: var(--primary-color);
             color: white;
             text-align: center;
             border-radius: 15px;
-            border: 3px solid transparent;
+            border: none;
             transition: all 0.2s ease-in-out;
         }
 
         .answer-btn:hover:not(:disabled) {
             transform: scale(1.05);
-            background-color: #2a3eb1;
+            background-color: #4527a0;
         }
 
-        .answer-btn:disabled {
-            cursor: not-allowed;
-            opacity: 0.7;
-        }
+        .answer-btn:disabled { cursor: not-allowed; opacity: 0.8; }
+        .answer-btn.correct { background-color: var(--correct-color); animation: pulse 0.5s; }
+        .answer-btn.incorrect { background-color: var(--incorrect-color); animation: shake 0.5s; }
 
-        .answer-btn.correct {
-            background-color: var(--correct-color);
-            animation: pulse 0.5s;
-        }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
 
-        .answer-btn.incorrect {
-            background-color: var(--incorrect-color);
-            animation: shake 0.5s;
-        }
+        #feedback-container { margin-top: 20px; min-height: 80px; }
+        #feedback-text { font-size: 1.2rem; font-weight: bold; }
+        .btn-next { margin-top: 10px; background-color: var(--secondary-color); color: #333; }
+        .hidden { display: none !important; }
 
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
+        .progress-bar-container { width: 100%; height: 15px; background-color: #e0e0e0; border-radius: 10px; margin-bottom: 20px; overflow: hidden; }
+        #progress-bar { height: 100%; width: 0%; background-color: var(--secondary-color); border-radius: 10px; transition: width 0.4s ease-in-out; }
 
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            75% { transform: translateX(5px); }
-        }
+        .trophy-img { width: 120px; margin-bottom: 20px; animation: bounce 1s infinite; }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
 
-        #feedback-container {
-            margin-top: 20px;
-            height: 80px;
-        }
+        #results-table { width: 100%; border-collapse: collapse; margin: 20px 0 30px; font-size: 1rem; }
+        #results-table th, #results-table td { padding: 12px; border: 1px solid #ddd; }
+        #results-table th { background-color: var(--primary-color); color: white; }
+        #results-table tr:nth-child(even) { background-color: #f2f2f2; }
 
-        #feedback-text {
-            font-size: 1.2rem;
-            font-weight: bold;
-        }
-
-        .btn-next {
-            margin-top: 10px;
-            background-color: var(--secondary-color);
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-        /* Progress Bar */
-        .progress-bar-container {
-            width: 100%;
-            height: 15px;
-            background-color: #e0e0e0;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            overflow: hidden;
-        }
-
-        #progress-bar {
-            height: 100%;
-            width: 0%;
-            background-color: var(--secondary-color);
-            border-radius: 10px;
-            transition: width 0.4s ease-in-out;
-        }
-
-        /* Results Screen */
-        .trophy-img {
-            width: 120px;
-            margin-bottom: 20px;
-            animation: bounce 1s infinite;
-        }
-
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-15px); }
-        }
-
-        #results-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0 30px;
-            font-size: 1rem;
-        }
-
-        #results-table th, #results-table td {
-            padding: 12px;
-            border: 1px solid #ddd;
-        }
-
-        #results-table th {
-            background-color: var(--primary-color);
-            color: white;
-        }
-
-        #results-table tr:nth-child(even) {
-            background-color: #f2f2f2;
-        }
-
-        @media (max-width: 600px) {
+        @media (max-width: 800px) {
             body { padding: 10px; }
             .game-container { padding: 20px; }
-            .title { font-size: 2.2rem; }
+            #gameplay-screen { flex-direction: column; }
+            .story-panel, .qa-panel { width: 100%; }
+            .title { font-size: 2rem; }
             .answers-grid { grid-template-columns: 1fr; }
-            .story-controls { flex-direction: column; }
         }
     </style>
 </head>
@@ -300,51 +250,49 @@
     <div class="game-container">
         <!-- מסך התחלה -->
         <div id="start-screen" class="screen active">
-            <h1 class="title">הרפתקת הקריאה<br><span>Reading Adventure</span></h1>
-            <p class="intro-text">מוכנים לצאת למסע קריאה קסום? לחצו כדי להתחיל!</p>
+            <h1 class="title">הרפתקת קריאה PRO<br><span>Reading Adventure</span></h1>
+            <p class="intro-text">ברוכים הבאים! בכל פעם תגלו סיפור חדש ומפתיע. לחצו כדי להתחיל את ההרפתקה!</p>
             <button id="start-btn" class="btn btn-start">
                 <i class="fas fa-rocket"></i> התחל משחק
             </button>
         </div>
 
-        <!-- מסך הסיפור -->
-        <div id="story-screen" class="screen">
-            <h2 id="story-title">הסיפור שלנו</h2>
-            <div class="story-box">
+        <!-- מסך המשחק הראשי -->
+        <div id="gameplay-screen" class="screen">
+            <div class="story-panel">
+                <h2 id="story-title"></h2>
                 <p id="story-text"></p>
-            </div>
-            <div class="story-controls">
-                <button id="read-aloud-btn" class="btn btn-secondary">
+                <button id="read-aloud-btn" class="btn">
                     <i class="fas fa-volume-up"></i> הקריאו לי
                 </button>
-                <button id="start-questions-btn" class="btn">
-                    <i class="fas fa-question-circle"></i> אני מוכן לשאלות
-                </button>
             </div>
-        </div>
-
-        <!-- מסך השאלות -->
-        <div id="question-screen" class="screen">
-            <div class="progress-bar-container">
-                <div id="progress-bar"></div>
-            </div>
-            <h2 id="question-text"></h2>
-            <div id="answers-container" class="answers-grid">
-                <!-- Answer buttons will be generated by JS -->
-            </div>
-            <div id="feedback-container">
-                <p id="feedback-text"></p>
-                <button id="next-question-btn" class="btn btn-next hidden">
-                    <i class="fas fa-arrow-right"></i> לשאלה הבאה
-                </button>
+            <div class="qa-panel">
+                <div id="start-questions-container">
+                    <button id="start-questions-btn" class="btn btn-main-action">
+                        <i class="fas fa-question-circle"></i> אני מוכן לשאלות
+                    </button>
+                </div>
+                <div id="qa-content" class="hidden">
+                    <div class="progress-bar-container">
+                        <div id="progress-bar"></div>
+                    </div>
+                    <h2 id="question-text"></h2>
+                    <div id="answers-container" class="answers-grid"></div>
+                    <div id="feedback-container">
+                        <p id="feedback-text"></p>
+                        <button id="next-question-btn" class="btn btn-next hidden">
+                            <i class="fas fa-arrow-right"></i> לשאלה הבאה
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
         
         <!-- מסך התוצאות -->
         <div id="results-screen" class="screen">
-            <h1 class="title">כל הכבוד!</h1>
+            <h1 class="title">אלופים! סיימתם בהצלחה!</h1>
             <img src="https://em-content.zobj.net/source/microsoft-teams/363/trophy_1f3c6.png" alt="Trophy" class="trophy-img">
-            <p class="results-summary">סיימת את הסיפור! הנה סיכום הזמנים שלך:</p>
+            <p class="results-summary">הנה סיכום הזמנים שלכם:</p>
             <table id="results-table">
                 <thead>
                     <tr>
@@ -353,9 +301,7 @@
                         <th>תוצאה</th>
                     </tr>
                 </thead>
-                <tbody id="results-body">
-                    <!-- Results rows will be generated by JS -->
-                </tbody>
+                <tbody id="results-body"></tbody>
             </table>
             <button id="play-again-btn" class="btn btn-start">
                 <i class="fas fa-redo"></i> שחק סיפור אחר
@@ -364,11 +310,9 @@
     </div>
 
     <script>
-        // JavaScript Logic
         // --- DOM Elements ---
         const startScreen = document.getElementById('start-screen');
-        const storyScreen = document.getElementById('story-screen');
-        const questionScreen = document.getElementById('question-screen');
+        const gameplayScreen = document.getElementById('gameplay-screen');
         const resultsScreen = document.getElementById('results-screen');
 
         const startBtn = document.getElementById('start-btn');
@@ -376,7 +320,9 @@
         const startQuestionsBtn = document.getElementById('start-questions-btn');
         const nextQuestionBtn = document.getElementById('next-question-btn');
         const playAgainBtn = document.getElementById('play-again-btn');
-
+        
+        const startQuestionsContainer = document.getElementById('start-questions-container');
+        const qaContent = document.getElementById('qa-content');
         const storyTitleEl = document.getElementById('story-title');
         const storyTextEl = document.getElementById('story-text');
         const questionTextEl = document.getElementById('question-text');
@@ -385,67 +331,74 @@
         const resultsBody = document.getElementById('results-body');
         const progressBar = document.getElementById('progress-bar');
 
-        // --- Game Data ---
-        const stories = [
-            {
-                title: "Leo's Clever Parrot",
-                text: "Leo had a pet parrot named Pip. Pip was bright green with a yellow beak. He loved to talk and learn new words. Every morning, Pip would say, 'Good morning, Leo!' Leo taught Pip how to sing a fun song about a pirate ship sailing on the sea.",
-                questions: [
-                    {
-                        q: "What kind of pet did Leo have?",
-                        options: ["A cat", "A dog", "A parrot", "A fish"],
-                        answer: "A parrot"
-                    },
-                    {
-                        q: "What color was Pip?",
-                        options: ["Blue and red", "Bright green", "Yellow and black", "Orange"],
-                        answer: "Bright green"
-                    },
-                    {
-                        q: "What did Pip say every morning?",
-                        options: ["'Hello, world!'", "'I am hungry!'", "'Let's play!'", "'Good morning, Leo!'"],
-                        answer: "'Good morning, Leo!'"
-                    },
-                    {
-                        q: "What song did Leo teach Pip?",
-                        options: ["A song about a car", "A song about a pirate ship", "A song about school", "A song about animals"],
-                        answer: "A song about a pirate ship"
+        // --- Story Generator Data ---
+        const characters = ["Leo the lion", "Mia the monkey", "Sam the squirrel", "Zoe the zebra", "Ben the bear"];
+        const objects = ["a magic map", "a shiny red bike", "a book of secrets", "a flying carpet", "a tiny, talking robot"];
+        const places = ["the Whispering Woods", "the Sunny Meadow", "the Crystal Caves", "the top of Sparkle Mountain", "the Hidden Lagoon"];
+        const actions = ["found a hidden treasure chest", "built an amazing treehouse", "organized a surprise party for all their friends", "discovered a new, colorful planet", "learned how to bake the world's biggest cookie"];
+        const feelings = ["very excited", "a little bit nervous", "incredibly happy", "proud of their work", "curious to see what happens next"];
+
+        // --- Function to Generate Stories ---
+        function generateRandomStory() {
+            const char = characters[Math.floor(Math.random() * characters.length)];
+            const obj = objects[Math.floor(Math.random() * objects.length)];
+            const place = places[Math.floor(Math.random() * places.length)];
+            const action = actions[Math.floor(Math.random() * actions.length)];
+            const feeling = feelings[Math.floor(Math.random() * feelings.length)];
+
+            const title = `${char}'s Big Adventure`;
+            const text = `${char} had ${obj}. One sunny morning, ${char} decided to go to ${place}. During the adventure, ${char} ${action}. This made ${char} feel ${feeling}.`;
+            
+            // Function to get distractors (wrong answers)
+            const getDistractors = (array, correctAnswer) => {
+                let distractors = [];
+                while (distractors.length < 3) {
+                    let randomItem = array[Math.floor(Math.random() * array.length)];
+                    if (randomItem !== correctAnswer && !distractors.includes(randomItem)) {
+                        distractors.push(randomItem);
                     }
-                ]
-            },
-            {
-                title: "The Magical Garden",
-                text: "Lily found a secret key in her backyard. It unlocked a small, hidden gate. Behind the gate was a magical garden where the flowers could sing and the butterflies had sparkling wings. In the center of the garden, there was a fountain that whispered secrets to anyone who listened closely.",
-                questions: [
-                    {
-                        q: "What did Lily find in her backyard?",
-                        options: ["A map", "A secret key", "A lost puppy", "A shiny rock"],
-                        answer: "A secret key"
-                    },
-                    {
-                        q: "What was special about the flowers in the garden?",
-                        options: ["They could fly", "They changed colors", "They could sing", "They grew candy"],
-                        answer: "They could sing"
-                    },
-                    {
-                        q: "What was in the center of the garden?",
-                        options: ["A big tree", "A bench", "A fountain", "A vegetable patch"],
-                        answer: "A fountain"
-                    },
-                    {
-                        q: "What did the butterflies have?",
-                        options: ["Sparkling wings", "Tiny hats", "Striped bodies", "Loud voices"],
-                        answer: "Sparkling wings"
-                    }
-                ]
-            }
-        ];
+                }
+                return distractors;
+            };
+
+            const questions = [
+                {
+                    q: "Who is the main character?",
+                    options: [char, ...getDistractors(characters, char)].sort(() => Math.random() - 0.5),
+                    answer: char
+                },
+                {
+                    q: `What object did ${char.split(' ')[0]} have?`,
+                    options: [obj, ...getDistractors(objects, obj)].sort(() => Math.random() - 0.5),
+                    answer: obj
+                },
+                {
+                    q: `Where did ${char.split(' ')[0]} go?`,
+                    options: [place, ...getDistractors(places, place)].sort(() => Math.random() - 0.5),
+                    answer: place
+                },
+                {
+                    q: "What was the main action in the story?",
+                    options: [action, ...getDistractors(actions, action)].sort(() => Math.random() - 0.5),
+                    answer: action
+                }
+            ];
+
+            return { title, text, questions };
+        }
 
         // --- Game State ---
-        let currentStoryIndex = 0;
+        let stories = [];
+        let currentStoryIndex = -1;
+        let lastStoryIndex = -1;
         let currentQuestionIndex = 0;
         let questionStartTime;
         let results = [];
+        
+        // --- Populate Stories ---
+        for (let i = 0; i < 50; i++) {
+            stories.push(generateRandomStory());
+        }
 
         // --- Functions ---
         function showScreen(screen) {
@@ -455,10 +408,20 @@
 
         function startGame() {
             results = [];
-            currentStoryIndex = Math.floor(Math.random() * stories.length); // Pick a random story
+            
+            // Ensure a new story is chosen every time
+            do {
+                currentStoryIndex = Math.floor(Math.random() * stories.length);
+            } while (stories.length > 1 && currentStoryIndex === lastStoryIndex);
+            lastStoryIndex = currentStoryIndex;
+
             currentQuestionIndex = 0;
             loadStory();
-            showScreen(storyScreen);
+            showScreen(gameplayScreen);
+            
+            // Reset QA panel
+            qaContent.classList.add('hidden');
+            startQuestionsContainer.classList.remove('hidden');
         }
 
         function loadStory() {
@@ -470,11 +433,10 @@
         function readAloud() {
             const text = stories[currentStoryIndex].text;
             if ('speechSynthesis' in window) {
-                // Cancel any previous speech
                 window.speechSynthesis.cancel();
                 const utterance = new SpeechSynthesisUtterance(text);
                 utterance.lang = 'en-US';
-                utterance.rate = 0.9; // A good speed for learners
+                utterance.rate = 0.9;
                 window.speechSynthesis.speak(utterance);
             } else {
                 alert("Sorry, your browser does not support text-to-speech.");
@@ -482,9 +444,10 @@
         }
 
         function startQuestions() {
+            startQuestionsContainer.classList.add('hidden');
+            qaContent.classList.remove('hidden');
             currentQuestionIndex = 0;
             loadQuestion();
-            showScreen(questionScreen);
         }
 
         function loadQuestion() {
@@ -527,12 +490,12 @@
             });
 
             if (isCorrect) {
-                feedbackTextEl.innerText = "Correct! Well done!";
+                feedbackTextEl.innerText = "מעולה! תשובה נכונה!";
                 feedbackTextEl.style.color = 'var(--correct-color)';
                 celebrate();
             } else {
                 button.classList.add('incorrect');
-                feedbackTextEl.innerText = `Not quite. The correct answer is "${correctAnswer}"`;
+                feedbackTextEl.innerText = `אופס! התשובה הנכונה היא "${correctAnswer}"`;
                 feedbackTextEl.style.color = 'var(--incorrect-color)';
             }
 
@@ -569,11 +532,7 @@
         }
 
         function celebrate() {
-            confetti({
-                particleCount: 100,
-                spread: 70,
-                origin: { y: 0.6 }
-            });
+            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
         }
 
         // --- Event Listeners ---
