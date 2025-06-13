@@ -139,6 +139,11 @@
             background: linear-gradient(to right, #4caf50, #66bb6a);
             font-family: 'Rubik', 'Comic Sans MS', Arial, sans-serif;
         }
+        
+        /* Added a new color for the new button to make it stand out */
+        .button.purple {
+             background: linear-gradient(to right, #6a1b9a, #ab47bc);
+        }
 
         .button:hover {
             background: linear-gradient(to right, var(--secondary-color), #FFD700);
@@ -237,6 +242,11 @@
             <button class="button" onclick="openLinkWithConfetti('ClassD/sentence-completion-4.html')">
                 <i class="fas fa-pen"></i> השלמת משפטים
             </button>
+            <!-- === THIS IS THE NEW BUTTON === -->
+            <button class="button purple" onclick="openLinkWithConfetti('ClassD/StoryTelling.html')">
+                <i class="fas fa-book-reader"></i> הרפתקת קריאה
+            </button>
+            <!-- ============================== -->
         </div>
 
         <div class="info-text">
@@ -250,11 +260,10 @@
                 particleCount: 150,
                 spread: 80,
                 origin: { y: 0.6 },
-                colors: ['#FEC260', '#ff9800', '#ff5722', '#4caf50']
+                colors: ['#FEC260', '#ff9800', '#ff5722', '#4caf50', '#6a1b9a']
             });
 
             setTimeout(() => {
-                // This line was changed to open the link in a new tab
                 window.open(url, '_blank'); 
             }, 500);
         }
@@ -277,7 +286,9 @@
                 const star = document.createElement('div');
                 star.className = 'star';
                 star.style.left = `${Math.random() * 100}vw`;
-                document.getElementById('stars').appendChild(star);
+                if(document.getElementById('stars')) {
+                   document.getElementById('stars').appendChild(star);
+                }
             }, 500);
         }
 
