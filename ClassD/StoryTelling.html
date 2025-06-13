@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>הרפתקת קריאה באנגלית</title>
+    
+    <!-- Fonts and Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;700&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+
+    <style>
+        /* CSS Styles */
+        :root {
+            --primary-color: #3d5af1;
+            --secondary-color: #ffc107;
+            --correct-color: #4caf50;
+            --incorrect-color: #f44336;
+            --bg-color: #f0f4ff;
+            --text-color: #333;
+            --light-text-color: #fff;
+            --container-bg: #ffffff;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            --border-radius: 20px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Heebo', 'Nunito', sans-serif;
+            background-color: var(--bg-color);
+            background-image: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: var(--text-color);
+            overflow: hidden;
+        }
+
+        .game-container {
+            background-color: var(--container-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            width: 95%;
+            max-width: 600px;
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .title {
+            font-family: 'Nunito', sans-serif;
+            font-weight: 800;
+            font-size: 2.8rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            line-height: 1.2;
+        }
+
+        .title span {
+            font-size: 1.5rem;
+            color: #777;
+            display: block;
+        }
+
+        .intro-text, .results-summary {
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+            max-width: 400px;
+        }
+
+        .btn {
+            font-family: 'Heebo', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            color: var(--light-text-color);
+        }
+
+        .btn i {
+            margin-inline-end: 10px;
+        }
+
+        .btn-start {
+            background-image: linear-gradient(to right, #6a11cb 0%, #2575fc 51%, #6a11cb 100%);
+            background-size: 200% auto;
+        }
+
+        .btn:not(.answer-btn):hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            background-position: right center;
+        }
+
+        .story-box {
+            background-color: #f8f9fa;
+            border: 2px dashed var(--primary-color);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            margin: 20px 0;
+            text-align: left;
+            direction: ltr;
+        }
+
+        #story-text {
+            font-family: 'Nunito', sans-serif;
+            font-size: 1.4rem;
+            line-height: 1.8;
+            color: var(--text-color);
+        }
+
+        #story-title {
+            font-size: 2rem;
+            color: var(--primary-color);
+        }
+
+        .story-controls {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary-color);
+        }
+
+        /* Question Screen */
+        #question-text {
+            font-size: 1.6rem;
+            margin-bottom: 30px;
+            font-weight: 700;
+            direction: ltr;
+        }
+
+        .answers-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            width: 100%;
+        }
+
+        .answer-btn {
+            width: 100%;
+            padding: 20px;
+            font-size: 1.1rem;
+            background-color: var(--primary-color);
+            color: white;
+            text-align: center;
+            border-radius: 15px;
+            border: 3px solid transparent;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .answer-btn:hover:not(:disabled) {
+            transform: scale(1.05);
+            background-color: #2a3eb1;
+        }
+
+        .answer-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .answer-btn.correct {
+            background-color: var(--correct-color);
+            animation: pulse 0.5s;
+        }
+
+        .answer-btn.incorrect {
+            background-color: var(--incorrect-color);
+            animation: shake 0.5s;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        #feedback-container {
+            margin-top: 20px;
+            height: 80px;
+        }
+
+        #feedback-text {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .btn-next {
+            margin-top: 10px;
+            background-color: var(--secondary-color);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Progress Bar */
+        .progress-bar-container {
+            width: 100%;
+            height: 15px;
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        #progress-bar {
+            height: 100%;
+            width: 0%;
+            background-color: var(--secondary-color);
+            border-radius: 10px;
+            transition: width 0.4s ease-in-out;
+        }
+
+        /* Results Screen */
+        .trophy-img {
+            width: 120px;
+            margin-bottom: 20px;
+            animation: bounce 1s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        #results-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0 30px;
+            font-size: 1rem;
+        }
+
+        #results-table th, #results-table td {
+            padding: 12px;
+            border: 1px solid #ddd;
+        }
+
+        #results-table th {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        #results-table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        @media (max-width: 600px) {
+            body { padding: 10px; }
+            .game-container { padding: 20px; }
+            .title { font-size: 2.2rem; }
+            .answers-grid { grid-template-columns: 1fr; }
+            .story-controls { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="game-container">
+        <!-- מסך התחלה -->
+        <div id="start-screen" class="screen active">
+            <h1 class="title">הרפתקת הקריאה<br><span>Reading Adventure</span></h1>
+            <p class="intro-text">מוכנים לצאת למסע קריאה קסום? לחצו כדי להתחיל!</p>
+            <button id="start-btn" class="btn btn-start">
+                <i class="fas fa-rocket"></i> התחל משחק
+            </button>
+        </div>
+
+        <!-- מסך הסיפור -->
+        <div id="story-screen" class="screen">
+            <h2 id="story-title">הסיפור שלנו</h2>
+            <div class="story-box">
+                <p id="story-text"></p>
+            </div>
+            <div class="story-controls">
+                <button id="read-aloud-btn" class="btn btn-secondary">
+                    <i class="fas fa-volume-up"></i> הקריאו לי
+                </button>
+                <button id="start-questions-btn" class="btn">
+                    <i class="fas fa-question-circle"></i> אני מוכן לשאלות
+                </button>
+            </div>
+        </div>
+
+        <!-- מסך השאלות -->
+        <div id="question-screen" class="screen">
+            <div class="progress-bar-container">
+                <div id="progress-bar"></div>
+            </div>
+            <h2 id="question-text"></h2>
+            <div id="answers-container" class="answers-grid">
+                <!-- Answer buttons will be generated by JS -->
+            </div>
+            <div id="feedback-container">
+                <p id="feedback-text"></p>
+                <button id="next-question-btn" class="btn btn-next hidden">
+                    <i class="fas fa-arrow-right"></i> לשאלה הבאה
+                </button>
+            </div>
+        </div>
+        
+        <!-- מסך התוצאות -->
+        <div id="results-screen" class="screen">
+            <h1 class="title">כל הכבוד!</h1>
+            <img src="https://em-content.zobj.net/source/microsoft-teams/363/trophy_1f3c6.png" alt="Trophy" class="trophy-img">
+            <p class="results-summary">סיימת את הסיפור! הנה סיכום הזמנים שלך:</p>
+            <table id="results-table">
+                <thead>
+                    <tr>
+                        <th>שאלה</th>
+                        <th>זמן (שניות)</th>
+                        <th>תוצאה</th>
+                    </tr>
+                </thead>
+                <tbody id="results-body">
+                    <!-- Results rows will be generated by JS -->
+                </tbody>
+            </table>
+            <button id="play-again-btn" class="btn btn-start">
+                <i class="fas fa-redo"></i> שחק סיפור אחר
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // JavaScript Logic
+        // --- DOM Elements ---
+        const startScreen = document.getElementById('start-screen');
+        const storyScreen = document.getElementById('story-screen');
+        const questionScreen = document.getElementById('question-screen');
+        const resultsScreen = document.getElementById('results-screen');
+
+        const startBtn = document.getElementById('start-btn');
+        const readAloudBtn = document.getElementById('read-aloud-btn');
+        const startQuestionsBtn = document.getElementById('start-questions-btn');
+        const nextQuestionBtn = document.getElementById('next-question-btn');
+        const playAgainBtn = document.getElementById('play-again-btn');
+
+        const storyTitleEl = document.getElementById('story-title');
+        const storyTextEl = document.getElementById('story-text');
+        const questionTextEl = document.getElementById('question-text');
+        const answersContainer = document.getElementById('answers-container');
+        const feedbackTextEl = document.getElementById('feedback-text');
+        const resultsBody = document.getElementById('results-body');
+        const progressBar = document.getElementById('progress-bar');
+
+        // --- Game Data ---
+        const stories = [
+            {
+                title: "Leo's Clever Parrot",
+                text: "Leo had a pet parrot named Pip. Pip was bright green with a yellow beak. He loved to talk and learn new words. Every morning, Pip would say, 'Good morning, Leo!' Leo taught Pip how to sing a fun song about a pirate ship sailing on the sea.",
+                questions: [
+                    {
+                        q: "What kind of pet did Leo have?",
+                        options: ["A cat", "A dog", "A parrot", "A fish"],
+                        answer: "A parrot"
+                    },
+                    {
+                        q: "What color was Pip?",
+                        options: ["Blue and red", "Bright green", "Yellow and black", "Orange"],
+                        answer: "Bright green"
+                    },
+                    {
+                        q: "What did Pip say every morning?",
+                        options: ["'Hello, world!'", "'I am hungry!'", "'Let's play!'", "'Good morning, Leo!'"],
+                        answer: "'Good morning, Leo!'"
+                    },
+                    {
+                        q: "What song did Leo teach Pip?",
+                        options: ["A song about a car", "A song about a pirate ship", "A song about school", "A song about animals"],
+                        answer: "A song about a pirate ship"
+                    }
+                ]
+            },
+            {
+                title: "The Magical Garden",
+                text: "Lily found a secret key in her backyard. It unlocked a small, hidden gate. Behind the gate was a magical garden where the flowers could sing and the butterflies had sparkling wings. In the center of the garden, there was a fountain that whispered secrets to anyone who listened closely.",
+                questions: [
+                    {
+                        q: "What did Lily find in her backyard?",
+                        options: ["A map", "A secret key", "A lost puppy", "A shiny rock"],
+                        answer: "A secret key"
+                    },
+                    {
+                        q: "What was special about the flowers in the garden?",
+                        options: ["They could fly", "They changed colors", "They could sing", "They grew candy"],
+                        answer: "They could sing"
+                    },
+                    {
+                        q: "What was in the center of the garden?",
+                        options: ["A big tree", "A bench", "A fountain", "A vegetable patch"],
+                        answer: "A fountain"
+                    },
+                    {
+                        q: "What did the butterflies have?",
+                        options: ["Sparkling wings", "Tiny hats", "Striped bodies", "Loud voices"],
+                        answer: "Sparkling wings"
+                    }
+                ]
+            }
+        ];
+
+        // --- Game State ---
+        let currentStoryIndex = 0;
+        let currentQuestionIndex = 0;
+        let questionStartTime;
+        let results = [];
+
+        // --- Functions ---
+        function showScreen(screen) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            screen.classList.add('active');
+        }
+
+        function startGame() {
+            results = [];
+            currentStoryIndex = Math.floor(Math.random() * stories.length); // Pick a random story
+            currentQuestionIndex = 0;
+            loadStory();
+            showScreen(storyScreen);
+        }
+
+        function loadStory() {
+            const story = stories[currentStoryIndex];
+            storyTitleEl.innerText = story.title;
+            storyTextEl.innerText = story.text;
+        }
+
+        function readAloud() {
+            const text = stories[currentStoryIndex].text;
+            if ('speechSynthesis' in window) {
+                // Cancel any previous speech
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'en-US';
+                utterance.rate = 0.9; // A good speed for learners
+                window.speechSynthesis.speak(utterance);
+            } else {
+                alert("Sorry, your browser does not support text-to-speech.");
+            }
+        }
+
+        function startQuestions() {
+            currentQuestionIndex = 0;
+            loadQuestion();
+            showScreen(questionScreen);
+        }
+
+        function loadQuestion() {
+            feedbackTextEl.innerText = '';
+            nextQuestionBtn.classList.add('hidden');
+            answersContainer.innerHTML = '';
+            
+            const story = stories[currentStoryIndex];
+            const question = story.questions[currentQuestionIndex];
+
+            questionTextEl.innerText = question.q;
+            updateProgressBar();
+            
+            question.options.forEach(option => {
+                const button = document.createElement('button');
+                button.innerText = option;
+                button.classList.add('btn', 'answer-btn');
+                button.onclick = () => checkAnswer(button, option, question.answer);
+                answersContainer.appendChild(button);
+            });
+
+            questionStartTime = new Date();
+        }
+
+        function checkAnswer(button, selectedOption, correctAnswer) {
+            const timeTaken = (new Date() - questionStartTime) / 1000;
+            const isCorrect = selectedOption === correctAnswer;
+
+            results.push({
+                question: currentQuestionIndex + 1,
+                time: timeTaken.toFixed(2),
+                correct: isCorrect
+            });
+            
+            document.querySelectorAll('.answer-btn').forEach(btn => {
+                btn.disabled = true;
+                if (btn.innerText === correctAnswer) {
+                    btn.classList.add('correct');
+                }
+            });
+
+            if (isCorrect) {
+                feedbackTextEl.innerText = "Correct! Well done!";
+                feedbackTextEl.style.color = 'var(--correct-color)';
+                celebrate();
+            } else {
+                button.classList.add('incorrect');
+                feedbackTextEl.innerText = `Not quite. The correct answer is "${correctAnswer}"`;
+                feedbackTextEl.style.color = 'var(--incorrect-color)';
+            }
+
+            nextQuestionBtn.classList.remove('hidden');
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < stories[currentStoryIndex].questions.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            resultsBody.innerHTML = '';
+            results.forEach(result => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>שאלה ${result.question}</td>
+                    <td>${result.time}s</td>
+                    <td>${result.correct ? '<i class="fas fa-check-circle" style="color: var(--correct-color);"></i> נכון' : '<i class="fas fa-times-circle" style="color: var(--incorrect-color);"></i> לא נכון'}</td>
+                `;
+                resultsBody.appendChild(row);
+            });
+            showScreen(resultsScreen);
+        }
+
+        function updateProgressBar() {
+            const totalQuestions = stories[currentStoryIndex].questions.length;
+            const progressPercentage = (currentQuestionIndex / totalQuestions) * 100;
+            progressBar.style.width = `${progressPercentage}%`;
+        }
+
+        function celebrate() {
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
+        }
+
+        // --- Event Listeners ---
+        startBtn.addEventListener('click', startGame);
+        readAloudBtn.addEventListener('click', readAloud);
+        startQuestionsBtn.addEventListener('click', startQuestions);
+        nextQuestionBtn.addEventListener('click', nextQuestion);
+        playAgainBtn.addEventListener('click', startGame);
+
+        // --- Initial Load ---
+        showScreen(startScreen);
+
+    </script>
+</body>
+</html>
