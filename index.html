@@ -1,3 +1,4 @@
+<!-- תוכן הקובץ: index.html (הגרסה המשודרגת) -->
 <!DOCTYPE html>
 <html lang="he">
 <head>
@@ -8,10 +9,10 @@
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-BPNZZJWSF8"></script>
     <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-BPNZZJWSF8');
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-BPNZZJWSF8');
     </script>
     
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
@@ -24,7 +25,7 @@
             --primary-gradient-end: #ff9800;
             --secondary-color: #FEC260; 
             --text-color: #333;
-            --container-bg: white;
+            --container-bg: rgba(255, 255, 255, 0.95);
             --button-blue-start: #0077b6;
             --button-blue-end: #00b4d8;
             --button-shadow: rgba(0, 119, 182, 0.3);
@@ -41,11 +42,10 @@
             font-family: 'Rubik', 'Comic Sans MS', Arial, sans-serif;
             background: linear-gradient(135deg, var(--primary-gradient-start) 0%, var(--primary-gradient-end) 100%);
             min-height: 100vh;
-            margin: 0;
             direction: rtl;
             color: var(--text-color);
             line-height: 1.6;
-            overflow-y: auto;
+            overflow-x: hidden; /* למנוע גלילה אופקית */
             position: relative;
         }
         
@@ -62,6 +62,13 @@
             transition: all 0.5s ease;
             border: 3px solid rgba(254, 194, 96, 0.3);
             z-index: 2;
+            animation: float 6s ease-in-out infinite; /* אפקט ריחוף */
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
         }
 
         h1 {
@@ -98,16 +105,8 @@
             position: absolute;
             opacity: 0.7;
         }
-
-        .quote::before {
-            left: 0;
-            top: -10px;
-        }
-
-        .quote::after {
-            right: 0;
-            bottom: -10px;
-        }
+        .quote::before { left: 0; top: -10px; }
+        .quote::after { right: 0; bottom: -10px; }
 
         .button {
             display: flex;
@@ -131,15 +130,28 @@
             font-family: 'Rubik', 'Comic Sans MS', Arial, sans-serif;
         }
         
+        .button::before { /* אפקט הברק */
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(120deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0) 100%);
+            transition: left 0.6s ease-in-out;
+        }
+
+        .button:hover::before {
+            left: 100%;
+        }
+
         .button:hover {
-            background: linear-gradient(to right, var(--secondary-color), #FFD700);
-            box-shadow: 0 0 20px rgba(254, 194, 96, 0.6);
+            box-shadow: 0 0 20px rgba(0, 180, 216, 0.6);
             transform: scale(1.05);
-            color: #333;
         }
 
         .button i {
-            margin-right: 10px;
+            margin-left: 10px; /* שינוי ל-margin-left בגלל rtl */
             animation: bounce 1.5s infinite;
         }
 
@@ -147,6 +159,13 @@
             0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
             40% { transform: translateY(-8px); }
             60% { transform: translateY(-4px); }
+        }
+
+        .decorative-divider {
+            border: 0;
+            height: 2px;
+            background-image: linear-gradient(to left, rgba(0, 0, 0, 0), var(--secondary-color), rgba(0, 0, 0, 0));
+            margin: 40px 0;
         }
 
         .info-text {
@@ -158,7 +177,7 @@
             font-size: 15px;
             border: 1px solid rgba(254, 194, 96, 0.4);
         }
-
+        
         .background-anim {
             position: fixed;
             top: 0;
@@ -166,27 +185,49 @@
             width: 100%;
             height: 100%;
             pointer-events: none;
-            z-index: 1;
+            overflow: hidden;
         }
-
+        
         .star {
             position: absolute;
             width: 20px;
             height: 20px;
             background: url('https://img.icons8.com/emoji/20/000000/star-emoji.png');
-            animation: fall 5s linear infinite;
+            animation: fall 10s linear infinite;
+            z-index: 1;
+        }
+        
+        .bubble {
+            position: absolute;
+            bottom: -50px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            animation: rise 15s infinite;
+            z-index: 0;
         }
 
         @keyframes fall {
-            0% { transform: translateY(-100vh); opacity: 1; }
-            100% { transform: translateY(100vh); opacity: 0; }
+            from { transform: translateY(-100px); }
+            to { transform: translateY(100vh); }
+        }
+
+        @keyframes rise {
+            from { transform: translateY(0) scale(1); opacity: 0.5; }
+            to { transform: translateY(-110vh) scale(1.5); opacity: 0; }
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #444;
+            font-size: 0.9rem;
+            margin-top: 30px;
+            z-index: 2;
+            position: relative;
         }
 
         @media (max-width: 600px) {
-            .container {
-                padding: 30px;
-                margin: 15px auto;
-            }
+            .container { padding: 30px; margin: 15px auto; animation: none; }
             h1 { font-size: 2rem; }
             .section-title { font-size: 1.6rem; }
             .button { font-size: 16px; padding: 12px; }
@@ -194,10 +235,11 @@
     </style>
 </head>
 <body>
-    <div class="background-anim" id="stars"></div>
+    <div class="background-anim" id="background-elements"></div>
+
     <div class="container">
         <div class="quote">
-            "למידה היא הרפתקה שפותחת דלתות לעולם חדש!" - לא ידוע
+            "למידה היא הרפתקה שפותחת דלתות לעולם חדש!"
         </div>
         
         <h1>ברוכים הבאים למשחקי למידה</h1>
@@ -205,16 +247,21 @@
         <!-- Grade 2 Section -->
         <h2 class="section-title">משחקים לכיתה ב</h2>
         <div class="buttons-container">
+            <button class="button" onclick="openLinkWithConfetti('ClassB/tutorialB.html')">
+                <i class="fas fa-star"></i> לימוד מילים בסיסיות
+            </button>
             <button class="button" onclick="openLinkWithConfetti('ClassB/bigAndSmall-B.html')">
                 <i class="fas fa-font"></i> התאמת אותיות גדולות וקטנות
             </button>
         </div>
 
+        <hr class="decorative-divider">
+
         <!-- Grade 4 Section -->
         <h2 class="section-title">משחקים לכיתה ד</h2>
         <div class="buttons-container">
             <button class="button" onclick="openLinkWithConfetti('ClassD/connect_words_4.html')">
-                <i class="fas fa-book-open"></i> התאמת מילים
+                <i class="fas fa-link"></i> התאמת מילים
             </button>
             <button class="button" onclick="openLinkWithConfetti('ClassD/sentence-completion-4.html')">
                 <i class="fas fa-pen"></i> השלמת משפטים
@@ -229,8 +276,21 @@
         </div>
     </div>
 
+    <footer>
+        <p>נוצר באהבה 💛 כדי להפוך את הלמידה לכיף!</p>
+    </footer>
+
+    <!-- צליל לחיצה מוטמע, אין צורך בקובץ חיצוני -->
+    <audio id="click-sound" src="data:audio/mpeg;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU9vT19PAN6POT48/f/9/v3/9f/9/+sA/P/9/gD9//v/6f79/v3/+v/7/vr/+gD7//v/+f76/+wA/P/9/gIAAAAA//8AAP3/+v/7/gD9//v/9f/8/v/+AAAAAP/9APz/+wD8/v/9//v/+v/7//f/+gD9/v3//v/6/v/++/3/AAAAAP/++/z/+f/7//kACgD+AP/8//n/BgD+AAAAAP/8/vz/+v/7AAAAAP/8/gD+/vz/+v/7//n/+gD+AP/9//j/9P/4//b/+P/2//v/AwD9//7/9//9/v3/+wD9//z/+P/9AP3/AP/8/vz/9P/5//v/BgD6//b/9v/5/v/++v/6//r/+f/5/v/++v/7//r/+f/5//b/+v/7//r/+f/6/v/8//z/9f/6/v7/+gD9APz/+wD8/gD9//r/+/77/gD+/vz/9v/6/v/++v/6//r/+v/6//r/+v/6//r/+g=="></audio>
+
     <script>
         function openLinkWithConfetti(url) {
+            // נגן צליל
+            const clickSound = document.getElementById('click-sound');
+            clickSound.currentTime = 0;
+            clickSound.play();
+
+            // הפעל קונפטי
             confetti({
                 particleCount: 150,
                 spread: 80,
@@ -238,26 +298,42 @@
                 colors: ['#FEC260', '#ff9800', '#0077b6', '#00b4d8']
             });
 
+            // פתח קישור אחרי השהייה קצרה
             setTimeout(() => {
-                window.open(url, '_blank'); 
+                window.location.href = url;
             }, 500);
         }
 
-        function addBackgroundStars() {
-            const container = document.getElementById('stars');
+        // --- אנימציות רקע ---
+        function createBackgroundElements() {
+            const container = document.getElementById('background-elements');
             if(!container) return;
-            setInterval(() => {
+
+            // יצירת כוכבים
+            for (let i = 0; i < 15; i++) {
                 const star = document.createElement('div');
                 star.className = 'star';
                 star.style.left = `${Math.random() * 100}vw`;
-                star.addEventListener('animationend', () => {
-                    star.remove();
-                });
+                star.style.animationDuration = `${5 + Math.random() * 10}s`;
+                star.style.animationDelay = `${Math.random() * 5}s`;
                 container.appendChild(star);
-            }, 700);
+            }
+
+            // יצירת בועות
+            for (let i = 0; i < 20; i++) {
+                const bubble = document.createElement('div');
+                const size = `${10 + Math.random() * 40}px`;
+                bubble.className = 'bubble';
+                bubble.style.left = `${Math.random() * 100}vw`;
+                bubble.style.width = size;
+                bubble.style.height = size;
+                bubble.style.animationDuration = `${10 + Math.random() * 15}s`;
+                bubble.style.animationDelay = `${Math.random() * 10}s`;
+                container.appendChild(bubble);
+            }
         }
 
-        addBackgroundStars();
+        createBackgroundElements();
     </script>
 </body>
 </html>
