@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>השלמת משפטים באנגלית - משחקי למידה</title>
+    <title>לימוד מילים חדשות באנגלית - משחקי למידה</title>
 
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-BPNZZJWSF8"></script>
@@ -82,10 +82,10 @@
             100% { transform: translateY(0px); }
         }
 
+        /* Apply floating animation only when this class is present */
         .container.floating {
             animation: float 6s ease-in-out infinite;
         }
-
 
         h1 {
             margin-bottom: 25px;
@@ -481,6 +481,64 @@
             transform: scale(1.1);
         }
 
+        /* Fixed word info at the bottom */
+        .fixed-word-info {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #f8f8f8; /* Light background */
+            padding: 15px 20px;
+            border-top: 1px solid #ccc;
+            box-shadow: 0 -5px 15px rgba(0,0,0,0.1);
+            z-index: 100; /* Ensure it's on top */
+            display: none; /* Hidden by default, shown by JS */
+            justify-content: space-around;
+            align-items: center;
+            flex-wrap: wrap; /* Allow wrapping on small screens */
+            gap: 10px; /* Space between word items */
+            font-family: 'Rubik', sans-serif;
+        }
+
+        .fixed-word-info .word-item {
+            display: flex;
+            align-items: center;
+            direction: rtl; /* Item container is RTL */
+            gap: 5px;
+        }
+
+        .fixed-word-info .english-word-fixed {
+            font-family: 'Lato', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--button-blue-end);
+            direction: ltr; /* English word is LTR */
+        }
+
+        .fixed-word-info .hebrew-definition-fixed {
+            font-size: 0.95rem;
+            color: #555;
+            direction: rtl; /* Hebrew definition is RTL */
+        }
+
+        .fixed-word-info .audio-button-fixed-small {
+            background: none;
+            border: none;
+            font-size: 1rem;
+            color: var(--secondary-color);
+            cursor: pointer;
+            opacity: 0.8;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            padding: 0;
+            margin: 0;
+            line-height: 1;
+        }
+
+        .fixed-word-info .audio-button-fixed-small:hover {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
 
         /* Background Animations (copied from index.html) */
         .background-anim {
@@ -537,6 +595,9 @@
             .start-game-button { font-size: 1.1rem; padding: 15px 30px;}
             .definitions-list .english-word { font-size: 1.2rem; }
             .definitions-list .hebrew-definition { font-size: 1rem; }
+            .fixed-word-info { padding: 10px 15px; }
+            .fixed-word-info .english-word-fixed { font-size: 1rem; }
+            .fixed-word-info .hebrew-definition-fixed { font-size: 0.85rem; }
         }
 
         @media (max-width: 480px) {
@@ -555,6 +616,12 @@
                 gap: 2px;
             }
             .word-selection-grid { grid-template-columns: 1fr; }
+            .fixed-word-info {
+                flex-direction: column; /* Stack words vertically */
+                align-items: flex-end; /* Align to right */
+                padding: 10px;
+            }
+            .fixed-word-info .word-item { width: 100%; justify-content: flex-end; }
         }
     </style>
 </head>
@@ -565,7 +632,7 @@
         <button class="back-button" onclick="window.location.href='../index.html'">
             <i class="fas fa-arrow-left"></i>
         </button>
-        <h1>השלמת משפטים באנגלית 🧩</h1>
+        <h1>לימוד מילים חדשות באנגלית 🧩</h1>
 
         <!-- Word Selection Section -->
         <div id="wordSelectionSection" class="word-selection-section active">
@@ -639,6 +706,11 @@
                 שחק שוב <i class="fas fa-redo-alt"></i>
             </button>
         </div>
+    </div>
+
+    <!-- Fixed section for selected words at the bottom of the screen -->
+    <div id="fixedWordInfo" class="fixed-word-info">
+        <!-- Words will be populated by JavaScript here -->
     </div>
 
     <footer>
@@ -930,6 +1002,8 @@
         const learnedWordsTableBody = document.getElementById('learnedWordsTableBody');
         const playAgainButton = document.getElementById('playAgainButton');
 
+        const fixedWordInfo = document.getElementById('fixedWordInfo'); // New: Fixed word info element
+
         // --- משתני מצב המשחק ---
         let currentQuestionIndex = 0;
         let score = 0;
@@ -955,9 +1029,11 @@
          * Selects a given number of unique elements from an array.
          * If `excludeElement` is provided, it will not be included in the result.
          * If not enough unique elements are available, it will return as many unique as possible.
-         * For distractors, it will pick from ALL wordsData.
-         * For initial word selection, it picks unique word objects.
-         * For game questions, it picks unique SENTENCE objects.
+         *
+         * @param {Array<Object|string>} arr - The array to select elements from. Can contain word objects or word strings.
+         * @param {number} num - The number of unique elements to select.
+         * @param {Object|string} [excludeElement=null] - An element to exclude from the selection. If an object, checks its 'word' property.
+         * @returns {Array<Object|string>} An array of unique selected elements.
          */
         function getRandomUniqueElements(arr, num, excludeElement = null) {
             const result = new Set();
@@ -965,24 +1041,19 @@
             
             // Filter out the excludeElement if provided
             if (excludeElement) {
-                // If arr contains objects, filter by a specific property (e.g., word.word)
                 if (typeof excludeElement === 'object' && excludeElement !== null && 'word' in excludeElement) {
-                    availableElements = availableElements.filter(item => item.word !== excludeElement.word);
+                    availableElements = availableElements.filter(item => (item.word !== excludeElement.word));
                 } else { // Assume it's a primitive value like a string (word name)
-                    availableElements = availableElements.filter(item => item !== excludeElement);
+                    availableElements = availableElements.filter(item => (item !== excludeElement));
                 }
             }
             
-            // If the original array contains objects, we might need to map them to unique identifiers first
-            let uniqueAvailableItems;
-            if (availableElements.length > 0 && typeof availableElements[0] === 'object' && 'word' in availableElements[0]) {
-                // This branch is for selecting unique *word objects* (for initial selection or distractors)
-                // or unique *sentence objects* (for game questions).
-                // For words, we deduplicate by 'word' string. For sentences, we'd need a unique ID or hash,
-                // but for now, assuming sentenceFull is unique enough for gameQuestions.
+            // Ensure unique collection for selection
+            let uniqueAvailableItems = [];
+            if (availableElements.length > 0 && typeof availableElements[0] === 'object' && ('word' in availableElements[0] || 'sentenceFull' in availableElements[0])) {
                 const seen = new Set();
                 uniqueAvailableItems = availableElements.filter(item => {
-                    const identifier = item.word || item.sentenceFull; // Use word for word objects, sentenceFull for sentence objects
+                    const identifier = item.word || item.sentenceFull; // Use 'word' for word objects, 'sentenceFull' for sentence objects
                     if (seen.has(identifier)) {
                         return false;
                     }
@@ -990,10 +1061,8 @@
                     return true;
                 });
             } else {
-                // This branch is for simple arrays of primitives (e.g., array of word strings for options)
                 uniqueAvailableItems = Array.from(new Set(availableElements));
             }
-
 
             if (uniqueAvailableItems.length < num) {
                 console.warn(`Not enough unique elements. Needed ${num}, found ${uniqueAvailableItems.length}. Returning all unique available.`);
@@ -1074,6 +1143,7 @@
 
             // Set main container to float for initial screens
             mainContainer.classList.add('floating');
+            fixedWordInfo.style.display = 'none'; // Hide fixed word info
 
             confirmSelectionButton.style.display = 'none'; // Hide until 3 words are selected
             confirmSelectionButton.classList.add('disabled');
@@ -1152,17 +1222,40 @@
             
             // Remove floating animation for the game section
             mainContainer.classList.remove('floating');
+            fixedWordInfo.style.display = 'flex'; // Show fixed word info
+
+            // Populate the fixed word info bar
+            fixedWordInfo.innerHTML = '';
+            selectedWordsForLearning.forEach(wordObj => {
+                const wordItem = document.createElement('div');
+                wordItem.classList.add('word-item');
+                wordItem.innerHTML = `
+                    <span class="english-word-fixed">${wordObj.word}</span> 
+                    <span class="hebrew-definition-fixed">(${wordObj.definition})</span>
+                    <button class="audio-button-fixed-small" onclick="speakText('${wordObj.word.replace(/'/g, "\\'")}', 'en-US')">
+                        <i class="fas fa-volume-up"></i>
+                    </button>
+                `;
+                fixedWordInfo.appendChild(wordItem);
+            });
 
             // Build gameQuestions from the 3 selected words' sentences, ensuring uniqueness
             let allPossibleSentences = [];
             selectedWordsForLearning.forEach(wordObj => {
                 wordObj.sentences.forEach(sentenceObj => {
-                    allPossibleSentences.push({ ...sentenceObj, parentWord: wordObj.word }); // Add parent word reference
+                    // Create a unique identifier for each sentence object based on its content
+                    const sentenceIdentifier = `${wordObj.word}-${sentenceObj.sentenceFull}`;
+                    allPossibleSentences.push({ 
+                        ...sentenceObj, 
+                        parentWord: wordObj.word,
+                        id: sentenceIdentifier // Add a unique ID for tracking
+                    }); 
                 });
             });
 
             // Select TOTAL_QUESTIONS_IN_GAME unique sentences from the pool
             // If not enough unique sentences are available, use all unique ones.
+            // Pass the array of sentence objects to getRandomUniqueElements
             gameQuestions = getRandomUniqueElements(allPossibleSentences, TOTAL_QUESTIONS_IN_GAME);
             
             if (gameQuestions.length < TOTAL_QUESTIONS_IN_GAME) {
@@ -1301,6 +1394,7 @@
             
             // Set main container to float for results screen
             mainContainer.classList.add('floating');
+            fixedWordInfo.style.display = 'none'; // Hide fixed word info
 
             // Populate the table of learned words
             learnedWordsTableBody.innerHTML = '';
