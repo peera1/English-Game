@@ -1,0 +1,1391 @@
+<!DOCTYPE html>
+<html lang="he">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>השלמת משפטים באנגלית - משחקי למידה</title>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-BPNZZJWSF8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-BPNZZJWSF8');
+    </script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;700;800&subset=hebrew&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap'); /* For English text */
+        
+        :root {
+            --primary-gradient-start: #FFD166; /* Soft Yellow */
+            --primary-gradient-end: #FFA07A;   /* Soft Salmon */
+            --secondary-color: #6C7A89;       /* Slate Grey - for accents */
+            --accent-color: #4CAF50;          /* Green - for subtle highlights */
+            --text-color: #333;
+            --container-bg: rgba(255, 255, 255, 0.98);
+            --button-blue-start: #2196F3;
+            --button-blue-end: #0D47A1;
+            --button-shadow: rgba(33, 150, 243, 0.4);
+            --section-title-color: #2c3e50;
+            --header-gradient-start: #FF5722;
+            --header-gradient-end: #FFC107;
+            --correct-color: #4CAF50; /* Green */
+            --incorrect-color: #F44336; /* Red */
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Rubik', sans-serif; /* Primary font for Hebrew UI */
+            background: linear-gradient(135deg, var(--primary-gradient-start) 0%, var(--primary-gradient-end) 100%);
+            min-height: 100vh;
+            direction: rtl; /* Overall RTL for Hebrew UI */
+            color: var(--text-color);
+            line-height: 1.8;
+            overflow-x: hidden;
+            position: relative;
+            font-size: 17px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background-color: var(--container-bg);
+            border-radius: 30px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+            padding: 40px;
+            text-align: center;
+            width: 95%;
+            max-width: 700px; /* Wider for sentences */
+            margin: 20px auto;
+            position: relative;
+            transition: all 0.5s ease;
+            border: 1px solid rgba(255, 209, 102, 0.6);
+            z-index: 2;
+            /* Animation applied dynamically via JS and .floating class */
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .container.floating {
+            animation: float 6s ease-in-out infinite;
+        }
+
+
+        h1 {
+            margin-bottom: 25px;
+            font-size: 2.5rem;
+            font-weight: 800;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.15);
+            background: linear-gradient(to right, var(--header-gradient-start), var(--header-gradient-end));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .back-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--secondary-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+
+        .back-button:hover {
+            transform: scale(1.1);
+            background: #5A6470;
+        }
+
+        /* Game Specific Styles */
+        .game-section, .results-section, .word-selection-section, .definitions-section {
+            display: none; /* Controlled by JS */
+            width: 100%;
+        }
+        .game-section.active, .results-section.active, .word-selection-section.active, .definitions-section.active {
+            display: block;
+        }
+
+        .section-title {
+            color: var(--section-title-color);
+            font-size: 2rem;
+            margin: 30px 0 20px;
+            font-weight: 700;
+        }
+
+        .question-counter {
+            font-size: 1.1rem;
+            color: var(--secondary-color);
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .sentence-display {
+            background-color: #e0f2f7; /* Light blue background for sentence */
+            border: 1px solid #b3e5fc;
+            border-radius: 15px;
+            padding: 30px 20px;
+            margin-bottom: 30px;
+            font-size: 1.8rem; /* Larger font for sentence */
+            font-weight: 500;
+            color: #2a6a8c;
+            line-height: 1.5;
+            min-height: 120px; /* Ensure consistent height */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            direction: ltr; /* English text needs LTR */
+            font-family: 'Lato', sans-serif; /* Specific font for English */
+        }
+        
+        .sentence-display .audio-button {
+            position: absolute;
+            top: 10px;
+            right: 10px; /* Adjust for LTR content inside RTL page */
+            left: unset;
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            color: #2a6a8c;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .sentence-display .audio-button:hover {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .option-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            border: 2px solid var(--button-blue-start);
+            border-radius: 15px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            background-color: white;
+            color: var(--button-blue-end);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            direction: ltr; /* Options are English words */
+            font-family: 'Lato', sans-serif;
+        }
+
+        .option-button:hover:not(.disabled) {
+            background-color: var(--button-blue-start);
+            color: white;
+            box-shadow: 0 6px 12px var(--button-shadow);
+            transform: translateY(-2px);
+        }
+
+        .option-button.correct {
+            background-color: var(--correct-color);
+            color: white;
+            border-color: var(--correct-color);
+            box-shadow: 0 6px 12px rgba(76, 175, 80, 0.4);
+        }
+
+        .option-button.incorrect {
+            background-color: var(--incorrect-color);
+            color: white;
+            border-color: var(--incorrect-color);
+            box-shadow: 0 6px 12px rgba(244, 67, 54, 0.4);
+        }
+
+        .option-button.disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+            /* Disable hover effects for disabled buttons */
+            pointer-events: none; 
+            transform: none;
+            box-shadow: none;
+        }
+        
+        /* Word Selection Screen specific styles */
+        .word-selection-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+            margin-top: 20px;
+            margin-bottom: 30px;
+        }
+        .word-selection-button {
+            background-color: #f0f8ff; /* Light blue */
+            border: 2px solid #a8dadc;
+            border-radius: 10px;
+            padding: 15px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1d3557;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            direction: ltr;
+            font-family: 'Lato', sans-serif;
+        }
+        .word-selection-button:hover:not(.selected) {
+            background-color: #e6f7ff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .word-selection-button.selected {
+            background-color: var(--button-blue-start);
+            color: white;
+            border-color: var(--button-blue-end);
+            box-shadow: 0 4px 8px var(--button-shadow);
+            transform: scale(1.05);
+        }
+        .word-selection-button.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .confirm-selection-button {
+            display: none; /* Controlled by JS */
+            margin-top: 20px;
+            padding: 15px 30px;
+            background: linear-gradient(to right, var(--accent-color), #388E3C);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 6px 12px rgba(76, 175, 80, 0.4);
+            transition: all 0.3s ease;
+        }
+        .confirm-selection-button:hover:not(.disabled) {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 16px rgba(76, 175, 80, 0.6);
+        }
+        .confirm-selection-button.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        /* Definitions Screen specific styles */
+        .definitions-list {
+            margin-top: 20px;
+            text-align: right;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 20px;
+            background-color: #fcfcfc;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .definitions-list div {
+            padding: 10px 0;
+            border-bottom: 1px dashed #eee;
+        }
+        .definitions-list div:last-child {
+            border-bottom: none;
+        }
+        .definitions-list .english-word {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--button-blue-end);
+            direction: ltr;
+            font-family: 'Lato', sans-serif;
+        }
+        .definitions-list .hebrew-definition {
+            font-size: 1.1rem;
+            color: #555;
+            margin-right: 10px; /* Space from word */
+            direction: rtl;
+        }
+        .start-game-button {
+            margin-top: 30px;
+            padding: 18px 40px;
+            background: linear-gradient(to right, #4CAF50, #2E8B57);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.3rem;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 8px 15px rgba(76, 175, 80, 0.5);
+            transition: all 0.3s ease;
+        }
+        .start-game-button:hover {
+            transform: translateY(-4px) scale(1.03);
+            box-shadow: 0 10px 20px rgba(76, 175, 80, 0.7);
+        }
+
+        .feedback-area {
+            min-height: 80px; /* Space for feedback */
+            margin-bottom: 25px;
+            font-size: 1.1rem;
+            color: #555;
+        }
+
+        .feedback-area p {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .feedback-area .english-sentence {
+            font-family: 'Lato', sans-serif;
+            direction: ltr;
+            font-weight: 500;
+        }
+
+        .feedback-area .translation {
+            font-style: italic;
+            color: #666;
+            font-size: 1rem;
+            direction: rtl; /* Translation is Hebrew */
+        }
+
+        .feedback-area .definition {
+            direction: rtl; /* Definition is Hebrew */
+        }
+
+        .next-button, .play-again-button {
+            display: none; /* Controlled by JS */
+            margin-top: 20px;
+            padding: 15px 30px;
+            background: linear-gradient(to right, var(--accent-color), #388E3C);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 6px 12px rgba(76, 175, 80, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .next-button:hover, .play-again-button:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 16px rgba(76, 175, 80, 0.6);
+        }
+
+        /* Results Section */
+        .results-section h2 {
+            font-size: 2.5rem;
+            color: var(--header-gradient-start);
+            margin-bottom: 20px;
+            font-weight: 800;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .results-table-container {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
+            direction: rtl; /* Table headers are Hebrew */
+        }
+
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 1rem;
+        }
+
+        .results-table th, .results-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+            text-align: right;
+        }
+
+        .results-table th {
+            background-color: var(--secondary-color);
+            color: white;
+            font-weight: 700;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+        .results-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .results-table tr:hover {
+            background-color: #f0f0f0;
+        }
+
+        .results-table .english-word-col {
+            font-family: 'Lato', sans-serif;
+            direction: ltr;
+        }
+
+        .results-table .english-sentence-col {
+            font-family: 'Lato', sans-serif;
+            direction: ltr;
+            display: flex; /* Allow content and button side by side */
+            align-items: center;
+            justify-content: flex-end; /* Align to right for RTL table */
+            gap: 8px; /* Space between text and button */
+        }
+
+        /* Style for audio button within table cells */
+        .results-table .audio-button-small {
+            background: none;
+            border: none;
+            font-size: 1.1rem; /* Smaller icon */
+            color: #6C7A89; /* Grey from secondary color */
+            cursor: pointer;
+            opacity: 0.8;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            padding: 0; /* Remove padding */
+            margin: 0; /* Remove margin */
+            line-height: 1; /* Adjust line height for icon */
+        }
+        
+        .results-table .audio-button-small:hover {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
+
+        /* Background Animations (copied from index.html) */
+        .background-anim {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        .star {
+            position: absolute;
+            background: url('https://img.icons8.com/emoji/20/000000/star-emoji.png');
+            background-size: cover;
+            animation: fall 10s linear infinite;
+            z-index: 1;
+        }
+        
+        .bubble {
+            position: absolute;
+            bottom: -50px;
+            background: rgba(255, 255, 255, 0.25);
+            border-radius: 50%;
+            animation: rise 15s infinite;
+            z-index: 0;
+        }
+
+        @keyframes fall {
+            from { transform: translateY(-100px) rotate(0deg); opacity: 1; }
+            to { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+        }
+
+        @keyframes rise {
+            from { transform: translateY(0) scale(0.8); opacity: 0.5; }
+            to { transform: translateY(-120vh) scale(1.8); opacity: 0; }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .container { padding: 30px; margin: 15px auto; max-width: 90%; }
+            h1 { font-size: 2rem; }
+            .sentence-display { font-size: 1.5rem; padding: 20px 15px; min-height: 100px; }
+            .sentence-display .audio-button { font-size: 1.5rem; }
+            .options-grid { grid-template-columns: 1fr; gap: 10px; }
+            .option-button { font-size: 1.1rem; padding: 12px; }
+            .next-button, .play-again-button { padding: 12px 25px; font-size: 1rem; }
+            .results-section h2 { font-size: 2rem; }
+            .results-table th, .results-table td { padding: 10px; font-size: 0.9rem; }
+            .results-table .audio-button-small { font-size: 1rem; }
+            .word-selection-button, .confirm-selection-button { font-size: 1rem; padding: 10px; }
+            .start-game-button { font-size: 1.1rem; padding: 15px 30px;}
+            .definitions-list .english-word { font-size: 1.2rem; }
+            .definitions-list .hebrew-definition { font-size: 1rem; }
+        }
+
+        @media (max-width: 480px) {
+            .container { padding: 20px; }
+            h1 { font-size: 1.8rem; }
+            .question-counter { font-size: 1rem; }
+            .sentence-display { font-size: 1.3rem; padding: 15px 10px; min-height: 80px; }
+            .sentence-display .audio-button { font-size: 1.3rem; top: 5px; right: 5px; left: unset; }
+            .option-button { font-size: 1rem; padding: 10px; border-radius: 10px; }
+            .feedback-area p { font-size: 1.1rem; }
+            .feedback-area .english-sentence, .feedback-area .translation, .feedback-area .definition { font-size: 0.9rem; }
+            .back-button { width: 40px; height: 40px; font-size: 1.2rem; top: 10px; right: 10px; }
+            .results-table .english-sentence-col {
+                flex-direction: column; /* Stack text and button */
+                align-items: flex-end; /* Align to right for RTL */
+                gap: 2px;
+            }
+            .word-selection-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="background-anim" id="background-elements"></div>
+
+    <div class="container" id="mainContainer">
+        <button class="back-button" onclick="window.location.href='../index.html'">
+            <i class="fas fa-arrow-left"></i>
+        </button>
+        <h1>השלמת משפטים באנגלית 🧩</h1>
+
+        <!-- Word Selection Section -->
+        <div id="wordSelectionSection" class="word-selection-section active">
+            <h2 class="section-title">בחר 3 מילים ללמוד</h2>
+            <p>מתוך המילים הבאות, בחר/י 3 מילים שתרצה/תרצי ללמוד במשחק זה.</p>
+            <div class="word-selection-grid" id="wordSelectionGrid">
+                <!-- Words will be populated by JavaScript -->
+            </div>
+            <button class="confirm-selection-button" id="confirmSelectionButton">
+                אישור בחירה <i class="fas fa-check-circle"></i>
+            </button>
+        </div>
+
+        <!-- Definitions Section -->
+        <div id="definitionsSection" class="definitions-section">
+            <h2 class="section-title">המילים שבחרת ללמוד הן:</h2>
+            <div class="definitions-list" id="definitionsList">
+                <!-- Definitions will be populated by JavaScript -->
+            </div>
+            <button class="start-game-button" id="startGameButton">
+                התחל משחק <i class="fas fa-play"></i>
+            </button>
+        </div>
+
+        <!-- Game Section -->
+        <div id="gameSection" class="game-section">
+            <p class="question-counter" id="questionCounter">שאלה 1 מתוך 10</p>
+            
+            <div class="sentence-display">
+                <button class="audio-button" id="playSentenceAudio">
+                    <i class="fas fa-volume-up"></i>
+                </button>
+                <span id="sentenceText">Loading question...</span>
+            </div>
+
+            <div class="options-grid" id="optionsGrid">
+                <!-- Options will be populated by JavaScript -->
+            </div>
+
+            <div class="feedback-area" id="feedbackArea">
+                <!-- Feedback and translation will appear here -->
+            </div>
+
+            <button class="next-button" id="nextQuestionButton">
+                השאלה הבאה <i class="fas fa-arrow-circle-left"></i>
+            </button>
+        </div>
+
+        <!-- Results Section -->
+        <div id="resultsSection" class="results-section">
+            <h2>🎉 כל הכבוד! 🎉</h2>
+            <p>סיימת את המשחק עם ניקוד של <span id="finalScore">0</span> מתוך 10!</p>
+            
+            <h3>מילים שלמדנו:</h3>
+            <div class="results-table-container">
+                <table class="results-table">
+                    <thead>
+                        <tr>
+                            <th>מילה חדשה</th>
+                            <th>משמעות</th>
+                            <th>המשפט המלא</th>
+                        </tr>
+                    </thead>
+                    <tbody id="learnedWordsTableBody">
+                        <!-- Learned words will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <button class="play-again-button" id="playAgainButton">
+                שחק שוב <i class="fas fa-redo-alt"></i>
+            </button>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2023 משחקי למידה. נוצר באהבה 💖 כדי להפוך את הלמידה לכיף!</p>
+    </footer>
+
+    <script>
+        // --- נתוני המילים והמשפטים ---
+        // חשוב: הוסיפו עוד מילים כדי להגיע לכ-100 מילים!
+        // לכל אובייקט:
+        // - word: המילה החדשה (באנגלית)
+        // - definition: הגדרה קצרה למילה (בעברית)
+        // - sentences: מערך של אובייקטים, כל אחד מכיל:
+        //   - sentenceBlank: המשפט עם המילה החסרה (באנגלית, סמנו ב-___)
+        //   - sentenceFull: המשפט המלא עם המילה החדשה (באנגלית)
+        //   - translation: תרגום מלא של המשפט המלא (לעברית)
+        const wordsData = [
+            {
+                word: "explore",
+                definition: "לחקור, לגלות",
+                sentences: [
+                    { sentenceBlank: "Let's ___ the mysterious cave.", sentenceFull: "Let's explore the mysterious cave.", translation: "בואו נחקור את המערה המסתורית." },
+                    { sentenceBlank: "We will ___ new ideas in class.", sentenceFull: "We will explore new ideas in class.", translation: "נחקור רעיונות חדשים בכיתה." },
+                    { sentenceBlank: "Tourists came to ___ the old city.", sentenceFull: "Tourists came to explore the old city.", translation: "תיירים באו לחקור את העיר העתיקה." },
+                    { sentenceBlank: "It's exciting to ___ new places.", sentenceFull: "It's exciting to explore new places.", translation: "מרגש לחקור מקומות חדשים." }
+                ]
+            },
+            {
+                word: "ancient",
+                definition: "עתיק, קדום",
+                sentences: [
+                    { sentenceBlank: "The archaeologist found an ___ coin.", sentenceFull: "The archaeologist found an ancient coin.", translation: "הארכיאולוג מצא מטבע עתיק." },
+                    { sentenceBlank: "They visited the ___ ruins.", sentenceFull: "They visited the ancient ruins.", translation: "הם ביקרו בחורבות העתיקות." },
+                    { sentenceBlank: "This story is about an ___ civilization.", sentenceFull: "This story is about an ancient civilization.", translation: "הסיפור הזה הוא על תרבות עתיקה." },
+                    { sentenceBlank: "An ___ map led them to treasure.", sentenceFull: "An ancient map led them to treasure.", translation: "מפה עתיקה הובילה אותם לאוצר." }
+                ]
+            },
+            {
+                word: "create",
+                definition: "ליצור, לברוא",
+                sentences: [
+                    { sentenceBlank: "She likes to ___ beautiful drawings.", sentenceFull: "She likes to create beautiful drawings.", translation: "היא אוהבת ליצור ציורים יפים." },
+                    { sentenceBlank: "We will ___ a new game for the fair.", sentenceFull: "We will create a new game for the fair.", translation: "ניצור משחק חדש ליריד." },
+                    { sentenceBlank: "Artists ___ amazing works of art.", sentenceFull: "Artists create amazing works of art.", translation: "אמנים יוצרים יצירות אמנות מדהימות." },
+                    { sentenceBlank: "Let's ___ a story together.", sentenceFull: "Let's create a story together.", translation: "בואו ניצור סיפור ביחד." }
+                ]
+            },
+            {
+                word: "discover",
+                definition: "לגלות",
+                sentences: [
+                    { sentenceBlank: "Scientists often ___ new types of animals.", sentenceFull: "Scientists often discover new types of animals.", translation: "מדענים מגלים לעיתים קרובות סוגים חדשים של בעלי חיים." },
+                    { sentenceBlank: "Did you ___ anything interesting today?", sentenceFull: "Did you discover anything interesting today?", translation: "האם גילית משהו מעניין היום?" },
+                    { sentenceBlank: "She hopes to ___ a cure for the disease.", sentenceFull: "She hopes to discover a cure for the disease.", translation: "היא מקווה לגלות תרופה למחלה." },
+                    { sentenceBlank: "He helped to ___ the hidden treasure.", sentenceFull: "He helped to discover the hidden treasure.", translation: "הוא עזר לגלות את האוצר הנסתר." }
+                ]
+            },
+            {
+                word: "brave",
+                definition: "אמיץ, נועז",
+                sentences: [
+                    { sentenceBlank: "The ___ knight rescued the princess.", sentenceFull: "The brave knight rescued the princess.", translation: "האביר האמיץ הציל את הנסיכה." },
+                    { sentenceBlank: "It was a very ___ decision.", sentenceFull: "It was a very brave decision.", translation: "זו הייתה החלטה אמיצה מאוד." },
+                    { sentenceBlank: "Only the ___ can face the dragon.", sentenceFull: "Only the brave can face the dragon.", translation: "רק האמיצים יכולים להתמודד עם הדרקון." },
+                    { sentenceBlank: "She was ___ enough to try something new.", sentenceFull: "She was brave enough to try something new.", translation: "היא הייתה אמיצה מספיק לנסות משהו חדש." }
+                ]
+            },
+            {
+                word: "curious",
+                definition: "סקרן",
+                sentences: [
+                    { sentenceBlank: "A ___ cat always wants to know what's happening.", sentenceFull: "A curious cat always wants to know what's happening.", translation: "חתול סקרן תמיד רוצה לדעת מה קורה." },
+                    { sentenceBlank: "The ___ child asked many questions.", sentenceFull: "The curious child asked many questions.", translation: "הילד הסקרן שאל שאלות רבות." },
+                    { sentenceBlank: "I am ___ about how it works.", sentenceFull: "I am curious about how it works.", translation: "אני סקרן לגבי איך זה עובד." },
+                    { sentenceBlank: "Her ___ mind always seeks answers.", sentenceFull: "Her curious mind always seeks answers.", translation: "מוחה הסקרן תמיד מחפש תשובות." }
+                ]
+            },
+            {
+                word: "journey",
+                definition: "מסע, טיול",
+                sentences: [
+                    { sentenceBlank: "Their long ___ took them across the desert.", sentenceFull: "Their long journey took them across the desert.", translation: "מסעם הארוך לקח אותם מעבר למדבר." },
+                    { sentenceBlank: "Every day is a new ___ of learning.", sentenceFull: "Every day is a new journey of learning.", translation: "כל יום הוא מסע חדש של למידה." },
+                    { sentenceBlank: "The hobbits began their ___ to Mordor.", sentenceFull: "The hobbits began their journey to Mordor.", translation: "ההוביטים החלו את מסעם למורדור." },
+                    { sentenceBlank: "We planned a wonderful ___ for the summer.", sentenceFull: "We planned a wonderful journey for the summer.", translation: "תכננו מסע נפלא לקיץ." }
+                ]
+            },
+            {
+                word: "mystery",
+                definition: "תעלומה, סוד",
+                sentences: [
+                    { sentenceBlank: "The old house held a strange ___.", sentenceFull: "The old house held a strange mystery.", translation: "הבית הישן הכיל תעלומה מוזרה." },
+                    { sentenceBlank: "Solving the ___ was difficult.", sentenceFull: "Solving the mystery was difficult.", translation: "פתרון התעלומה היה קשה." },
+                    { sentenceBlank: "It's a complete ___ to me.", sentenceFull: "It's a complete mystery to me.", translation: "זו תעלומה מוחלטת עבורי." },
+                    { sentenceBlank: "The detective tried to solve the ___.", sentenceFull: "The detective tried to solve the mystery.", translation: "הבלש ניסה לפתור את התעלומה." }
+                ]
+            },
+            {
+                word: "protect",
+                definition: "להגן",
+                sentences: [
+                    { sentenceBlank: "We must ___ our planet from pollution.", sentenceFull: "We must protect our planet from pollution.", translation: "עלינו להגן על כדור הארץ שלנו מפני זיהום." },
+                    { sentenceBlank: "A shield can ___ you from arrows.", sentenceFull: "A shield can protect you from arrows.", translation: "מגן יכול להגן עליך מפני חיצים." },
+                    { sentenceBlank: "Parents always ___ their children.", sentenceFull: "Parents always protect their children.", translation: "הורים תמיד מגנים על ילדיהם." },
+                    { sentenceBlank: "The police are here to ___ the city.", sentenceFull: "The police are here to protect the city.", translation: "המשטרה כאן כדי להגן על העיר." }
+                ]
+            },
+            {
+                word: "valuable",
+                definition: "בעל ערך, יקר",
+                sentences: [
+                    { sentenceBlank: "Gold is a very ___ metal.", sentenceFull: "Gold is a very valuable metal.", translation: "זהב הוא מתכת יקרה מאוד." },
+                    { sentenceBlank: "This old book is very ___.", sentenceFull: "This old book is very valuable.", translation: "הספר הישן הזה יקר מאוד." },
+                    { sentenceBlank: "Time is our most ___ resource.", sentenceFull: "Time is our most valuable resource.", translation: "זמן הוא המשאב היקר ביותר שלנו." },
+                    { sentenceBlank: "She kept all her ___ possessions in a safe.", sentenceFull: "She kept all her valuable possessions in a safe.", translation: "היא שמרה את כל חפציה היקרים בכספת." }
+                ]
+            },
+            {
+                word: "unique",
+                definition: "ייחודי, מיוחד במינו",
+                sentences: [
+                    { sentenceBlank: "Each person has a ___ fingerprint.", sentenceFull: "Each person has a unique fingerprint.", translation: "לכל אדם יש טביעת אצבע ייחודית." },
+                    { sentenceBlank: "This painting is truly ___.", sentenceFull: "This painting is truly unique.", translation: "הציור הזה באמת ייחודי." },
+                    { sentenceBlank: "Her talent is quite ___.", sentenceFull: "Her talent is quite unique.", translation: "הכישרון שלה די ייחודי." },
+                    { sentenceBlank: "The flower had a ___ shape.", sentenceFull: "The flower had a unique shape.", translation: "לפרח הייתה צורה ייחודית." }
+                ]
+            },
+            {
+                word: "predict",
+                definition: "לנבא, לחזות",
+                sentences: [
+                    { sentenceBlank: "Can you ___ what will happen next in the story?", sentenceFull: "Can you predict what will happen next in the story?", translation: "האם תוכל לחזות מה יקרה הלאה בסיפור?" },
+                    { sentenceBlank: "It's hard to ___ the future.", sentenceFull: "It's hard to predict the future.", translation: "קשה לנבא את העתיד." },
+                    { sentenceBlank: "The weather forecast can ___ rain.", sentenceFull: "The weather forecast can predict rain.", translation: "תחזית מזג האוויר יכולה לנבא גשם." },
+                    { sentenceBlank: "I can ___ that you will enjoy this book.", sentenceFull: "I can predict that you will enjoy this book.", translation: "אני יכול לנבא שתיהנה מהספר הזה." }
+                ]
+            },
+            {
+                word: "imagine",
+                definition: "לדמיין",
+                sentences: [
+                    { sentenceBlank: "Try to ___ a world without cars.", sentenceFull: "Try to imagine a world without cars.", translation: "נסו לדמיין עולם ללא מכוניות." },
+                    { sentenceBlank: "She loves to ___ fantastic creatures.", sentenceFull: "She loves to imagine fantastic creatures.", translation: "היא אוהבת לדמיין יצורים פנטסטיים." },
+                    { sentenceBlank: "Can you ___ being on the moon?", sentenceFull: "Can you imagine being on the moon?", translation: "האם אתה יכול לדמיין להיות על הירח?" },
+                    { sentenceBlank: "It's hard to ___ life without friends.", sentenceFull: "It's hard to imagine life without friends.", translation: "קשה לדמיין חיים ללא חברים." }
+                ]
+            },
+            {
+                word: "improve",
+                definition: "לשפר",
+                sentences: [
+                    { sentenceBlank: "Practice helps you ___ your skills.", sentenceFull: "Practice helps you improve your skills.", translation: "תרגול עוזר לך לשפר את כישוריך." },
+                    { sentenceBlank: "He wants to ___ his reading.", sentenceFull: "He wants to improve his reading.", translation: "הוא רוצה לשפר את הקריאה שלו." },
+                    { sentenceBlank: "We can always ___ our efforts.", sentenceFull: "We can always improve our efforts.", translation: "אנחנו תמיד יכולים לשפר את מאמצינו." },
+                    { sentenceBlank: "Eating healthy can ___ your health.", sentenceFull: "Eating healthy can improve your health.", translation: "אכילה בריאה יכולה לשפר את בריאותך." }
+                ]
+            },
+            {
+                word: "knowledge",
+                definition: "ידע",
+                sentences: [
+                    { sentenceBlank: "Reading books can increase your ___.", sentenceFull: "Reading books can increase your knowledge.", translation: "קריאת ספרים יכולה להגדיל את הידע שלך." },
+                    { sentenceBlank: "He has a lot of ___ about history.", sentenceFull: "He has a lot of knowledge about history.", translation: "יש לו הרבה ידע על היסטוריה." },
+                    { sentenceBlank: "Seek ___ from reliable sources.", sentenceFull: "Seek knowledge from reliable sources.", translation: "חפשו ידע ממקורות אמינים." },
+                    { sentenceBlank: "___ is power.", sentenceFull: "Knowledge is power.", translation: "ידע הוא כוח." }
+                ]
+            },
+            {
+                word: "opportunity",
+                definition: "הזדמנות",
+                sentences: [
+                    { sentenceBlank: "This is a great ___ to learn something new.", sentenceFull: "This is a great opportunity to learn something new.", translation: "זו הזדמנות מצוינת ללמוד משהו חדש." },
+                    { sentenceBlank: "Don't miss the ___ to visit the museum.", sentenceFull: "Don't miss the opportunity to visit the museum.", translation: "אל תחמיצו את ההזדמנות לבקר במוזיאון." },
+                    { sentenceBlank: "Every challenge is an ___ for growth.", sentenceFull: "Every challenge is an opportunity for growth.", translation: "כל אתגר הוא הזדמנות לצמיחה." },
+                    { sentenceBlank: "She seized the ___ to show her talent.", sentenceFull: "She seized the opportunity to show her talent.", translation: "היא ניצלה את ההזדמנות להראות את כישרונה." }
+                ]
+            },
+            {
+                word: "challenge",
+                definition: "אתגר",
+                sentences: [
+                    { sentenceBlank: "Climbing the mountain was a big ___.", sentenceFull: "Climbing the mountain was a big challenge.", translation: "הטיפוס על ההר היה אתגר גדול." },
+                    { sentenceBlank: "Learning a new language is a fun ___.", sentenceFull: "Learning a new language is a fun challenge.", translation: "לימוד שפה חדשה הוא אתגר מהנה." },
+                    { sentenceBlank: "Face every ___ with courage.", sentenceFull: "Face every challenge with courage.", translation: "התמודדו עם כל אתגר באומץ." },
+                    { sentenceBlank: "The teacher gave them a difficult ___.", sentenceFull: "The teacher gave them a difficult challenge.", translation: "המורה נתן להם אתגר קשה." }
+                ]
+            },
+            {
+                word: "solution",
+                definition: "פתרון",
+                sentences: [
+                    { sentenceBlank: "We need to find a ___ to this problem.", sentenceFull: "We need to find a solution to this problem.", translation: "אנחנו צריכים למצוא פתרון לבעיה הזו." },
+                    { sentenceBlank: "The math problem has one correct ___.", sentenceFull: "The math problem has one correct solution.", translation: "לבעיית המתמטיקה יש פתרון נכון אחד." },
+                    { sentenceBlank: "He found a clever ___ to the puzzle.", sentenceFull: "He found a clever solution to the puzzle.", translation: "הוא מצא פתרון חכם לפאזל." },
+                    { sentenceBlank: "Working together helped them find the ___.", sentenceFull: "Working together helped them find the solution.", translation: "עבודה משותפת עזרה להם למצוא את הפתרון." }
+                ]
+            },
+            {
+                word: "support",
+                definition: "תמיכה, לתמוך",
+                sentences: [
+                    { sentenceBlank: "Friends always ___ each other.", sentenceFull: "Friends always support each other.", translation: "חברים תמיד תומכים זה בזה." },
+                    { sentenceBlank: "Your family will always ___ you.", sentenceFull: "Your family will always support you.", translation: "המשפחה שלך תמיד תתמוך בך." },
+                    { sentenceBlank: "The bridge needs strong ___.", sentenceFull: "The bridge needs strong support.", translation: "הגשר זקוק לתמיכה חזקה." },
+                    { sentenceBlank: "We offer full ___ to our students.", sentenceFull: "We offer full support to our students.", translation: "אנו מציעים תמיכה מלאה לתלמידינו." }
+                ]
+            },
+            {
+                word: "cooperate",
+                definition: "לשתף פעולה",
+                sentences: [
+                    { sentenceBlank: "The students decided to ___ on the project.", sentenceFull: "The students decided to cooperate on the project.", translation: "התלמידים החליטו לשתף פעולה בפרויקט." },
+                    { sentenceBlank: "It is important to ___ with your teammates.", sentenceFull: "It is important to cooperate with your teammates.", translation: "חשוב לשתף פעולה עם חברי הצוות שלך." },
+                    { sentenceBlank: "Animals sometimes ___ to find food.", sentenceFull: "Animals sometimes cooperate to find food.", translation: "בעלי חיים לפעמים משתפים פעולה כדי למצוא מזון." },
+                    { sentenceBlank: "We need to ___ to finish this task.", sentenceFull: "We need to cooperate to finish this task.", translation: "אנחנו צריכים לשתף פעולה כדי לסיים את המשימה הזו." }
+                ]
+            },
+            {
+                word: "fragile",
+                definition: "שביר, עדין",
+                sentences: [
+                    { sentenceBlank: "Be careful with the glass vase, it's very ___.", sentenceFull: "Be careful with the glass vase, it's very fragile.", translation: "היזהרו עם אגרטל הזכוכית, הוא מאוד שביר." },
+                    { sentenceBlank: "The butterfly's wings are ___.", sentenceFull: "The butterfly's wings are fragile.", translation: "כנפי הפרפר שבירות." },
+                    { sentenceBlank: "Handle with care, this item is ___.", sentenceFull: "Handle with care, this item is fragile.", translation: "טפל בזהירות, פריט זה שביר." },
+                    { sentenceBlank: "Some ancient artifacts are extremely ___.", sentenceFull: "Some ancient artifacts are extremely fragile.", translation: "חפצי אמנות עתיקים מסוימים שבירים ביותר." }
+                ]
+            },
+            {
+                word: "enormous",
+                definition: "ענק, עצום",
+                sentences: [
+                    { sentenceBlank: "The elephant is an ___ animal.", sentenceFull: "The elephant is an enormous animal.", translation: "הפיל הוא חיה ענקית." },
+                    { sentenceBlank: "They built an ___ castle.", sentenceFull: "They built an enormous castle.", translation: "הם בנו טירה ענקית." },
+                    { sentenceBlank: "The whale is an ___ creature of the sea.", sentenceFull: "The whale is an enormous creature of the sea.", translation: "הלוויתן הוא יצור ימי עצום." },
+                    { sentenceBlank: "He has an ___ appetite.", sentenceFull: "He has an enormous appetite.", translation: "יש לו תיאבון עצום." }
+                ]
+            },
+            {
+                word: "gradually",
+                definition: "בהדרגה, לאט לאט",
+                sentences: [
+                    { sentenceBlank: "The sun set ___, painting the sky orange.", sentenceFull: "The sun set gradually, painting the sky orange.", translation: "השמש שקעה בהדרגה, וצבעה את השמיים בכתום." },
+                    { sentenceBlank: "She ___ learned to play the piano.", sentenceFull: "She gradually learned to play the piano.", translation: "היא למדה בהדרגה לנגן בפסנתר." },
+                    { sentenceBlank: "The leaves ___ turned yellow.", sentenceFull: "The leaves gradually turned yellow.", translation: "העלים הפכו בהדרגה לצהובים." },
+                    { sentenceBlank: "The noise ___ faded away.", sentenceFull: "The noise gradually faded away.", translation: "הרעש דעך בהדרגה." }
+                ]
+            },
+            {
+                word: "observe",
+                definition: "לצפות, להתבונן",
+                sentences: [
+                    { sentenceBlank: "She likes to ___ birds in her garden.", sentenceFull: "She likes to observe birds in her garden.", translation: "היא אוהבת לצפות בציפורים בגינה שלה." },
+                    { sentenceBlank: "Scientists ___ the stars at night.", sentenceFull: "Scientists observe the stars at night.", translation: "מדענים צופים בכוכבים בלילה." },
+                    { sentenceBlank: "It's interesting to ___ human behavior.", sentenceFull: "It's interesting to observe human behavior.", translation: "מעניין להתבונן בהתנהגות אנושית." },
+                    { sentenceBlank: "Please ___ silence in the library.", sentenceFull: "Please observe silence in the library.", translation: "אנא שמור/שמרי על שקט בספרייה." }
+                ]
+            },
+            {
+                word: "purpose",
+                definition: "מטרה, תכלית",
+                sentences: [
+                    { sentenceBlank: "What is the ___ of this machine?", sentenceFull: "What is the purpose of this machine?", translation: "מהי מטרת המכונה הזו?" },
+                    { sentenceBlank: "Every tool has a specific ___.", sentenceFull: "Every tool has a specific purpose.", translation: "לכל כלי יש מטרה מסוימת." },
+                    { sentenceBlank: "His ___ in life was to help others.", sentenceFull: "His purpose in life was to help others.", translation: "מטרתו בחיים הייתה לעזור לאחרים." },
+                    { sentenceBlank: "She studies with a clear ___.", sentenceFull: "She studies with a clear purpose.", translation: "היא לומדת עם מטרה ברורה." }
+                ]
+            }
+        ];
+
+        // --- אלמנטים מה-DOM ---
+        const mainContainer = document.getElementById('mainContainer'); // Reference to the main container
+        const wordSelectionSection = document.getElementById('wordSelectionSection');
+        const wordSelectionGrid = document.getElementById('wordSelectionGrid');
+        const confirmSelectionButton = document.getElementById('confirmSelectionButton');
+
+        const definitionsSection = document.getElementById('definitionsSection');
+        const definitionsList = document.getElementById('definitionsList');
+        const startGameButton = document.getElementById('startGameButton');
+
+        const gameSection = document.getElementById('gameSection');
+        const resultsSection = document.getElementById('resultsSection');
+        const questionCounterElement = document.getElementById('questionCounter');
+        const sentenceTextElement = document.getElementById('sentenceText');
+        const playSentenceAudioButton = document.getElementById('playSentenceAudio');
+        const optionsGrid = document.getElementById('optionsGrid');
+        const feedbackArea = document.getElementById('feedbackArea');
+        const nextQuestionButton = document.getElementById('nextQuestionButton');
+        const finalScoreElement = document.getElementById('finalScore');
+        const learnedWordsTableBody = document.getElementById('learnedWordsTableBody');
+        const playAgainButton = document.getElementById('playAgainButton');
+
+        // --- משתני מצב המשחק ---
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let correctlyAnsweredWords = [];
+        let gameQuestions = [];
+        const TOTAL_QUESTIONS_IN_GAME = 10; // Fixed number of questions in the actual game
+        let currentAudioUtterance = null; // To keep track of current speech
+        let attemptsRemaining = 2; // Number of attempts for the current question
+
+        let wordsForInitialSelection = []; // The 10 words presented to the user at the start
+        let selectedWordsForLearning = []; // The 3 words chosen by the user (full word objects)
+
+        // --- פונקציות עזר ---
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]]; // Swap elements
+            }
+            return array;
+        }
+
+        /**
+         * Selects a given number of unique elements from an array.
+         * If `excludeElement` is provided, it will not be included in the result.
+         * If not enough unique elements are available, it will return as many unique as possible.
+         * For distractors, it will pick from ALL wordsData.
+         * For initial word selection, it picks unique word objects.
+         * For game questions, it picks unique SENTENCE objects.
+         */
+        function getRandomUniqueElements(arr, num, excludeElement = null) {
+            const result = new Set();
+            let availableElements = [...arr]; // Create a shallow copy
+            
+            // Filter out the excludeElement if provided
+            if (excludeElement) {
+                // If arr contains objects, filter by a specific property (e.g., word.word)
+                if (typeof excludeElement === 'object' && excludeElement !== null && 'word' in excludeElement) {
+                    availableElements = availableElements.filter(item => item.word !== excludeElement.word);
+                } else { // Assume it's a primitive value like a string (word name)
+                    availableElements = availableElements.filter(item => item !== excludeElement);
+                }
+            }
+            
+            // If the original array contains objects, we might need to map them to unique identifiers first
+            let uniqueAvailableItems;
+            if (availableElements.length > 0 && typeof availableElements[0] === 'object' && 'word' in availableElements[0]) {
+                // This branch is for selecting unique *word objects* (for initial selection or distractors)
+                // or unique *sentence objects* (for game questions).
+                // For words, we deduplicate by 'word' string. For sentences, we'd need a unique ID or hash,
+                // but for now, assuming sentenceFull is unique enough for gameQuestions.
+                const seen = new Set();
+                uniqueAvailableItems = availableElements.filter(item => {
+                    const identifier = item.word || item.sentenceFull; // Use word for word objects, sentenceFull for sentence objects
+                    if (seen.has(identifier)) {
+                        return false;
+                    }
+                    seen.add(identifier);
+                    return true;
+                });
+            } else {
+                // This branch is for simple arrays of primitives (e.g., array of word strings for options)
+                uniqueAvailableItems = Array.from(new Set(availableElements));
+            }
+
+
+            if (uniqueAvailableItems.length < num) {
+                console.warn(`Not enough unique elements. Needed ${num}, found ${uniqueAvailableItems.length}. Returning all unique available.`);
+                return shuffleArray(uniqueAvailableItems); // Return all unique elements if not enough
+            }
+
+            while (result.size < num) {
+                const randomIndex = Math.floor(Math.random() * uniqueAvailableItems.length);
+                const chosen = uniqueAvailableItems[randomIndex];
+                result.add(chosen);
+                uniqueAvailableItems.splice(randomIndex, 1); // Remove to ensure uniqueness
+            }
+            return Array.from(result);
+        }
+
+        function speakText(text, lang = 'en-US', rate = 1.0) {
+            if ('speechSynthesis' in window) {
+                if (currentAudioUtterance) {
+                    window.speechSynthesis.cancel();
+                }
+
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = lang;
+                utterance.rate = rate;
+                
+                currentAudioUtterance = utterance;
+
+                window.speechSynthesis.speak(utterance);
+
+                utterance.onend = () => {
+                    currentAudioUtterance = null;
+                };
+                utterance.onerror = (event) => {
+                    console.error('Speech synthesis error:', event.error);
+                    currentAudioUtterance = null;
+                };
+            } else {
+                console.warn("Speech Synthesis API not supported in this browser.");
+            }
+        }
+
+        function disableAllOptionsAndAudio() {
+            Array.from(optionsGrid.children).forEach(button => {
+                button.classList.add('disabled');
+                button.disabled = true;
+            });
+            playSentenceAudioButton.disabled = true;
+            playSentenceAudioButton.classList.add('disabled');
+        }
+
+        function enableAllOptionsAndAudio() {
+            Array.from(optionsGrid.children).forEach(button => {
+                button.classList.remove('disabled', 'correct', 'incorrect');
+                button.disabled = false;
+            });
+            playSentenceAudioButton.disabled = false;
+            playSentenceAudioButton.classList.remove('disabled');
+        }
+
+        function clearFeedback() {
+            feedbackArea.innerHTML = '';
+        }
+
+        // --- Game Flow Functions ---
+
+        function initGame() {
+            currentQuestionIndex = 0;
+            score = 0;
+            correctlyAnsweredWords = [];
+            gameQuestions = [];
+            selectedWordsForLearning = [];
+
+            // Show initial word selection screen
+            wordSelectionSection.classList.add('active');
+            definitionsSection.classList.remove('active');
+            gameSection.classList.remove('active');
+            resultsSection.classList.remove('active');
+
+            // Set main container to float for initial screens
+            mainContainer.classList.add('floating');
+
+            confirmSelectionButton.style.display = 'none'; // Hide until 3 words are selected
+            confirmSelectionButton.classList.add('disabled');
+
+            displayWordSelection();
+            createBackgroundElements(); // Re-create background animations
+        }
+
+        function displayWordSelection() {
+            if (wordsData.length < 10) {
+                alert(`אין מספיק מילים במאגר (${wordsData.length}) כדי לבחור 10 מילים בהתחלה. אנא הוסף עוד מילים!`);
+                window.location.href = '../index.html'; // Go back to main page
+                return;
+            }
+
+            wordSelectionGrid.innerHTML = '';
+            selectedWordsForLearning = []; // Reset selected words
+
+            // Get 10 unique word objects for initial selection
+            wordsForInitialSelection = getRandomUniqueElements(wordsData, 10);
+            shuffleArray(wordsForInitialSelection);
+
+            wordsForInitialSelection.forEach(wordObj => {
+                const button = document.createElement('button');
+                button.classList.add('word-selection-button');
+                button.textContent = wordObj.word;
+                button.dataset.word = wordObj.word; // Store word for easy lookup
+                button.onclick = () => toggleWordSelection(button, wordObj);
+                wordSelectionGrid.appendChild(button);
+            });
+        }
+
+        function toggleWordSelection(button, wordObj) {
+            if (button.classList.contains('selected')) {
+                button.classList.remove('selected');
+                selectedWordsForLearning = selectedWordsForLearning.filter(w => w.word !== wordObj.word);
+            } else {
+                if (selectedWordsForLearning.length < 3) {
+                    button.classList.add('selected');
+                    selectedWordsForLearning.push(wordObj);
+                } else {
+                    alert('ניתן לבחור רק 3 מילים.');
+                }
+            }
+            updateConfirmButtonState();
+        }
+
+        function updateConfirmButtonState() {
+            if (selectedWordsForLearning.length === 3) {
+                confirmSelectionButton.style.display = 'block';
+                confirmSelectionButton.classList.remove('disabled');
+            } else {
+                confirmSelectionButton.style.display = 'none';
+                confirmSelectionButton.classList.add('disabled');
+            }
+        }
+
+        function goToDefinitions() {
+            wordSelectionSection.classList.remove('active');
+            definitionsSection.classList.add('active');
+            displayDefinitions();
+        }
+
+        function displayDefinitions() {
+            definitionsList.innerHTML = '';
+            selectedWordsForLearning.forEach(wordObj => {
+                const div = document.createElement('div');
+                div.innerHTML = `<span class="english-word">${wordObj.word}</span> <span class="hebrew-definition">(${wordObj.definition})</span>`;
+                definitionsList.appendChild(div);
+            });
+        }
+
+        function startGameLoop() {
+            definitionsSection.classList.remove('active');
+            gameSection.classList.add('active');
+            
+            // Remove floating animation for the game section
+            mainContainer.classList.remove('floating');
+
+            // Build gameQuestions from the 3 selected words' sentences, ensuring uniqueness
+            let allPossibleSentences = [];
+            selectedWordsForLearning.forEach(wordObj => {
+                wordObj.sentences.forEach(sentenceObj => {
+                    allPossibleSentences.push({ ...sentenceObj, parentWord: wordObj.word }); // Add parent word reference
+                });
+            });
+
+            // Select TOTAL_QUESTIONS_IN_GAME unique sentences from the pool
+            // If not enough unique sentences are available, use all unique ones.
+            gameQuestions = getRandomUniqueElements(allPossibleSentences, TOTAL_QUESTIONS_IN_GAME);
+            
+            if (gameQuestions.length < TOTAL_QUESTIONS_IN_GAME) {
+                alert(`שימו לב: לא נמצאו ${TOTAL_QUESTIONS_IN_GAME} משפטים ייחודיים עבור המילים שבחרתם. המשחק יכיל ${gameQuestions.length} שאלות.`);
+            }
+
+            shuffleArray(gameQuestions); // Shuffle the order of the generated questions
+
+            displayQuestion();
+        }
+
+        function displayQuestion() {
+            if (currentQuestionIndex >= gameQuestions.length) {
+                endGame();
+                return;
+            }
+
+            const currentQuestion = gameQuestions[currentQuestionIndex];
+            // The correct word for this question is stored in parentWord
+            const correctWordObj = wordsData.find(w => w.word === currentQuestion.parentWord);
+
+            if (!correctWordObj) { // Fallback in case something went wrong
+                console.error("Could not find parent word for current question:", currentQuestion);
+                nextQuestion(); // Skip this question
+                return;
+            }
+
+            questionCounterElement.textContent = `שאלה ${currentQuestionIndex + 1} מתוך ${gameQuestions.length}`;
+            sentenceTextElement.innerHTML = currentQuestion.sentenceBlank;
+            optionsGrid.innerHTML = '';
+            clearFeedback();
+            enableAllOptionsAndAudio(); // Enable all options for a new question
+            nextQuestionButton.style.display = 'none';
+            attemptsRemaining = 2; // Reset attempts for new question
+
+            // Create options for the current question
+            // Get distractors from the *entire* wordsData pool's *word strings*
+            let distractors = getRandomUniqueElements(
+                wordsData.map(d => d.word), 
+                3, // Try to get 3 unique distractors
+                correctWordObj.word // Exclude the correct word string
+            );
+            
+            const options = [...distractors, correctWordObj.word]; // Combine distractors and correct word string
+            shuffleArray(options); // Shuffle the order of the options
+
+            options.forEach(option => {
+                const button = document.createElement('button');
+                button.classList.add('option-button');
+                button.textContent = option;
+                button.onclick = () => checkAnswer(button, option, currentQuestion, correctWordObj);
+                optionsGrid.appendChild(button);
+            });
+
+            // Play audio of the sentence without the missing word
+            const sentenceWithoutWord = currentQuestion.sentenceBlank.replace('___', '');
+            speakText(sentenceWithoutWord, 'en-US'); // Speak English
+        }
+
+        function checkAnswer(selectedButton, selectedOption, currentQuestion, correctWordObj) {
+            window.speechSynthesis.cancel(); // Stop any previous speech
+
+            let isCorrect = (selectedOption === correctWordObj.word);
+
+            if (isCorrect) {
+                selectedButton.classList.add('correct');
+                score++;
+                // Add the correct word object to the list for results table (only if not already there)
+                if (!correctlyAnsweredWords.some(w => w.word === correctWordObj.word)) {
+                    correctlyAnsweredWords.push(correctWordObj);
+                }
+                
+                disableAllOptionsAndAudio(); // Disable all buttons after correct answer
+
+                feedbackArea.innerHTML = `
+                    <p style="color: var(--correct-color);">✔ נכון מאוד!</p>
+                    <p class="english-sentence">"${currentQuestion.sentenceFull}"</p>
+                    <p class="translation">(${currentQuestion.translation})</p>
+                    <p class="definition">המילה "${correctWordObj.word}" פירושה: ${correctWordObj.definition}</p>
+                `;
+                speakText(currentQuestion.sentenceFull, 'en-US'); // Read full English sentence
+                
+                // Trigger confetti on correct answer
+                confetti({
+                    particleCount: 80,
+                    spread: 60,
+                    origin: { y: 0.7 },
+                    colors: ['#4CAF50', '#8BC34A', '#FFD166']
+                });
+                
+                nextQuestionButton.style.display = 'block'; // Show next button
+            } else { // Incorrect answer
+                selectedButton.classList.add('incorrect');
+                selectedButton.disabled = true; // Disable only the incorrect button chosen
+                selectedButton.classList.add('disabled'); // Add disabled class to prevent hover effects
+
+                attemptsRemaining--;
+
+                if (attemptsRemaining > 0) {
+                    feedbackArea.innerHTML = `
+                        <p style="color: var(--incorrect-color);">❌ לא נכון. נסה שוב! נותרו לך ${attemptsRemaining} ניסיון/ות.</p>
+                    `;
+                    speakText(`That's incorrect. Try again! You have ${attemptsRemaining} attempt(s) left.`, 'en-US');
+                    // Other options remain enabled for the next attempt.
+                } else { // Last attempt
+                    disableAllOptionsAndAudio(); // Disable all buttons after final incorrect attempt
+
+                    // Highlight the correct answer
+                    Array.from(optionsGrid.children).forEach(button => {
+                        if (button.textContent === correctWordObj.word) {
+                            button.classList.add('correct');
+                        }
+                    });
+
+                    feedbackArea.innerHTML = `
+                        <p style="color: var(--incorrect-color);">❌ לא נכון. נגמרו הניסיונות.</p>
+                        <p class="english-sentence">המילה הנכונה היא "${correctWordObj.word}". "${currentQuestion.sentenceFull}"</p>
+                        <p class="translation">(${currentQuestion.translation})</p>
+                        <p class="definition">המילה "${correctWordObj.word}" פירושה: ${correctWordObj.definition}</p>
+                    `;
+                    speakText(`That's incorrect. The correct word is ${correctWordObj.word}. ${currentQuestion.sentenceFull}`, 'en-US');
+                    nextQuestionButton.style.display = 'block'; // Show next button
+                }
+            }
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            displayQuestion();
+        }
+
+        function endGame() {
+            gameSection.classList.remove('active');
+            resultsSection.classList.add('active');
+            finalScoreElement.textContent = score;
+            
+            // Set main container to float for results screen
+            mainContainer.classList.add('floating');
+
+            // Populate the table of learned words
+            learnedWordsTableBody.innerHTML = '';
+            if (correctlyAnsweredWords.length === 0) {
+                learnedWordsTableBody.innerHTML = '<tr><td colspan="3">לא ענית על אף שאלה נכון. נסה שוב!</td></tr>';
+            } else {
+                // Sort words alphabetically by English word
+                correctlyAnsweredWords.sort((a, b) => a.word.localeCompare(b.word));
+
+                correctlyAnsweredWords.forEach(wordObj => {
+                    // For the results table, we want to show all sentences for the words the user learned
+                    wordObj.sentences.forEach(sentenceObj => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td class="english-word-col">${wordObj.word}</td>
+                            <td>${wordObj.definition}</td>
+                            <td class="english-sentence-col">
+                                <span>${sentenceObj.sentenceFull}</span>
+                                <button class="audio-button-small" onclick="speakText('${sentenceObj.sentenceFull.replace(/'/g, "\\'")}', 'en-US')">
+                                    <i class="fas fa-volume-up"></i>
+                                </button>
+                            </td>
+                        `;
+                        learnedWordsTableBody.appendChild(row);
+                    });
+                });
+            }
+
+            playAgainButton.style.display = 'block';
+
+            // Large confetti blast at the end of the game
+            confetti({
+                particleCount: 250,
+                spread: 120,
+                origin: { y: 0.6 },
+                colors: ['#FFD166', '#FFA07A', '#2196F3', '#0D47A1', '#4CAF50']
+            });
+        }
+
+        // --- Event Listeners ---
+        confirmSelectionButton.addEventListener('click', goToDefinitions);
+        startGameButton.addEventListener('click', startGameLoop);
+        nextQuestionButton.addEventListener('click', nextQuestion);
+        playAgainButton.addEventListener('click', initGame);
+        playSentenceAudioButton.addEventListener('click', () => {
+            const currentQuestion = gameQuestions[currentQuestionIndex];
+            const sentenceWithoutWord = currentQuestion.sentenceBlank.replace('___', '');
+            speakText(sentenceWithoutWord, 'en-US'); // Speak English
+        });
+
+        // --- Background Animations (from index.html) ---
+        function createBackgroundElements() {
+            const container = document.getElementById('background-elements');
+            if(!container) return;
+
+            // Clear previous elements if re-initializing
+            container.innerHTML = ''; 
+
+            for (let i = 0; i < 20; i++) {
+                const star = document.createElement('div');
+                const size = `${15 + Math.random() * 15}px`;
+                star.className = 'star';
+                star.style.left = `${Math.random() * 100}vw`;
+                star.style.width = size;
+                star.style.height = size;
+                star.style.animationDuration = `${7 + Math.random() * 8}s`;
+                star.style.animationDelay = `${Math.random() * 7}s`;
+                container.appendChild(star);
+            }
+
+            for (let i = 0; i < 25; i++) {
+                const bubble = document.createElement('div');
+                const size = `${20 + Math.random() * 60}px`;
+                bubble.className = 'bubble';
+                bubble.style.left = `${Math.random() * 100}vw`;
+                bubble.style.width = size;
+                bubble.style.height = size;
+                bubble.style.animationDuration = `${12 + Math.random() * 10}s`;
+                bubble.style.animationDelay = `${Math.random() * 8}s`;
+                container.appendChild(bubble);
+            }
+        }
+
+        // --- Start the game when the page loads ---
+        document.addEventListener('DOMContentLoaded', initGame);
+    </script>
+</body>
+</html>
