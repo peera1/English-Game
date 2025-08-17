@@ -35,6 +35,7 @@
             --header-gradient-end: #FFC107;
             --correct-color: #4CAF50; /* Green */
             --incorrect-color: #F44336; /* Red */
+            --fixed-bar-height: 80px; /* Estimated height of the fixed bottom bar */
         }
 
         * {
@@ -58,6 +59,7 @@
             align-items: center;
             justify-content: center;
             padding: 20px;
+            padding-bottom: var(--fixed-bar-height); /* Ensure space for the fixed bar */
         }
         
         .container {
@@ -73,7 +75,6 @@
             transition: all 0.5s ease;
             border: 1px solid rgba(255, 209, 102, 0.6);
             z-index: 2;
-            /* Animation applied dynamically via JS and .floating class */
         }
 
         @keyframes float {
@@ -579,13 +580,19 @@
             to { transform: translateY(-120vh) scale(1.8); opacity: 0; }
         }
 
-        /* Responsive adjustments */
+        /* Responsive adjustments for phones specifically */
         @media (max-width: 768px) {
-            .container { padding: 30px; margin: 15px auto; max-width: 90%; }
+            .container { 
+                padding: 30px 20px; /* Reduced horizontal padding for smaller screens */
+                margin: 15px auto; 
+                max-width: 90%; 
+            }
             h1 { font-size: 2rem; }
             .sentence-display { font-size: 1.5rem; padding: 20px 15px; min-height: 100px; }
             .sentence-display .audio-button { font-size: 1.5rem; }
-            .options-grid { grid-template-columns: 1fr; gap: 10px; }
+            .options-grid { grid-template-columns: 1fr; /* Stack options vertically */
+                gap: 10px; 
+            }
             .option-button { font-size: 1.1rem; padding: 12px; }
             .next-button, .play-again-button { padding: 12px 25px; font-size: 1rem; }
             .results-section h2 { font-size: 2rem; }
@@ -595,9 +602,24 @@
             .start-game-button { font-size: 1.1rem; padding: 15px 30px;}
             .definitions-list .english-word { font-size: 1.2rem; }
             .definitions-list .hebrew-definition { font-size: 1rem; }
-            .fixed-word-info { padding: 10px 15px; }
+            
+            /* Fixed bar specific adjustments for smaller screens */
+            :root {
+                --fixed-bar-height: 100px; /* Increased height for stacking */
+            }
+            .fixed-word-info { 
+                padding: 10px; /* Reduced padding */
+                flex-direction: column; /* Stack words vertically */
+                align-items: flex-end; /* Align to right for RTL */
+                gap: 5px; /* Reduce gap between stacked items */
+            }
+            .fixed-word-info .word-item { 
+                width: 100%; /* Take full width */
+                justify-content: flex-end; /* Align content to the right */
+            }
             .fixed-word-info .english-word-fixed { font-size: 1rem; }
             .fixed-word-info .hebrew-definition-fixed { font-size: 0.85rem; }
+            .fixed-word-info .audio-button-fixed-small { font-size: 0.9rem; }
         }
 
         @media (max-width: 480px) {
@@ -611,17 +633,20 @@
             .feedback-area .english-sentence, .feedback-area .translation, .feedback-area .definition { font-size: 0.9rem; }
             .back-button { width: 40px; height: 40px; font-size: 1.2rem; top: 10px; right: 10px; }
             .results-table .english-sentence-col {
-                flex-direction: column; /* Stack text and button */
-                align-items: flex-end; /* Align to right for RTL */
+                flex-direction: column; 
+                align-items: flex-end; 
                 gap: 2px;
             }
             .word-selection-grid { grid-template-columns: 1fr; }
-            .fixed-word-info {
-                flex-direction: column; /* Stack words vertically */
-                align-items: flex-end; /* Align to right */
-                padding: 10px;
+            /* Further reduce fixed bar height if needed, or stick to column layout */
+            :root {
+                --fixed-bar-height: 110px; /* Adjust as needed for 3 lines */
             }
-            .fixed-word-info .word-item { width: 100%; justify-content: flex-end; }
+            .fixed-word-info {
+                padding: 8px; /* Even less padding */
+            }
+            .fixed-word-info .english-word-fixed { font-size: 0.9rem; }
+            .fixed-word-info .hebrew-definition-fixed { font-size: 0.75rem; }
         }
     </style>
 </head>
