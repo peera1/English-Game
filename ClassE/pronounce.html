@@ -8,7 +8,7 @@
     @import url('https://fonts.googleapis.com/css2?family=Varela+Round&display=swap');
     body {
       font-family: 'Varela Round', Arial, sans-serif;
-      background: linear-gradient(135deg, #e0e7ff 0%, #f0e9ff 100%);
+      background: radial-gradient(circle at 70% 10%, #e0e7ff 0%, #f0e9ff 100%);
       margin: 0;
       min-height: 100vh;
       color: #22223b;
@@ -33,14 +33,42 @@
       transition: all 0.3s;
     }
     h1 {
-      font-size: 2.1rem;
-      margin-bottom: 18px;
+      font-size: 2.2rem;
+      margin-bottom: 8px;
       background: linear-gradient(to right, #7c3aed, #facc15);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       font-weight: 700;
       letter-spacing: 1.5px;
       text-shadow: 0 2px 8px #a78bfa22;
+    }
+    .subtitle {
+      font-size: 1.1rem;
+      color: #b197fc;
+      margin-bottom: 18px;
+      font-weight: 500;
+      letter-spacing: 1px;
+    }
+    .progress-bar {
+      width: 100%;
+      height: 12px;
+      background: #ede9fe;
+      border-radius: 8px;
+      margin-bottom: 18px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px #a78bfa11;
+    }
+    .progress {
+      height: 100%;
+      background: linear-gradient(90deg, #7c3aed 0%, #facc15 100%);
+      border-radius: 8px;
+      transition: width 0.4s;
+    }
+    .score {
+      font-size: 1.1em;
+      color: #7c3aed;
+      margin-bottom: 10px;
+      font-weight: bold;
     }
     .question-panel {
       font-size: 1.3rem;
@@ -135,29 +163,8 @@
       80% { transform: translateX(8px); }
       100% { transform: translateX(0); }
     }
-    .progress-bar {
-      width: 100%;
-      height: 12px;
-      background: #ede9fe;
-      border-radius: 8px;
-      margin-bottom: 18px;
-      overflow: hidden;
-      box-shadow: 0 2px 8px #a78bfa11;
-    }
-    .progress {
-      height: 100%;
-      background: linear-gradient(90deg, #7c3aed 0%, #facc15 100%);
-      border-radius: 8px;
-      transition: width 0.4s;
-    }
-    .score {
-      font-size: 1.1em;
-      color: #7c3aed;
-      margin-bottom: 10px;
-      font-weight: bold;
-    }
     .result-panel {
-      font-size: 1.5em;
+      font-size: 1.25em;
       color: #34d399;
       margin: 30px 0 18px 0;
       font-weight: bold;
@@ -168,6 +175,19 @@
       align-items: center;
       justify-content: center;
       flex-direction: column;
+    }
+    .result-panel .full-sentence {
+      color: #7c3aed;
+      font-size: 1.1em;
+      margin-top: 10px;
+      margin-bottom: 10px;
+      font-weight: 500;
+      letter-spacing: 1px;
+    }
+    .result-panel .pronoun {
+      color: #7c3aed;
+      font-weight: bold;
+      font-size: 1.1em;
     }
     .next-btn {
       background: linear-gradient(90deg, #facc15 0%, #a78bfa 100%);
@@ -194,6 +214,49 @@
       margin-bottom: 10px;
       animation: pop 0.5s;
     }
+    .summary-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 18px;
+      background: #f8fafc;
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px #a78bfa11;
+      font-size: 1em;
+    }
+    .summary-table th, .summary-table td {
+      padding: 10px 6px;
+      border-bottom: 1px solid #e0e7ff;
+      text-align: center;
+    }
+    .summary-table th {
+      background: #ede9fe;
+      color: #7c3aed;
+      font-weight: bold;
+    }
+    .summary-table tr:last-child td {
+      border-bottom: none;
+    }
+    .summary-table .correct {
+      color: #34d399;
+      font-weight: bold;
+    }
+    .summary-table .wrong {
+      color: #f87171;
+      font-weight: bold;
+    }
+    .summary-table .pronoun {
+      color: #7c3aed;
+      font-weight: bold;
+    }
+    .summary-table .user-answer {
+      font-weight: bold;
+    }
+    .summary-table .full-sentence {
+      color: #22223b;
+      font-size: 0.98em;
+      font-weight: 400;
+    }
     @media (max-width: 600px) {
       .container {
         padding: 10vw 2vw 8vw 2vw;
@@ -202,33 +265,133 @@
         max-width: 99vw;
       }
       h1 { font-size: 1.1rem; }
+      .subtitle { font-size: 0.95rem; }
       .question-panel { font-size: 1rem; padding: 7px 2px; }
       .option-btn { font-size: 1rem; width: 80px; padding: 10px 0; }
       .result-panel { font-size: 1.1rem; }
       .next-btn { font-size: 0.95rem; padding: 8px 10px; }
       .options { gap: 8px; }
+      .summary-table th, .summary-table td { padding: 6px 2px; font-size: 0.95em; }
     }
     @media (max-width: 400px) {
       .container { padding: 4vw 1vw 4vw 1vw; }
       .option-btn { width: 60px; font-size: 0.9rem; }
+      .summary-table th, .summary-table td { font-size: 0.9em; }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>English Pronouns Game<br><span style="font-size:1rem;font-weight:400;">5th Grade Level</span></h1>
+    <h1>English Pronouns Game</h1>
+    <div class="subtitle">5th Grade Level</div>
     <div class="progress-bar"><div class="progress" id="progress"></div></div>
     <div class="score" id="score"></div>
     <div id="game"></div>
   </div>
   <script>
-    // Pronouns for 5th grade (including object and possessive)
+    // Pronouns for 5th grade
     const pronouns = [
       "I", "you", "he", "she", "it", "we", "they"
     ];
 
-    // 5th grade level, varied, no repeats, no "he and also he"
+    // Sentences with the pronoun in different positions (not always at the start)
     const sentences = [
+      {text: "Tomorrow, ___ will finish the project.", answer: "I"},
+      {text: "We are going to the museum this weekend.", answer: "We"},
+      {text: "Reading a fascinating book about space is what ___ is doing.", answer: "She"},
+      {text: "The teacher asked ___ to bring his homework.", answer: "He"},
+      {text: "Chess in the park is what ___ are playing.", answer: "They"},
+      {text: "It is raining outside, so bring an umbrella.", answer: "It"},
+      {text: "Do ___ need to study for your test?", answer: "You"},
+      {text: "Cleaning my room is something ___ am responsible for.", answer: "I"},
+      {text: "My best friend is Anna and ___ loves to paint.", answer: "She"},
+      {text: "Cookies together are what ___ are going to bake.", answer: "We"},
+      {text: "The dog is barking loudly at the mailman because ___ is scared.", answer: "It"},
+      {text: "If you need help, ___ will help you with your homework.", answer: "He"},
+      {text: "Excited about the school trip are ___!", answer: "They"},
+      {text: "After school, ___ am going to the library.", answer: "I"},
+      {text: "Always polite to everyone, that's ___!", answer: "He"},
+      {text: "The winners of the competition are ___!", answer: "You"},
+      {text: "Making a delicious cake is what ___ is doing.", answer: "She"},
+      {text: "A treehouse in the backyard is what ___ are building.", answer: "We"},
+      {text: "My favorite animal at the zoo is the panda, and ___ is very cute.", answer: "It"},
+      {text: "Practicing for the concert are ___.", answer: "They"},
+      {text: "Going to the library after school is what ___ am doing.", answer: "I"},
+      {text: "Drawing a beautiful picture is what ___ is doing.", answer: "She"},
+      {text: "Tonight, ___ will join us for dinner.", answer: "He"},
+      {text: "The same book is what ___ are reading.", answer: "We"},
+      {text: "Very soft and fluffy, that's ___.", answer: "It"},
+      {text: "After class, ___ are playing basketball.", answer: "They"},
+      {text: "Finish your assignment, ___ need to.", answer: "You"},
+      {text: "A letter to my cousin is what ___ am writing.", answer: "I"},
+      {text: "Learning a new language is what ___ is doing.", answer: "He"},
+      {text: "Going to the science fair are ___.", answer: "We"},
+      {text: "Jumping over the fence is what ___ is doing.", answer: "It"},
+      {text: "Singing in the choir are ___.", answer: "They"},
+      {text: "Helping her mom in the kitchen is what ___ is doing.", answer: "She"},
+      {text: "Planning a surprise party is what ___ am doing.", answer: "I"},
+      {text: "Playing the piano beautifully is what ___ is doing.", answer: "He"},
+      {text: "Watching a movie together are ___.", answer: "We"},
+      {text: "Chasing its tail is what ___ is doing.", answer: "It"},
+      {text: "Going to visit their grandparents are ___.", answer: "They"},
+      {text: "Telling a funny story is what ___ is doing.", answer: "She"},
+      {text: "Drawing a comic strip is what ___ am doing.", answer: "I"},
+      {text: "Fixing his bicycle is what ___ is doing.", answer: "He"},
+      {text: "Listening to music are ___.", answer: "You"},
+      {text: "Making a paper airplane is what ___ is doing.", answer: "She"},
+      {text: "Playing video games are ___.", answer: "We"},
+      {text: "Eating its food is what ___ is doing.", answer: "It"},
+      {text: "Learning about history are ___.", answer: "They"},
+      {text: "Practicing my spelling words is what ___ am doing.", answer: "I"},
+      {text: "Wearing a red hat is what ___ is doing.", answer: "He"},
+      {text: "Helping to clean the classroom are ___.", answer: "We"},
+      {text: "Sleeping on the couch is what ___ is doing.", answer: "It"},
+      {text: "Going to the playground are ___.", answer: "They"},
+      {text: "Reading a story to the class is what ___ is doing.", answer: "She"},
+      {text: "Feeding my pet fish is what ___ am doing.", answer: "I"},
+      {text: "Building a sandcastle is what ___ is doing.", answer: "He"},
+      {text: "Making decorations for the party are ___.", answer: "We"},
+      {text: "Wagging its tail is what ___ is doing.", answer: "It"},
+      {text: "Drawing pictures for the wall are ___.", answer: "They"},
+      {text: "Singing a song is what ___ is doing.", answer: "She"},
+      {text: "Going to ride my bike is what ___ am doing.", answer: "I"},
+      {text: "Playing soccer with his friends is what ___ is doing.", answer: "He"},
+      {text: "Writing stories in English are ___.", answer: "We"},
+      {text: "Purring softly is what ___ is doing.", answer: "It"},
+      {text: "Planting flowers in the garden are ___.", answer: "They"},
+      {text: "Painting a landscape is what ___ is doing.", answer: "She"},
+      {text: "Reading a mystery book is what ___ am doing.", answer: "I"},
+      {text: "Fixing the computer is what ___ is doing.", answer: "He"},
+      {text: "Learning new words are ___.", answer: "You"},
+      {text: "Jumping on the trampoline is what ___ is doing.", answer: "She"},
+      {text: "Building a model airplane are ___.", answer: "We"},
+      {text: "Eating a carrot is what ___ is doing.", answer: "It"},
+      {text: "Playing outside are ___.", answer: "They"},
+      {text: "Helping my dad is what ___ am doing.", answer: "I"},
+      {text: "Telling a secret is what ___ is doing.", answer: "He"},
+      {text: "Reading quietly are ___.", answer: "We"},
+      {text: "Running in the yard is what ___ is doing.", answer: "It"},
+      {text: "Making a poster are ___.", answer: "They"},
+      {text: "Writing a poem is what ___ is doing.", answer: "She"},
+      {text: "Drawing a map is what ___ am doing.", answer: "I"},
+      {text: "Fixing the lamp is what ___ is doing.", answer: "He"},
+      {text: "Listening to the teacher are ___.", answer: "You"},
+      {text: "Baking cookies is what ___ is doing.", answer: "She"},
+      {text: "Playing with blocks are ___.", answer: "We"},
+      {text: "Chasing a butterfly is what ___ is doing.", answer: "It"},
+      {text: "Going to the zoo are ___.", answer: "They"},
+      {text: "Learning to swim is what ___ am doing.", answer: "I"},
+      {text: "Reading a magazine is what ___ is doing.", answer: "He"},
+      {text: "Watching the parade are ___.", answer: "We"},
+      {text: "Sleeping in the sun is what ___ is doing.", answer: "It"},
+      {text: "Building a snowman are ___.", answer: "They"},
+      {text: "Telling a joke is what ___ is doing.", answer: "She"},
+      {text: "Writing in my diary is what ___ am doing.", answer: "I"},
+      {text: "Fixing the fence is what ___ is doing.", answer: "He"},
+      {text: "Playing tag are ___.", answer: "We"},
+      {text: "Eating its dinner is what ___ is doing.", answer: "It"},
+      {text: "Drawing animals are ___.", answer: "They"},
+      {text: "Singing in the choir is what ___ is doing.", answer: "She"},
       {text: "___ will finish the project by tomorrow.", answer: "I"},
       {text: "___ are going to the museum this weekend.", answer: "We"},
       {text: "___ is reading a fascinating book about space.", answer: "She"},
@@ -341,6 +504,7 @@
     let current = 0;
     let score = 0;
     let locked = false;
+    let answersLog = [];
 
     function updateProgress() {
       document.getElementById('progress').style.width = ((current) / 10 * 100) + "%";
@@ -359,8 +523,18 @@
     function speakSentence(sentence, answer) {
       if (!('speechSynthesis' in window)) return;
       window.speechSynthesis.cancel();
-      let before = sentence.split("___")[0];
-      let after = sentence.split("___")[1] || "";
+      let idx = sentence.indexOf("___");
+      if (idx === -1) {
+        // fallback: just read the sentence
+        let utter = new window.SpeechSynthesisUtterance(sentence);
+        utter.lang = 'en-US';
+        if (enVoice) utter.voice = enVoice;
+        utter.rate = 0.92;
+        window.speechSynthesis.speak(utter);
+        return;
+      }
+      let before = sentence.substring(0, idx);
+      let after = sentence.substring(idx + 3);
       let utter1 = new window.SpeechSynthesisUtterance(before.trim());
       utter1.lang = 'en-US';
       if (enVoice) utter1.voice = enVoice;
@@ -408,11 +582,19 @@
       if (locked) return;
       locked = true;
       const q = questions[current];
-      if (opt === q.answer) {
+      let isCorrect = (opt === q.answer);
+      if (isCorrect) {
         btn.classList.add('correct');
         speakFeedback("Great job!");
         score++;
-        waitForSpeechEnd(() => showResult(true));
+        answersLog.push({
+          question: q.text,
+          correct: q.answer,
+          user: opt,
+          isCorrect: true,
+          fullSentence: q.text.replace("___", q.answer)
+        });
+        waitForSpeechEnd(() => showResult(true, q, opt));
       } else {
         btn.classList.add('wrong');
         speakFeedback("Try again, you can do it!");
@@ -420,6 +602,16 @@
           btn.classList.remove('wrong');
           locked = false;
         }, 900);
+        // Log wrong answer only if first attempt
+        if (!answersLog[current] || answersLog[current].isCorrect === undefined) {
+          answersLog.push({
+            question: q.text,
+            correct: q.answer,
+            user: opt,
+            isCorrect: false,
+            fullSentence: q.text.replace("___", q.answer)
+          });
+        }
       }
     }
 
@@ -451,27 +643,21 @@
       }, 100);
     }
 
-    function showResult(correct) {
-      const q = questions[current];
+    function showResult(correct, q, userAnswer) {
+      let fullSentence = q.text.replace("___", `<span class="pronoun">${q.answer}</span>`);
       document.getElementById('game').innerHTML = `
         <div class="result-panel">
-          <div class="emoji">${correct ? "🎉" : "🙂"}</div>
+          <div class="emoji">🎉</div>
           <div>
-            ${correct ? "Correct! The answer is:" : "The answer is:"}
-            <span style="color:#7c3aed;font-weight:bold;">${q.answer}</span>
+            <span style="color:#34d399;">Correct! The answer is: </span>
+            <span class="pronoun">${q.answer}</span>
           </div>
-          <div style="margin-top:10px;">
-            <button class="next-btn" onclick="nextQuestion()">Next</button>
-          </div>
+          <div class="full-sentence">${fullSentence}</div>
+          <button class="next-btn" onclick="nextQuestion()">Next</button>
         </div>
       `;
-      if (correct) {
-        // Read the full sentence with the answer
-        let fullSentence = q.text.replace("___", q.answer);
-        speakFeedback(fullSentence);
-      } else {
-        speakFeedback(q.answer);
-      }
+      // Read the full sentence with the answer
+      speakFeedback(q.text.replace("___", q.answer));
     }
 
     function nextQuestion() {
@@ -479,23 +665,54 @@
       if (current >= 10) {
         document.getElementById('progress').style.width = "100%";
         document.getElementById('score').textContent = `Score: ${score} / 10`;
-        document.getElementById('game').innerHTML = `
-          <div class="result-panel">
-            <div class="emoji">🏆</div>
-            <div>Game Over!<br>Your score: <span style="color:#7c3aed;">${score} / 10</span></div>
-            <button class="next-btn" onclick="restartGame()">Play Again</button>
-          </div>
-        `;
+        showSummary();
         speakFeedback("Congratulations! You finished the game!");
       } else {
         askQuestion();
       }
     }
 
+    function showSummary() {
+      let correctCount = answersLog.filter(a => a.isCorrect).length;
+      let wrongCount = answersLog.length - correctCount;
+      let tableRows = answersLog.map((a, idx) => `
+        <tr>
+          <td>${idx + 1}</td>
+          <td class="full-sentence">${a.question.replace("___", `<span class="pronoun">${a.correct}</span>`)}</td>
+          <td class="pronoun">${a.correct}</td>
+          <td class="user-answer" style="color:${a.isCorrect ? '#34d399' : '#f87171'}">${a.user}</td>
+          <td class="${a.isCorrect ? 'correct' : 'wrong'}">${a.isCorrect ? "✔" : "✗"}</td>
+        </tr>
+      `).join('');
+      document.getElementById('game').innerHTML = `
+        <div class="result-panel" style="color:#7c3aed;">
+          <div class="emoji">🏆</div>
+          <div style="font-size:1.2em;">Game Over!</div>
+          <div style="margin:8px 0 8px 0;">Your score: <span style="color:#34d399;">${score} / 10</span></div>
+        </div>
+        <table class="summary-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Full Sentence</th>
+              <th>Correct Pronoun</th>
+              <th>Your Answer</th>
+              <th>Result</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${tableRows}
+          </tbody>
+        </table>
+        <button class="next-btn" onclick="restartGame()" style="margin-top:18px;">Play Again</button>
+      `;
+    }
+
     function restartGame() {
       questions = shuffle(sentences).slice(0, 10);
       current = 0;
       score = 0;
+      answersLog = [];
       askQuestion();
     }
 
