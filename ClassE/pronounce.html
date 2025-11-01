@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Pronouns English Game</title>
+  <title>Pronouns English Game - 5th Grade Level</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Varela+Round&display=swap');
@@ -22,7 +22,7 @@
       padding: 44px 28px 32px 28px;
       text-align: center;
       width: 95%;
-      max-width: 440px;
+      max-width: 520px;
       margin: 40px auto 30px auto;
       position: relative;
       z-index: 2;
@@ -216,119 +216,115 @@
 </head>
 <body>
   <div class="container">
-    <h1>English Pronouns Game</h1>
+    <h1>English Pronouns Game<br><span style="font-size:1rem;font-weight:400;">5th Grade Level</span></h1>
     <div class="progress-bar"><div class="progress" id="progress"></div></div>
     <div class="score" id="score"></div>
     <div id="game"></div>
   </div>
   <script>
-    // All pronouns
+    // Pronouns for 5th grade (including object and possessive)
     const pronouns = [
       "I", "you", "he", "she", "it", "we", "they"
     ];
 
-    // 100+ sentences with pronouns to fill in
+    // 5th grade level, varied, no repeats, no "he and also he"
     const sentences = [
-      {text: "___ am happy.", answer: "I"},
-      {text: "___ are my friend.", answer: "You"},
-      {text: "___ is my brother.", answer: "He"},
-      {text: "___ is my sister.", answer: "She"},
-      {text: "___ is a cat.", answer: "It"},
-      {text: "___ are playing football.", answer: "We"},
-      {text: "___ are eating pizza.", answer: "They"},
-      {text: "___ am learning English.", answer: "I"},
-      {text: "___ is reading a book.", answer: "He"},
-      {text: "___ is drawing a picture.", answer: "She"},
-      {text: "___ is raining.", answer: "It"},
-      {text: "___ are going to school.", answer: "We"},
-      {text: "___ are watching TV.", answer: "They"},
-      {text: "___ are my teacher.", answer: "You"},
-      {text: "___ am your student.", answer: "I"},
-      {text: "___ is my dog.", answer: "It"},
-      {text: "___ is singing.", answer: "She"},
-      {text: "___ is running.", answer: "He"},
-      {text: "___ are friends.", answer: "We"},
-      {text: "___ are in the park.", answer: "They"},
-      {text: "___ are tall.", answer: "You"},
-      {text: "___ am short.", answer: "I"},
-      {text: "___ is blue.", answer: "It"},
-      {text: "___ is my father.", answer: "He"},
-      {text: "___ is my mother.", answer: "She"},
-      {text: "___ are brothers.", answer: "They"},
-      {text: "___ are sisters.", answer: "We"},
-      {text: "___ are kind.", answer: "You"},
-      {text: "___ am tired.", answer: "I"},
-      {text: "___ is cold.", answer: "It"},
-      {text: "___ is hot.", answer: "It"},
-      {text: "___ is my uncle.", answer: "He"},
-      {text: "___ is my aunt.", answer: "She"},
-      {text: "___ are hungry.", answer: "We"},
-      {text: "___ are thirsty.", answer: "They"},
-      {text: "___ are smart.", answer: "You"},
-      {text: "___ am ready.", answer: "I"},
-      {text: "___ is sleeping.", answer: "He"},
-      {text: "___ is dancing.", answer: "She"},
-      {text: "___ is barking.", answer: "It"},
-      {text: "___ are laughing.", answer: "We"},
-      {text: "___ are crying.", answer: "They"},
-      {text: "___ are funny.", answer: "You"},
-      {text: "___ am excited.", answer: "I"},
-      {text: "___ is eating.", answer: "He"},
-      {text: "___ is drinking.", answer: "She"},
-      {text: "___ is jumping.", answer: "It"},
-      {text: "___ are singing.", answer: "We"},
-      {text: "___ are dancing.", answer: "They"},
-      {text: "___ are running.", answer: "You"},
-      {text: "___ am running.", answer: "I"},
-      {text: "___ is playing.", answer: "He"},
-      {text: "___ is cooking.", answer: "She"},
-      {text: "___ is flying.", answer: "It"},
-      {text: "___ are cooking.", answer: "We"},
-      {text: "___ are flying.", answer: "They"},
-      {text: "___ are playing.", answer: "You"},
-      {text: "___ am playing.", answer: "I"},
-      {text: "___ is swimming.", answer: "He"},
-      {text: "___ is painting.", answer: "She"},
-      {text: "___ is barking.", answer: "It"},
-      {text: "___ are painting.", answer: "We"},
-      {text: "___ are swimming.", answer: "They"},
-      {text: "___ are painting.", answer: "You"},
-      {text: "___ am painting.", answer: "I"},
-      {text: "___ is talking.", answer: "He"},
-      {text: "___ is listening.", answer: "She"},
-      {text: "___ is meowing.", answer: "It"},
-      {text: "___ are listening.", answer: "We"},
-      {text: "___ are talking.", answer: "They"},
-      {text: "___ are listening.", answer: "You"},
-      {text: "___ am listening.", answer: "I"},
-      {text: "___ is walking.", answer: "He"},
-      {text: "___ is walking.", answer: "She"},
-      {text: "___ is walking.", answer: "It"},
-      {text: "___ are walking.", answer: "We"},
-      {text: "___ are walking.", answer: "They"},
-      {text: "___ are walking.", answer: "You"},
-      {text: "___ am walking.", answer: "I"},
-      {text: "___ is smiling.", answer: "He"},
-      {text: "___ is smiling.", answer: "She"},
-      {text: "___ is smiling.", answer: "It"},
-      {text: "___ are smiling.", answer: "We"},
-      {text: "___ are smiling.", answer: "They"},
-      {text: "___ are smiling.", answer: "You"},
-      {text: "___ am smiling.", answer: "I"},
-      {text: "___ is jumping.", answer: "He"},
-      {text: "___ is jumping.", answer: "She"},
-      {text: "___ is jumping.", answer: "It"},
-      {text: "___ are jumping.", answer: "We"},
-      {text: "___ are jumping.", answer: "They"},
-      {text: "___ are jumping.", answer: "You"},
-      {text: "___ am jumping.", answer: "I"},
-      {text: "___ is eating.", answer: "He"},
-      {text: "___ is eating.", answer: "She"},
-      {text: "___ is eating.", answer: "It"},
-      {text: "___ are eating.", answer: "We"},
-      {text: "___ are eating.", answer: "They"},
-      {text: "___ are eating.", answer: "You"},
-      {text: "___ am eating.", answer: "I"}
+      {text: "___ will finish the project by tomorrow.", answer: "I"},
+      {text: "___ are going to the museum this weekend.", answer: "We"},
+      {text: "___ is reading a fascinating book about space.", answer: "She"},
+      {text: "___ forgot to bring his homework.", answer: "He"},
+      {text: "___ are playing chess in the park.", answer: "They"},
+      {text: "___ is raining outside, so bring an umbrella.", answer: "It"},
+      {text: "___ need to study for your test.", answer: "You"},
+      {text: "___ am responsible for cleaning my room.", answer: "I"},
+      {text: "___ is my best friend and loves to paint.", answer: "She"},
+      {text: "___ are going to bake cookies together.", answer: "We"},
+      {text: "___ is barking loudly at the mailman.", answer: "It"},
+      {text: "___ will help you with your homework.", answer: "He"},
+      {text: "___ are excited about the school trip.", answer: "They"},
+      {text: "___ am learning to play the guitar.", answer: "I"},
+      {text: "___ is always polite to everyone.", answer: "He"},
+      {text: "___ are the winners of the competition.", answer: "You"},
+      {text: "___ is making a delicious cake.", answer: "She"},
+      {text: "___ are building a treehouse in the backyard.", answer: "We"},
+      {text: "___ is my favorite animal at the zoo.", answer: "It"},
+      {text: "___ are practicing for the concert.", answer: "They"},
+      {text: "___ am going to the library after school.", answer: "I"},
+      {text: "___ is drawing a beautiful picture.", answer: "She"},
+      {text: "___ will join us for dinner tonight.", answer: "He"},
+      {text: "___ are reading the same book.", answer: "We"},
+      {text: "___ is very soft and fluffy.", answer: "It"},
+      {text: "___ are playing basketball after class.", answer: "They"},
+      {text: "___ need to finish your assignment.", answer: "You"},
+      {text: "___ am writing a letter to my cousin.", answer: "I"},
+      {text: "___ is learning a new language.", answer: "He"},
+      {text: "___ are going to the science fair.", answer: "We"},
+      {text: "___ is jumping over the fence.", answer: "It"},
+      {text: "___ are singing in the choir.", answer: "They"},
+      {text: "___ is helping her mom in the kitchen.", answer: "She"},
+      {text: "___ am planning a surprise party.", answer: "I"},
+      {text: "___ is playing the piano beautifully.", answer: "He"},
+      {text: "___ are watching a movie together.", answer: "We"},
+      {text: "___ is chasing its tail.", answer: "It"},
+      {text: "___ are going to visit their grandparents.", answer: "They"},
+      {text: "___ is telling a funny story.", answer: "She"},
+      {text: "___ am drawing a comic strip.", answer: "I"},
+      {text: "___ is fixing his bicycle.", answer: "He"},
+      {text: "___ are listening to music.", answer: "You"},
+      {text: "___ is making a paper airplane.", answer: "She"},
+      {text: "___ are playing video games.", answer: "We"},
+      {text: "___ is eating its food.", answer: "It"},
+      {text: "___ are learning about history.", answer: "They"},
+      {text: "___ am practicing my spelling words.", answer: "I"},
+      {text: "___ is wearing a red hat.", answer: "He"},
+      {text: "___ are helping to clean the classroom.", answer: "We"},
+      {text: "___ is sleeping on the couch.", answer: "It"},
+      {text: "___ are going to the playground.", answer: "They"},
+      {text: "___ is reading a story to the class.", answer: "She"},
+      {text: "___ am feeding my pet fish.", answer: "I"},
+      {text: "___ is building a sandcastle.", answer: "He"},
+      {text: "___ are making decorations for the party.", answer: "We"},
+      {text: "___ is wagging its tail.", answer: "It"},
+      {text: "___ are drawing pictures for the wall.", answer: "They"},
+      {text: "___ is singing a song.", answer: "She"},
+      {text: "___ am going to ride my bike.", answer: "I"},
+      {text: "___ is playing soccer with his friends.", answer: "He"},
+      {text: "___ are writing stories in English.", answer: "We"},
+      {text: "___ is purring softly.", answer: "It"},
+      {text: "___ are planting flowers in the garden.", answer: "They"},
+      {text: "___ is painting a landscape.", answer: "She"},
+      {text: "___ am reading a mystery book.", answer: "I"},
+      {text: "___ is fixing the computer.", answer: "He"},
+      {text: "___ are learning new words.", answer: "You"},
+      {text: "___ is jumping on the trampoline.", answer: "She"},
+      {text: "___ are building a model airplane.", answer: "We"},
+      {text: "___ is eating a carrot.", answer: "It"},
+      {text: "___ are playing outside.", answer: "They"},
+      {text: "___ am helping my dad.", answer: "I"},
+      {text: "___ is telling a secret.", answer: "He"},
+      {text: "___ are reading quietly.", answer: "We"},
+      {text: "___ is running in the yard.", answer: "It"},
+      {text: "___ are making a poster.", answer: "They"},
+      {text: "___ is writing a poem.", answer: "She"},
+      {text: "___ am drawing a map.", answer: "I"},
+      {text: "___ is fixing the lamp.", answer: "He"},
+      {text: "___ are listening to the teacher.", answer: "You"},
+      {text: "___ is baking cookies.", answer: "She"},
+      {text: "___ are playing with blocks.", answer: "We"},
+      {text: "___ is chasing a butterfly.", answer: "It"},
+      {text: "___ are going to the zoo.", answer: "They"},
+      {text: "___ am learning to swim.", answer: "I"},
+      {text: "___ is reading a magazine.", answer: "He"},
+      {text: "___ are watching the parade.", answer: "We"},
+      {text: "___ is sleeping in the sun.", answer: "It"},
+      {text: "___ are building a snowman.", answer: "They"},
+      {text: "___ is telling a joke.", answer: "She"},
+      {text: "___ am writing in my diary.", answer: "I"},
+      {text: "___ is fixing the fence.", answer: "He"},
+      {text: "___ are playing tag.", answer: "We"},
+      {text: "___ is eating its dinner.", answer: "It"},
+      {text: "___ are drawing animals.", answer: "They"},
+      {text: "___ is singing in the choir.", answer: "She"}
     ];
 
     // Shuffle array
@@ -375,7 +371,6 @@
       utter2.rate = 0.92;
       window.speechSynthesis.speak(utter1);
       setTimeout(() => {
-        // Wait 3 seconds for the blank
         setTimeout(() => {
           window.speechSynthesis.speak(utter2);
         }, 3000);
@@ -457,19 +452,26 @@
     }
 
     function showResult(correct) {
+      const q = questions[current];
       document.getElementById('game').innerHTML = `
         <div class="result-panel">
           <div class="emoji">${correct ? "🎉" : "🙂"}</div>
           <div>
             ${correct ? "Correct! The answer is:" : "The answer is:"}
-            <span style="color:#7c3aed;font-weight:bold;">${questions[current].answer}</span>
+            <span style="color:#7c3aed;font-weight:bold;">${q.answer}</span>
           </div>
           <div style="margin-top:10px;">
             <button class="next-btn" onclick="nextQuestion()">Next</button>
           </div>
         </div>
       `;
-      speakFeedback(questions[current].answer);
+      if (correct) {
+        // Read the full sentence with the answer
+        let fullSentence = q.text.replace("___", q.answer);
+        speakFeedback(fullSentence);
+      } else {
+        speakFeedback(q.answer);
+      }
     }
 
     function nextQuestion() {
