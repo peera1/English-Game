@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Pronouns English Game</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Varela+Round&display=swap');
+    body {
+      font-family: 'Varela Round', Arial, sans-serif;
+      background: linear-gradient(135deg, #e0e7ff 0%, #f0e9ff 100%);
+      margin: 0;
+      min-height: 100vh;
+      color: #22223b;
+      overflow-x: hidden;
+      direction: ltr;
+    }
+    .container {
+      background: #fff;
+      border-radius: 32px;
+      box-shadow: 0 18px 48px rgba(124,58,237,0.13);
+      padding: 44px 28px 32px 28px;
+      text-align: center;
+      width: 95%;
+      max-width: 440px;
+      margin: 40px auto 30px auto;
+      position: relative;
+      z-index: 2;
+      min-height: 500px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      transition: all 0.3s;
+    }
+    h1 {
+      font-size: 2.1rem;
+      margin-bottom: 18px;
+      background: linear-gradient(to right, #7c3aed, #facc15);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-shadow: 0 2px 8px #a78bfa22;
+    }
+    .question-panel {
+      font-size: 1.3rem;
+      margin-bottom: 32px;
+      color: #7c3aed;
+      background: #ede9fe;
+      border-radius: 18px;
+      padding: 18px 10px;
+      box-shadow: 0 2px 8px #a78bfa11;
+      min-height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.18s;
+      user-select: none;
+      gap: 12px;
+      position: relative;
+    }
+    .question-panel:hover {
+      background: #e0e7ff;
+    }
+    .speaker {
+      font-size: 1.5em;
+      color: #facc15;
+      margin-left: 10px;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    .speaker:hover { color: #7c3aed; }
+    .sentence {
+      font-size: 1.3em;
+      font-weight: 500;
+      letter-spacing: 1px;
+    }
+    .blank {
+      display: inline-block;
+      min-width: 60px;
+      border-bottom: 2px dashed #a78bfa;
+      margin: 0 6px;
+      height: 1.2em;
+      vertical-align: middle;
+    }
+    .options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
+      justify-content: center;
+      margin-bottom: 30px;
+    }
+    .option-btn {
+      background: linear-gradient(135deg, #a78bfa 60%, #f472b6 100%);
+      color: #fff;
+      border: none;
+      border-radius: 18px;
+      font-size: 1.3rem;
+      font-weight: bold;
+      padding: 14px 0;
+      width: 110px;
+      cursor: pointer;
+      box-shadow: 0 2px 12px #a78bfa22;
+      transition: background 0.18s, transform 0.13s;
+      outline: none;
+      position: relative;
+      letter-spacing: 2px;
+      user-select: none;
+    }
+    .option-btn:active {
+      background: linear-gradient(135deg, #7c3aed 60%, #f472b6 100%);
+      transform: scale(0.97);
+    }
+    .option-btn.correct {
+      background: linear-gradient(135deg, #34d399 60%, #a7f3d0 100%);
+      color: #065f46;
+      animation: pop 0.4s;
+    }
+    .option-btn.wrong {
+      background: linear-gradient(135deg, #f87171 60%, #fbbf24 100%);
+      color: #fff;
+      animation: shake 0.4s;
+    }
+    @keyframes pop {
+      0% { transform: scale(1); }
+      60% { transform: scale(1.18); }
+      100% { transform: scale(1); }
+    }
+    @keyframes shake {
+      0% { transform: translateX(0); }
+      20% { transform: translateX(-8px); }
+      40% { transform: translateX(8px); }
+      60% { transform: translateX(-8px); }
+      80% { transform: translateX(8px); }
+      100% { transform: translateX(0); }
+    }
+    .progress-bar {
+      width: 100%;
+      height: 12px;
+      background: #ede9fe;
+      border-radius: 8px;
+      margin-bottom: 18px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px #a78bfa11;
+    }
+    .progress {
+      height: 100%;
+      background: linear-gradient(90deg, #7c3aed 0%, #facc15 100%);
+      border-radius: 8px;
+      transition: width 0.4s;
+    }
+    .score {
+      font-size: 1.1em;
+      color: #7c3aed;
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+    .result-panel {
+      font-size: 1.5em;
+      color: #34d399;
+      margin: 30px 0 18px 0;
+      font-weight: bold;
+      letter-spacing: 2px;
+      animation: pop 0.5s;
+      min-height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+    }
+    .next-btn {
+      background: linear-gradient(90deg, #facc15 0%, #a78bfa 100%);
+      color: #fff;
+      border: none;
+      border-radius: 18px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      padding: 14px 38px;
+      cursor: pointer;
+      box-shadow: 0 2px 12px #a78bfa22;
+      margin-top: 10px;
+      transition: background 0.18s, transform 0.13s;
+      outline: none;
+      letter-spacing: 1px;
+      user-select: none;
+    }
+    .next-btn:active {
+      background: linear-gradient(90deg, #facc15 0%, #7c3aed 100%);
+      transform: scale(0.97);
+    }
+    .emoji {
+      font-size: 2.2rem;
+      margin-bottom: 10px;
+      animation: pop 0.5s;
+    }
+    @media (max-width: 600px) {
+      .container {
+        padding: 10vw 2vw 8vw 2vw;
+        border-radius: 18px;
+        min-height: 320px;
+        max-width: 99vw;
+      }
+      h1 { font-size: 1.1rem; }
+      .question-panel { font-size: 1rem; padding: 7px 2px; }
+      .option-btn { font-size: 1rem; width: 80px; padding: 10px 0; }
+      .result-panel { font-size: 1.1rem; }
+      .next-btn { font-size: 0.95rem; padding: 8px 10px; }
+      .options { gap: 8px; }
+    }
+    @media (max-width: 400px) {
+      .container { padding: 4vw 1vw 4vw 1vw; }
+      .option-btn { width: 60px; font-size: 0.9rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>English Pronouns Game</h1>
+    <div class="progress-bar"><div class="progress" id="progress"></div></div>
+    <div class="score" id="score"></div>
+    <div id="game"></div>
+  </div>
+  <script>
+    // All pronouns
+    const pronouns = [
+      "I", "you", "he", "she", "it", "we", "they"
+    ];
+
+    // 100+ sentences with pronouns to fill in
+    const sentences = [
+      {text: "___ am happy.", answer: "I"},
+      {text: "___ are my friend.", answer: "You"},
+      {text: "___ is my brother.", answer: "He"},
+      {text: "___ is my sister.", answer: "She"},
+      {text: "___ is a cat.", answer: "It"},
+      {text: "___ are playing football.", answer: "We"},
+      {text: "___ are eating pizza.", answer: "They"},
+      {text: "___ am learning English.", answer: "I"},
+      {text: "___ is reading a book.", answer: "He"},
+      {text: "___ is drawing a picture.", answer: "She"},
+      {text: "___ is raining.", answer: "It"},
+      {text: "___ are going to school.", answer: "We"},
+      {text: "___ are watching TV.", answer: "They"},
+      {text: "___ are my teacher.", answer: "You"},
+      {text: "___ am your student.", answer: "I"},
+      {text: "___ is my dog.", answer: "It"},
+      {text: "___ is singing.", answer: "She"},
+      {text: "___ is running.", answer: "He"},
+      {text: "___ are friends.", answer: "We"},
+      {text: "___ are in the park.", answer: "They"},
+      {text: "___ are tall.", answer: "You"},
+      {text: "___ am short.", answer: "I"},
+      {text: "___ is blue.", answer: "It"},
+      {text: "___ is my father.", answer: "He"},
+      {text: "___ is my mother.", answer: "She"},
+      {text: "___ are brothers.", answer: "They"},
+      {text: "___ are sisters.", answer: "We"},
+      {text: "___ are kind.", answer: "You"},
+      {text: "___ am tired.", answer: "I"},
+      {text: "___ is cold.", answer: "It"},
+      {text: "___ is hot.", answer: "It"},
+      {text: "___ is my uncle.", answer: "He"},
+      {text: "___ is my aunt.", answer: "She"},
+      {text: "___ are hungry.", answer: "We"},
+      {text: "___ are thirsty.", answer: "They"},
+      {text: "___ are smart.", answer: "You"},
+      {text: "___ am ready.", answer: "I"},
+      {text: "___ is sleeping.", answer: "He"},
+      {text: "___ is dancing.", answer: "She"},
+      {text: "___ is barking.", answer: "It"},
+      {text: "___ are laughing.", answer: "We"},
+      {text: "___ are crying.", answer: "They"},
+      {text: "___ are funny.", answer: "You"},
+      {text: "___ am excited.", answer: "I"},
+      {text: "___ is eating.", answer: "He"},
+      {text: "___ is drinking.", answer: "She"},
+      {text: "___ is jumping.", answer: "It"},
+      {text: "___ are singing.", answer: "We"},
+      {text: "___ are dancing.", answer: "They"},
+      {text: "___ are running.", answer: "You"},
+      {text: "___ am running.", answer: "I"},
+      {text: "___ is playing.", answer: "He"},
+      {text: "___ is cooking.", answer: "She"},
+      {text: "___ is flying.", answer: "It"},
+      {text: "___ are cooking.", answer: "We"},
+      {text: "___ are flying.", answer: "They"},
+      {text: "___ are playing.", answer: "You"},
+      {text: "___ am playing.", answer: "I"},
+      {text: "___ is swimming.", answer: "He"},
+      {text: "___ is painting.", answer: "She"},
+      {text: "___ is barking.", answer: "It"},
+      {text: "___ are painting.", answer: "We"},
+      {text: "___ are swimming.", answer: "They"},
+      {text: "___ are painting.", answer: "You"},
+      {text: "___ am painting.", answer: "I"},
+      {text: "___ is talking.", answer: "He"},
+      {text: "___ is listening.", answer: "She"},
+      {text: "___ is meowing.", answer: "It"},
+      {text: "___ are listening.", answer: "We"},
+      {text: "___ are talking.", answer: "They"},
+      {text: "___ are listening.", answer: "You"},
+      {text: "___ am listening.", answer: "I"},
+      {text: "___ is walking.", answer: "He"},
+      {text: "___ is walking.", answer: "She"},
+      {text: "___ is walking.", answer: "It"},
+      {text: "___ are walking.", answer: "We"},
+      {text: "___ are walking.", answer: "They"},
+      {text: "___ are walking.", answer: "You"},
+      {text: "___ am walking.", answer: "I"},
+      {text: "___ is smiling.", answer: "He"},
+      {text: "___ is smiling.", answer: "She"},
+      {text: "___ is smiling.", answer: "It"},
+      {text: "___ are smiling.", answer: "We"},
+      {text: "___ are smiling.", answer: "They"},
+      {text: "___ are smiling.", answer: "You"},
+      {text: "___ am smiling.", answer: "I"},
+      {text: "___ is jumping.", answer: "He"},
+      {text: "___ is jumping.", answer: "She"},
+      {text: "___ is jumping.", answer: "It"},
+      {text: "___ are jumping.", answer: "We"},
+      {text: "___ are jumping.", answer: "They"},
+      {text: "___ are jumping.", answer: "You"},
+      {text: "___ am jumping.", answer: "I"},
+      {text: "___ is eating.", answer: "He"},
+      {text: "___ is eating.", answer: "She"},
+      {text: "___ is eating.", answer: "It"},
+      {text: "___ are eating.", answer: "We"},
+      {text: "___ are eating.", answer: "They"},
+      {text: "___ are eating.", answer: "You"},
+      {text: "___ am eating.", answer: "I"}
+    ];
+
+    // Shuffle array
+    function shuffle(arr) {
+      let a = arr.slice();
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    let questions = shuffle(sentences).slice(0, 10);
+    let current = 0;
+    let score = 0;
+    let locked = false;
+
+    function updateProgress() {
+      document.getElementById('progress').style.width = ((current) / 10 * 100) + "%";
+      document.getElementById('score').textContent = `Score: ${score} / ${current}`;
+    }
+
+    // Speech
+    let enVoice = null;
+    function loadVoices() {
+      const voices = window.speechSynthesis.getVoices();
+      enVoice = voices.find(v => v.lang && v.lang.startsWith('en'));
+    }
+    window.speechSynthesis.onvoiceschanged = loadVoices;
+    loadVoices();
+
+    function speakSentence(sentence, answer) {
+      if (!('speechSynthesis' in window)) return;
+      window.speechSynthesis.cancel();
+      let before = sentence.split("___")[0];
+      let after = sentence.split("___")[1] || "";
+      let utter1 = new window.SpeechSynthesisUtterance(before.trim());
+      utter1.lang = 'en-US';
+      if (enVoice) utter1.voice = enVoice;
+      utter1.rate = 0.92;
+      let utter2 = new window.SpeechSynthesisUtterance(after.trim());
+      utter2.lang = 'en-US';
+      if (enVoice) utter2.voice = enVoice;
+      utter2.rate = 0.92;
+      window.speechSynthesis.speak(utter1);
+      setTimeout(() => {
+        // Wait 3 seconds for the blank
+        setTimeout(() => {
+          window.speechSynthesis.speak(utter2);
+        }, 3000);
+      }, Math.max(utter1.text.length * 60, 400));
+    }
+
+    function askQuestion(playAudio = true) {
+      locked = false;
+      updateProgress();
+      const q = questions[current];
+      // Make 3 wrong options
+      let options = [q.answer];
+      let wrongs = shuffle(pronouns.filter(p => p !== q.answer)).slice(0, 3);
+      options = shuffle(options.concat(wrongs));
+      // Sentence with blank
+      let htmlSentence = q.text.replace("___", `<span class="blank"></span>`);
+      document.getElementById('game').innerHTML = `
+        <div class="question-panel" onclick="playQuestion()">
+          <span class="sentence">${htmlSentence}</span>
+          <span class="speaker" title="Hear the sentence">🔊</span>
+        </div>
+        <div class="options">
+          ${options.map(opt => `<button class="option-btn" onclick="choose('${opt}', this)">${opt}</button>`).join('')}
+        </div>
+      `;
+      if (playAudio) setTimeout(playQuestion, 400);
+    }
+
+    function playQuestion() {
+      const q = questions[current];
+      speakSentence(q.text, q.answer);
+    }
+
+    function choose(opt, btn) {
+      if (locked) return;
+      locked = true;
+      const q = questions[current];
+      if (opt === q.answer) {
+        btn.classList.add('correct');
+        speakFeedback("Great job!");
+        score++;
+        waitForSpeechEnd(() => showResult(true));
+      } else {
+        btn.classList.add('wrong');
+        speakFeedback("Try again, you can do it!");
+        setTimeout(() => {
+          btn.classList.remove('wrong');
+          locked = false;
+        }, 900);
+      }
+    }
+
+    function speakFeedback(text) {
+      if (!('speechSynthesis' in window)) return;
+      window.speechSynthesis.cancel();
+      let utter = new window.SpeechSynthesisUtterance(text);
+      utter.lang = 'en-US';
+      if (enVoice) utter.voice = enVoice;
+      utter.rate = 1;
+      window.speechSynthesis.speak(utter);
+    }
+
+    function waitForSpeechEnd(callback) {
+      if (!('speechSynthesis' in window)) {
+        setTimeout(callback, 1200);
+        return;
+      }
+      const synth = window.speechSynthesis;
+      if (!synth.speaking) {
+        callback();
+        return;
+      }
+      const interval = setInterval(() => {
+        if (!synth.speaking) {
+          clearInterval(interval);
+          callback();
+        }
+      }, 100);
+    }
+
+    function showResult(correct) {
+      document.getElementById('game').innerHTML = `
+        <div class="result-panel">
+          <div class="emoji">${correct ? "🎉" : "🙂"}</div>
+          <div>
+            ${correct ? "Correct! The answer is:" : "The answer is:"}
+            <span style="color:#7c3aed;font-weight:bold;">${questions[current].answer}</span>
+          </div>
+          <div style="margin-top:10px;">
+            <button class="next-btn" onclick="nextQuestion()">Next</button>
+          </div>
+        </div>
+      `;
+      speakFeedback(questions[current].answer);
+    }
+
+    function nextQuestion() {
+      current++;
+      if (current >= 10) {
+        document.getElementById('progress').style.width = "100%";
+        document.getElementById('score').textContent = `Score: ${score} / 10`;
+        document.getElementById('game').innerHTML = `
+          <div class="result-panel">
+            <div class="emoji">🏆</div>
+            <div>Game Over!<br>Your score: <span style="color:#7c3aed;">${score} / 10</span></div>
+            <button class="next-btn" onclick="restartGame()">Play Again</button>
+          </div>
+        `;
+        speakFeedback("Congratulations! You finished the game!");
+      } else {
+        askQuestion();
+      }
+    }
+
+    function restartGame() {
+      questions = shuffle(sentences).slice(0, 10);
+      current = 0;
+      score = 0;
+      askQuestion();
+    }
+
+    // Make functions global
+    window.choose = choose;
+    window.nextQuestion = nextQuestion;
+    window.restartGame = restartGame;
+    window.playQuestion = playQuestion;
+
+    askQuestion();
+  </script>
+</body>
+</html>
