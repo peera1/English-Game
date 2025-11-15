@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מבחן אנגלית - כיתה ג'</title>
+    <style>
+        @media print {
+            body {
+                margin: 0;
+                padding: 15px;
+            }
+            .no-print {
+                display: none;
+            }
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .test-container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header {
+            text-align: center;
+            border-bottom: 3px solid #4CAF50;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            color: #2c3e50;
+            margin: 10px 0;
+        }
+        
+        .student-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
+        
+        .info-field {
+            flex: 1;
+            margin: 0 10px;
+        }
+        
+        .info-field label {
+            font-weight: bold;
+            color: #555;
+        }
+        
+        .info-field input {
+            width: 100%;
+            border: none;
+            border-bottom: 2px solid #333;
+            padding: 5px;
+            background: transparent;
+        }
+        
+        .question-section {
+            margin-bottom: 35px;
+        }
+        
+        .question-section h2 {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-size: 18px;
+        }
+        
+        .question {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #fafafa;
+            border-right: 4px solid #4CAF50;
+        }
+        
+        .question-number {
+            font-weight: bold;
+            color: #4CAF50;
+            margin-bottom: 10px;
+        }
+        
+        .answer-line {
+            border-bottom: 1px solid #333;
+            display: inline-block;
+            min-width: 150px;
+            margin: 0 5px;
+        }
+        
+        .word-bank {
+            background-color: #e8f5e9;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            text-align: center;
+        }
+        
+        .word-bank-title {
+            font-weight: bold;
+            color: #2e7d32;
+            margin-bottom: 10px;
+        }
+        
+        .word-options {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        .word-option {
+            background-color: white;
+            padding: 8px 15px;
+            border: 2px dashed #4CAF50;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        
+        .matching-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        
+        .matching-table td {
+            padding: 12px;
+            border: 1px solid #ddd;
+        }
+        
+        .matching-table .english {
+            font-weight: bold;
+            background-color: #e3f2fd;
+            width: 40%;
+        }
+        
+        .matching-table .hebrew {
+            background-color: #fff3e0;
+            width: 40%;
+        }
+        
+        .matching-table .answer {
+            width: 20%;
+            text-align: center;
+        }
+        
+        .print-button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 20px auto;
+            display: block;
+        }
+        
+        .print-button:hover {
+            background-color: #45a049;
+        }
+        
+        .score-box {
+            float: left;
+            border: 2px solid #333;
+            padding: 10px 20px;
+            text-align: center;
+        }
+        
+        .score-box label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <button class="print-button no-print" onclick="window.print()">🖨️ הדפס מבחן</button>
+    
+    <div class="test-container">
+        <div class="header">
+            <h1>מבחן באנגלית - כיתה ג'</h1>
+            <p style="color: #666;">זמן: 45 דקות | 100 נקודות</p>
+        </div>
+        
+        <div class="student-info">
+            <div class="info-field">
+                <label>שם התלמיד/ה:</label>
+                <input type="text">
+            </div>
+            <div class="info-field">
+                <label>כיתה:</label>
+                <input type="text" style="width: 60px;">
+            </div>
+            <div class="info-field">
+                <label>תאריך:</label>
+                <input type="text" style="width: 100px;">
+            </div>
+        </div>
+        
+        <div class="score-box">
+            <label>ציון:</label>
+            <div style="font-size: 24px;">____</div>
+        </div>
+        
+        <div style="clear: both; margin-bottom: 20px;"></div>
+        
+        <!-- חלק 1: אותיות -->
+        <div class="question-section">
+            <h2>Part 1: Letters - Big and Small (10 points)</h2>
+            
+            <div class="question">
+                <div class="question-number">Write the small letter next to the big letter:</div>
+                <table style="width: 100%; margin-top: 10px; font-size: 20px;">
+                    <tr>
+                        <td style="padding: 12px;">1. A <span class="answer-line" style="width: 60px;"></span></td>
+                        <td style="padding: 12px;">2. N <span class="answer-line" style="width: 60px;"></span></td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 12px;">3. G <span class="answer-line" style="width: 60px;"></span></td>
+                        <td style="padding: 12px;">4. E <span class="answer-line" style="width: 60px;"></span></td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 12px;">5. T <span class="answer-line" style="width: 60px;"></span></td>
+                        <td style="padding: 12px;">6. P <span class="answer-line" style="width: 60px;"></span></td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 12px;">7. H <span class="answer-line" style="width: 60px;"></span></td>
+                        <td style="padding: 12px;">8. B <span class="answer-line" style="width: 60px;"></span></td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 12px;">9. I <span class="answer-line" style="width: 60px;"></span></td>
+                        <td style="padding: 12px;">10. D <span class="answer-line" style="width: 60px;"></span></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        
+        <!-- חלק 2: תרגום למילים -->
+        <div class="question-section">
+            <h2>Part 2: Translate to English (20 points)</h2>
+            
+            <div class="question">
+                <div class="question-number">תרגם/י את המילים הבאות לאנגלית:</div>
+                <table style="width: 100%; margin-top: 10px;">
+                    <tr>
+                        <td style="padding: 8px;">1. ילד - <span class="answer-line"></span></td>
+                        <td style="padding: 8px;">2. ילדה - <span class="answer-line"></span></td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px;">3. כלב - <span class="answer-line"></span></td>
+                        <td style="padding: 8px;">4. חתול - <span class="answer-line"></span></td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px;">5. אדום - <span class="answer-line"></span></td>
+                        <td style="padding: 8px;">6. כחול - <span class="answer-line"></span></td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px;">7. ספר - <span class="answer-line"></span></td>
+                        <td style="padding: 8px;">8. דלת - <span class="answer-line"></span></td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px;">9. טוב - <span class="answer-line"></span></td>
+                        <td style="padding: 8px;">10. מהיר - <span class="answer-line"></span></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        
+        <!-- חלק 3: תרגום לעברית -->
+        <div class="question-section">
+            <h2>Part 3: Translate to Hebrew (20 points)</h2>
+            
+            <div class="question">
+                <div class="question-number">תרגם/י את המילים הבאות לעברית:</div>
+                <table style="width: 100%; margin-top: 10px;">
+                    <tr>
+                        <td style="padding: 8px;">1. apple - <span class="answer-line"></span></td>
+                        <td style="padding: 8px;">2. house - <span class="answer-line"></span></td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px;">3. teacher - <span class="answer-line"></span></td>
+                        <td style="padding: 8px;">4. pencil - <span class="answer-line"></span></td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px;">5. happy - <span class="answer-line"></span></td>
+                        <td style="padding: 8px;">6. tall - <span class="answer-line"></span></td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px;">7. grandma - <span class="answer-line"></span></td>
+                        <td style="padding: 8px;">8. sister - <span class="answer-line"></span></td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px;">9. yellow - <span class="answer-line"></span></td>
+                        <td style="padding: 8px;">10. elephant - <span class="answer-line"></span></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        
+        <!-- חלק 4: מספרים -->
+        <div class="question-section">
+            <h2>Part 4: Numbers (10 points)</h2>
+            
+            <div class="question">
+                <div class="question-number">Write the numbers in English:</div>
+                <table style="width: 100%; margin-top: 10px;">
+                    <tr>
+                        <td style="padding: 8px;">1. 3 - <span class="answer-line"></span></td>
+                        <td style="padding: 8px;">2. 7 - <span class="answer-line"></span></td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px;">3. 10 - <span class="answer-line"></span></td>
+                        <td style="padding: 8px;">4. 12 - <span class="answer-line"></span></td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px;">5. 0 - <span class="answer-line"></span></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        
+        <!-- חלק 5: השלמת משפטים -->
+        <div class="question-section">
+            <h2>Part 5: Complete the Sentences (15 points)</h2>
+            
+            <div class="word-bank">
+                <div class="word-bank-title">בנק מילים:</div>
+                <div class="word-options">
+                    <span class="word-option">hello</span>
+                    <span class="word-option">thank you</span>
+                    <span class="word-option">what</span>
+                    <span class="word-option">open</span>
+                    <span class="word-option">sit down</span>
+                </div>
+            </div>
+            
+            <div class="question" style="direction: ltr; text-align: left;">
+                <p>1. <span class="answer-line" style="width: 120px;"></span>, my name is Dan.</p>
+                <p>2. <span class="answer-line" style="width: 120px;"></span> is your name?</p>
+                <p>3. <span class="answer-line" style="width: 120px;"></span> the door, please.</p>
+                <p>4. <span class="answer-line" style="width: 120px;"></span> for the gift!</p>
+                <p>5. Please <span class="answer-line" style="width: 120px;"></span> and listen.</p>
+            </div>
+        </div>
+        
+        <!-- חלק 6: חיבור -->
+        <div class="question-section">
+            <h2>Part 6: Matching (20 points)</h2>
+            
+            <div class="question">
+                <div class="question-number">חבר/י את המשפט באנגלית לתרגום בעברית:</div>
+                <table class="matching-table">
+                    <tr>
+                        <td class="english">1. Good morning</td>
+                        <td class="answer"></td>
+                        <td class="hebrew">א. איך קוראים לך?</td>
+                    </tr>
+                    <tr>
+                        <td class="english">2. How are you?</td>
+                        <td class="answer"></td>
+                        <td class="hebrew">ב. בוקר טוב</td>
+                    </tr>
+                    <tr>
+                        <td class="english">3. What's your name?</td>
+                        <td class="answer"></td>
+                        <td class="hebrew">ג. להתראות</td>
+                    </tr>
+                    <tr>
+                        <td class="english">4. I like...</td>
+                        <td class="answer"></td>
+                        <td class="hebrew">ד. מה שלומך?</td>
+                    </tr>
+                    <tr>
+                        <td class="english">5. Goodbye</td>
+                        <td class="answer"></td>
+                        <td class="hebrew">ה. אני אוהב/ת...</td>
+                    </tr>
+                    <tr>
+                        <td class="english">6. Thank you</td>
+                        <td class="answer"></td>
+                        <td class="hebrew">ו. אני רואה...</td>
+                    </tr>
+                    <tr>
+                        <td class="english">7. I see...</td>
+                        <td class="answer"></td>
+                        <td class="hebrew">ז. בבקשה (you're welcome)</td>
+                    </tr>
+                    <tr>
+                        <td class="english">8. You're welcome</td>
+                        <td class="answer"></td>
+                        <td class="hebrew">ח. תודה רבה</td>
+                    </tr>
+                    <tr>
+                        <td class="english">9. I'm fine</td>
+                        <td class="answer"></td>
+                        <td class="hebrew">ט. אני בסדר</td>
+                    </tr>
+                    <tr>
+                        <td class="english">10. Look!</td>
+                        <td class="answer"></td>
+                        <td class="hebrew">י. תסתכל/י!</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        
+        <!-- חלק 7: כתיבת משפט -->
+        <div class="question-section">
+            <h2>Part 7: Write About Yourself (10 points)</h2>
+            
+            <div class="question" style="direction: ltr; text-align: left;">
+                <div class="question-number" style="direction: rtl; text-align: right;">כתוב/כתבי 2-3 משפטים על עצמך באנגלית:</div>
+                <p style="margin-top: 15px;">Use: My name is..., I am..., I like...</p>
+                <div style="margin-top: 20px;">
+                    <div style="border-bottom: 1px solid #333; margin: 15px 0; height: 25px;"></div>
+                    <div style="border-bottom: 1px solid #333; margin: 15px 0; height: 25px;"></div>
+                    <div style="border-bottom: 1px solid #333; margin: 15px 0; height: 25px;"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 40px; padding: 20px; background-color: #e8f5e9; border-radius: 5px;">
+            <h3 style="color: #2e7d32; margin: 0;">Good Luck! 🌟 בהצלחה!</h3>
+        </div>
+    </div>
+</body>
+</html>
