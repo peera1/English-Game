@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>משחק ניחוש מספר - כיתה ג'</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #f093fb 0%, #667eea 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 500px;
+            margin: 40px auto;
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            padding: 40px 30px 30px 30px;
+            text-align: center;
+        }
+        h1 {
+            color: #764ba2;
+            margin-bottom: 20px;
+        }
+        .instructions {
+            color: #555;
+            font-size: 1.2em;
+            margin-bottom: 25px;
+        }
+        .input-area {
+            margin-bottom: 20px;
+        }
+        input[type="number"] {
+            font-size: 1.3em;
+            padding: 10px;
+            border-radius: 8px;
+            border: 2px solid #667eea;
+            width: 100px;
+            text-align: center;
+            margin-left: 10px;
+        }
+        button {
+            font-size: 1.1em;
+            padding: 10px 25px;
+            border-radius: 8px;
+            border: none;
+            background: linear-gradient(135deg, #667eea 0%, #f093fb 100%);
+            color: #fff;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.2s;
+        }
+        button:hover {
+            background: linear-gradient(135deg, #f093fb 0%, #667eea 100%);
+            transform: scale(1.05);
+        }
+        .message {
+            font-size: 1.3em;
+            margin: 20px 0;
+            min-height: 2em;
+        }
+        .success {
+            color: #28a745;
+            font-weight: bold;
+        }
+        .fail {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        .attempts {
+            color: #764ba2;
+            font-size: 1.1em;
+            margin-bottom: 10px;
+        }
+        .play-again-btn {
+            margin-top: 25px;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        }
+        @media (max-width: 600px) {
+            .container { padding: 20px 5px; }
+            h1 { font-size: 1.3em; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎲 משחק ניחוש מספר</h1>
+        <div class="instructions">
+            אני חושב על מספר בין <span id="minNum">1</span> ל-<span id="maxNum">100</span>.<br>
+            נסו לגלות מהו!<br>
+            אחרי כל ניחוש, אגיד אם המספר גדול או קטן מדי.
+        </div>
+        <div class="attempts" id="attemptsDisplay">ניסיונות: 0</div>
+        <div class="input-area">
+            <input type="number" id="guessInput" min="1" max="100" placeholder="הכנס מספר">
+            <button onclick="makeGuess()">נחש</button>
+        </div>
+        <div class="message" id="message"></div>
+        <button class="play-again-btn" id="playAgainBtn" onclick="startNewGame()" style="display:none;">🔄 שחק שוב</button>
+    </div>
+    <script>
+        let secretNumber;
+        let attempts;
+        const minNum = 1;
+        const maxNum = 100;
+
+        function startNewGame() {
+            secretNumber = Math.floor(Math.random() * (maxNum - minNum + 1)) + minNum;
+            attempts = 0;
+            document.getElementById('attemptsDisplay').textContent = "ניסיונות: 0";
+            document.getElementById('message').textContent = "";
+            document.getElementById('message').className = "message";
+            document.getElementById('guessInput').value = "";
+            document.getElementById('guessInput').disabled = false;
+            document.querySelector('.input-area button').disabled = false;
+            document.getElementById('playAgainBtn').style.display = "none";
+        }
+
+        function makeGuess() {
+            const input = document.getElementById('guessInput');
+            const guess = Number(input.value);
+            if (!guess || guess < minNum || guess > maxNum) {
+                showMessage("אנא הכנס מספר בין 1 ל-100", "fail");
+                return;
+            }
+            attempts++;
+            document.getElementById('attemptsDisplay').textContent = "ניסיונות: " + attempts;
+            if (guess === secretNumber) {
+                showMessage("כל הכבוד! ניחשת נכון! המספר הוא " + secretNumber + " 🎉", "success");
+                input.disabled = true;
+                document.querySelector('.input-area button').disabled = true;
+                document.getElementById('playAgainBtn').style.display = "inline-block";
+            } else if (guess < secretNumber) {
+                showMessage("המספר שלי גדול יותר!", "fail");
+            } else {
+                showMessage("המספר שלי קטן יותר!", "fail");
+            }
+            input.value = "";
+            input.focus();
+        }
+
+        function showMessage(msg, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = msg;
+            messageDiv.className = "message " + type;
+        }
+
+        // הצג את טווח המספרים
+        document.getElementById('minNum').textContent = minNum;
+        document.getElementById('maxNum').textContent = maxNum;
+
+        // התחל משחק חדש אוטומטית
+        window.onload = startNewGame;
+
+        // אפשר ניחוש גם בלחיצה על Enter
+        document.getElementById('guessInput').addEventListener('keyup', function(e) {
+            if (e.key === 'Enter') makeGuess();
+        });
+    </script>
+</body>
+</html>
