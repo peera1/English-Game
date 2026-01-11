@@ -418,180 +418,199 @@ const wordBank = [
     { word: "purple", hebrew: "סגול", sentence: "The grape is purple." }
 ];
 
-        let currentWords = [];
-        let selectedWord = null;
-        let matches = {};
-        let results = [];
-        let correctSentences = [];
+let currentWords = [];
+let selectedWord = null;
+let matches = {};
+let results = [];
+let correctSentences = [];
+let attempts = {}; // Track attempts per word
 
-        function shuffleArray(arr) {
-            const newArr = [...arr];
-            for (let i = newArr.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [newArr[i], newArr[j]] = [newArr[j], newArr[i]];
-            }
-            return newArr;
+function shuffleArray(arr) {
+    const newArr = [...arr];
+    for (let i = newArr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [newArr[i], newArr[j]] = [newArr[j], newArr[i]];
+    }
+    return newArr;
+}
+
+function getRandomWords() {
+    return shuffleArray(wordBank).slice(0, 10);
+}
+
+function speak(text, lang = 'en-US') {
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = lang;
+    utterance.rate = 0.8;
+    speechSynthesis.speak(utterance);
+}
+
+function startNewGame() {
+    currentWords = getRandomWords();
+    selectedWord = null;
+    matches = {};
+    results = [];
+    correctSentences = [];
+    attempts = {};
+    document.getElementById('gameView').classList.remove('hidden');
+    document.getElementById('summaryView').classList.add('hidden');
+    renderGame();
+    updateSentencesList();
+}
+
+function renderGame() {
+    const englishDiv = document.getElementById('englishWords');
+    const hebrewDiv = document.getElementById('hebrewWords');
+    englishDiv.innerHTML = '';
+    hebrewDiv.innerHTML = '';
+
+    currentWords.forEach(item => {
+        const btn = document.createElement('button');
+        btn.className = 'word-btn';
+        const speaker = document.createElement('span');
+        speaker.className = 'speaker-icon';
+        speaker.textContent = '🔊';
+        speaker.onclick = (e) => {
+            e.stopPropagation();
+            speak(item.word, 'en-US');
+        };
+        btn.appendChild(speaker);
+        const textSpan = document.createElement('span');
+        textSpan.textContent = item.word;
+        btn.appendChild(textSpan);
+        btn.onclick = () => selectWord(item.word);
+
+        if (matches[item.word]) {
+            btn.disabled = true;
+            btn.classList.add('correct');
+            const resultIcon = document.createElement('span');
+            resultIcon.textContent = ' ✓';
+            btn.appendChild(resultIcon);
+        } else if (selectedWord === item.word) {
+            btn.classList.add('selected');
+        } else {
+            btn.classList.add('available');
         }
+        englishDiv.appendChild(btn);
+    });
 
-        function getRandomWords() {
-            return shuffleArray(wordBank).slice(0, 10);
+    // Shuffle Hebrew words for display
+    const shuffledHebrew = shuffleArray(currentWords);
+    shuffledHebrew.forEach(item => {
+        const btn = document.createElement('button');
+        btn.className = 'word-btn hebrew-btn';
+        btn.textContent = item.hebrew;
+        btn.onclick = () => selectHebrew(item.hebrew);
+
+        // Only disable if already matched correctly
+        if (Object.values(matches).includes(item.hebrew)) {
+            btn.disabled = true;
+            btn.classList.add('correct');
         }
+        hebrewDiv.appendChild(btn);
+    });
 
-        function speak(text, lang = 'en-US') {
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = lang;
-            utterance.rate = 0.8;
-            speechSynthesis.speak(utterance);
+    // Update match count
+    document.getElementById('matchCount').textContent = Object.keys(matches).length;
+}
+
+function selectWord(word) {
+    if (matches[word]) return;
+    selectedWord = word;
+    renderGame();
+}
+
+function selectHebrew(hebrew) {
+    if (!selectedWord) return;
+    const item = currentWords.find(w => w.word === selectedWord);
+    if (!attempts[selectedWord]) attempts[selectedWord] = 0;
+    attempts[selectedWord] += 1;
+    const correct = item && item.hebrew === hebrew;
+    if (correct) {
+        matches[selectedWord] = hebrew;
+        results.push({
+            word: selectedWord,
+            hebrew: hebrew,
+            correct: true,
+            sentence: item ? item.sentence : '',
+            tries: attempts[selectedWord]
+        });
+        correctSentences.push({
+            word: selectedWord,
+            hebrew: hebrew,
+            sentence: item.sentence
+        });
+        selectedWord = null;
+        renderGame();
+        updateSentencesList();
+        if (Object.keys(matches).length === 10) {
+            setTimeout(showSummary, 800);
         }
+    } else {
+        // Just record the attempt, don't disable anything
+        results.push({
+            word: selectedWord,
+            hebrew: hebrew,
+            correct: false,
+            sentence: item ? item.sentence : '',
+            tries: attempts[selectedWord]
+        });
+        // Keep the word selected so the player can try again
+        renderGame();
+    }
+}
 
-        function startNewGame() {
-            currentWords = getRandomWords();
-            selectedWord = null;
-            matches = {};
-            results = [];
-            correctSentences = [];
-            document.getElementById('gameView').classList.remove('hidden');
-            document.getElementById('summaryView').classList.add('hidden');
-            renderGame();
-            updateSentencesList();
-        }
+function updateSentencesList() {
+    const list = document.getElementById('sentencesList');
+    if (correctSentences.length === 0) {
+        list.innerHTML = `<div class="empty-sentences">
+            🎯 המשפטים שלך יופיעו כאן<br>
+            אחרי שתתאים מילים נכון!
+        </div>`;
+        return;
+    }
+    list.innerHTML = '';
+    correctSentences.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'sentence-item';
+        div.innerHTML = `
+            <div class="sentence-word">${item.word} <span style="font-size:1.2em;">→</span> ${item.hebrew}</div>
+            <div class="sentence-text">${item.sentence}</div>
+        `;
+        list.appendChild(div);
+    });
+}
 
-        function renderGame() {
-            const englishDiv = document.getElementById('englishWords');
-            const hebrewDiv = document.getElementById('hebrewWords');
-            englishDiv.innerHTML = '';
-            hebrewDiv.innerHTML = '';
+function showSummary() {
+    document.getElementById('gameView').classList.add('hidden');
+    document.getElementById('summaryView').classList.remove('hidden');
+    document.getElementById('finalScore').textContent = Object.keys(matches).length;
+    // Stars
+    let stars = '';
+    const score = Object.keys(matches).length;
+    for (let i = 0; i < Math.floor(score / 2); i++) stars += '⭐';
+    document.getElementById('starsDisplay').textContent = stars;
+    // Results
+    const resultsList = document.getElementById('resultsList');
+    resultsList.innerHTML = '';
+    // Show only the first correct match for each word, and all attempts
+    currentWords.forEach(item => {
+        const wordResults = results.filter(r => r.word === item.word);
+        const correctResult = wordResults.find(r => r.correct);
+        const tries = attempts[item.word] || 0;
+        const div = document.createElement('div');
+        div.className = 'result-item ' + (correctResult ? 'correct' : 'incorrect');
+        div.innerHTML = `
+            <div class="result-word">${item.word} <span style="font-size:1.2em;">→</span> ${item.hebrew}</div>
+            <div class="result-detail">${correctResult ? 'נכון!' : 'לא נכון.'} ניסיונות: ${tries}</div>
+            <div class="result-sentence">${item.sentence}</div>
+        `;
+        resultsList.appendChild(div);
+    });
+}
 
-            currentWords.forEach(item => {
-                const btn = document.createElement('button');
-                btn.className = 'word-btn';
-                const speaker = document.createElement('span');
-                speaker.className = 'speaker-icon';
-                speaker.textContent = '🔊';
-                speaker.onclick = (e) => {
-                    e.stopPropagation();
-                    speak(item.word, 'en-US');
-                };
-                btn.appendChild(speaker);
-                const textSpan = document.createElement('span');
-                textSpan.textContent = item.word;
-                btn.appendChild(textSpan);
-                btn.onclick = () => selectWord(item.word);
-
-                if (matches[item.word]) {
-                    btn.disabled = true;
-                    const result = results.find(r => r.word === item.word);
-                    btn.classList.add(result && result.correct ? 'correct' : 'incorrect');
-                    const resultIcon = document.createElement('span');
-                    resultIcon.textContent = ' ' + (result && result.correct ? '✓' : '✗');
-                    btn.appendChild(resultIcon);
-                } else if (selectedWord === item.word) {
-                    btn.classList.add('selected');
-                } else {
-                    btn.classList.add('available');
-                }
-                englishDiv.appendChild(btn);
-            });
-
-            // Shuffle Hebrew words for display
-            const shuffledHebrew = shuffleArray(currentWords);
-            shuffledHebrew.forEach(item => {
-                const btn = document.createElement('button');
-                btn.className = 'word-btn hebrew-btn';
-                btn.textContent = item.hebrew;
-                btn.onclick = () => selectHebrew(item.hebrew);
-
-                if (Object.values(matches).includes(item.hebrew)) {
-                    btn.disabled = true;
-                    const result = results.find(r => r.hebrew === item.hebrew);
-                    btn.classList.add(result && result.correct ? 'correct' : 'incorrect');
-                }
-                hebrewDiv.appendChild(btn);
-            });
-
-            // Update match count
-            document.getElementById('matchCount').textContent = Object.keys(matches).length;
-        }
-
-        function selectWord(word) {
-            if (matches[word]) return;
-            selectedWord = word;
-            renderGame();
-        }
-
-        function selectHebrew(hebrew) {
-            if (!selectedWord) return;
-            const item = currentWords.find(w => w.word === selectedWord);
-            const correct = item && item.hebrew === hebrew;
-            matches[selectedWord] = hebrew;
-            results.push({
-                word: selectedWord,
-                hebrew: hebrew,
-                correct: correct,
-                sentence: item ? item.sentence : ''
-            });
-            if (correct) {
-                correctSentences.push({
-                    word: selectedWord,
-                    hebrew: hebrew,
-                    sentence: item.sentence
-                });
-            }
-            selectedWord = null;
-            renderGame();
-            updateSentencesList();
-            if (Object.keys(matches).length === 10) {
-                setTimeout(showSummary, 800);
-            }
-        }
-
-        function updateSentencesList() {
-            const list = document.getElementById('sentencesList');
-            if (correctSentences.length === 0) {
-                list.innerHTML = `<div class="empty-sentences">
-                    🎯 המשפטים שלך יופיעו כאן<br>
-                    אחרי שתתאים מילים נכון!
-                </div>`;
-                return;
-            }
-            list.innerHTML = '';
-            correctSentences.forEach(item => {
-                const div = document.createElement('div');
-                div.className = 'sentence-item';
-                div.innerHTML = `
-                    <div class="sentence-word">${item.word} <span style="font-size:1.2em;">→</span> ${item.hebrew}</div>
-                    <div class="sentence-text">${item.sentence}</div>
-                `;
-                list.appendChild(div);
-            });
-        }
-
-        function showSummary() {
-            document.getElementById('gameView').classList.add('hidden');
-            document.getElementById('summaryView').classList.remove('hidden');
-            document.getElementById('finalScore').textContent = results.filter(r => r.correct).length;
-            // Stars
-            let stars = '';
-            const score = results.filter(r => r.correct).length;
-            for (let i = 0; i < Math.floor(score / 2); i++) stars += '⭐';
-            document.getElementById('starsDisplay').textContent = stars;
-            // Results
-            const resultsList = document.getElementById('resultsList');
-            resultsList.innerHTML = '';
-            results.forEach(r => {
-                const div = document.createElement('div');
-                div.className = 'result-item ' + (r.correct ? 'correct' : 'incorrect');
-                div.innerHTML = `
-                    <div class="result-word">${r.word} <span style="font-size:1.2em;">→</span> ${r.hebrew}</div>
-                    <div class="result-detail">${r.correct ? 'נכון!' : 'לא נכון.'}</div>
-                    <div class="result-sentence">${r.sentence}</div>
-                `;
-                resultsList.appendChild(div);
-            });
-        }
-
-        // התחל משחק אוטומטית
-        window.onload = startNewGame;
+// התחל משחק אוטומטית
+window.onload = startNewGame;
     </script>
 </body>
 </html>
