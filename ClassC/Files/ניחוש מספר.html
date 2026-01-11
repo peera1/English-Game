@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>משחק ניחוש מספר - כיתה ג'</title>
+    <title>Number Guessing Game - Grade 3</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -87,19 +87,19 @@
 </head>
 <body>
     <div class="container">
-        <h1>🎲 משחק ניחוש מספר</h1>
+        <h1>🎲 Number Guessing Game</h1>
         <div class="instructions">
-            אני חושב על מספר בין <span id="minNum">1</span> ל-<span id="maxNum">100</span>.<br>
-            נסו לגלות מהו!<br>
-            אחרי כל ניחוש, אגיד אם המספר גדול או קטן מדי.
+            I'm thinking of a number between <span id="minNum">1</span> and <span id="maxNum">100</span>.<br>
+            Try to guess what it is!<br>
+            After each guess, I'll tell you if the number is too high or too low.
         </div>
-        <div class="attempts" id="attemptsDisplay">ניסיונות: 0</div>
+        <div class="attempts" id="attemptsDisplay">Attempts: 0</div>
         <div class="input-area">
-            <input type="number" id="guessInput" min="1" max="100" placeholder="הכנס מספר">
-            <button onclick="makeGuess()">נחש</button>
+            <input type="number" id="guessInput" min="1" max="100" placeholder="Enter a number">
+            <button onclick="makeGuess()">Guess</button>
         </div>
         <div class="message" id="message"></div>
-        <button class="play-again-btn" id="playAgainBtn" onclick="startNewGame()" style="display:none;">🔄 שחק שוב</button>
+        <button class="play-again-btn" id="playAgainBtn" onclick="startNewGame()" style="display:none;">🔄 Play Again</button>
     </div>
     <script>
         let secretNumber;
@@ -110,7 +110,7 @@
         function startNewGame() {
             secretNumber = Math.floor(Math.random() * (maxNum - minNum + 1)) + minNum;
             attempts = 0;
-            document.getElementById('attemptsDisplay').textContent = "ניסיונות: 0";
+            document.getElementById('attemptsDisplay').textContent = "Attempts: 0";
             document.getElementById('message').textContent = "";
             document.getElementById('message').className = "message";
             document.getElementById('guessInput').value = "";
@@ -123,20 +123,20 @@
             const input = document.getElementById('guessInput');
             const guess = Number(input.value);
             if (!guess || guess < minNum || guess > maxNum) {
-                showMessage("אנא הכנס מספר בין 1 ל-100", "fail");
+                showMessage("Please enter a number between 1 and 100", "fail");
                 return;
             }
             attempts++;
-            document.getElementById('attemptsDisplay').textContent = "ניסיונות: " + attempts;
+            document.getElementById('attemptsDisplay').textContent = "Attempts: " + attempts;
             if (guess === secretNumber) {
-                showMessage("כל הכבוד! ניחשת נכון! המספר הוא " + secretNumber + " 🎉", "success");
+                showMessage("Congratulations! You guessed it! The number was " + secretNumber + " 🎉", "success");
                 input.disabled = true;
                 document.querySelector('.input-area button').disabled = true;
                 document.getElementById('playAgainBtn').style.display = "inline-block";
             } else if (guess < secretNumber) {
-                showMessage("המספר שלי גדול יותר!", "fail");
+                showMessage("My number is higher!", "fail");
             } else {
-                showMessage("המספר שלי קטן יותר!", "fail");
+                showMessage("My number is lower!", "fail");
             }
             input.value = "";
             input.focus();
@@ -148,14 +148,14 @@
             messageDiv.className = "message " + type;
         }
 
-        // הצג את טווח המספרים
+        // Display the number range
         document.getElementById('minNum').textContent = minNum;
         document.getElementById('maxNum').textContent = maxNum;
 
-        // התחל משחק חדש אוטומטית
+        // Start a new game automatically
         window.onload = startNewGame;
 
-        // אפשר ניחוש גם בלחיצה על Enter
+        // Allow guessing by pressing Enter
         document.getElementById('guessInput').addEventListener('keyup', function(e) {
             if (e.key === 'Enter') makeGuess();
         });
