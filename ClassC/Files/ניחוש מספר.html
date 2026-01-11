@@ -1,20 +1,27 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Number Guessing Game - Grade 3</title>
+    <title>משחק ניחוש מספרים - כיתה ג'</title>
     <style>
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: 'Varela Round', Arial, sans-serif;
             background: linear-gradient(135deg, #f093fb 0%, #667eea 100%);
             min-height: 100vh;
             margin: 0;
             padding: 0;
+            direction: rtl;
+        }
+        .main-flex {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 40px;
+            margin-top: 40px;
         }
         .container {
-            max-width: 500px;
-            margin: 40px auto;
+            max-width: 400px;
             background: #fff;
             border-radius: 20px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
@@ -24,6 +31,7 @@
         h1 {
             color: #764ba2;
             margin-bottom: 20px;
+            font-size: 2em;
         }
         .instructions {
             color: #555;
@@ -79,65 +87,132 @@
             margin-top: 25px;
             background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
         }
+        /* Guess board styles */
+        .guess-board-container {
+            min-width: 220px;
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            padding: 30px 20px 20px 20px;
+            margin-top: 0;
+            text-align: center;
+        }
+        .guess-board-title {
+            color: #667eea;
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+        .guess-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            max-height: 320px;
+            overflow-y: auto;
+        }
+        .guess-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #f7f7fa;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            padding: 8px 14px;
+            font-size: 1.1em;
+            box-shadow: 0 2px 8px rgba(102,126,234,0.07);
+            transition: background 0.2s;
+        }
+        .guess-item:last-child {
+            background: #e0e7ff;
+            font-weight: bold;
+        }
+        .arrow {
+            font-size: 1.3em;
+            margin-right: 10px;
+            margin-left: 10px;
+        }
+        .arrow.up { color: #28a745; }
+        .arrow.down { color: #dc3545; }
+        .arrow.equal { color: #ff9800; }
+        @media (max-width: 900px) {
+            .main-flex { flex-direction: column; align-items: center; gap: 20px; }
+            .guess-board-container { margin-top: 20px; }
+        }
         @media (max-width: 600px) {
-            .container { padding: 20px 5px; }
+            .container, .guess-board-container { padding: 20px 5px; }
             h1 { font-size: 1.3em; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🎲 Number Guessing Game</h1>
-        <div class="instructions">
-            I'm thinking of a number between <span id="minNum">1</span> and <span id="maxNum">100</span>.<br>
-            Try to guess what it is!<br>
-            After each guess, I'll tell you if the number is too high or too low.
+    <div class="main-flex">
+        <div class="container">
+            <h1>🎲 משחק ניחוש מספרים</h1>
+            <div class="instructions">
+                אני חושב על מספר בין <span id="minNum">1</span> ל-<span id="maxNum">100</span>.<br>
+                נסו לנחש מהו!<br>
+                אחרי כל ניחוש אגיד אם המספר גבוה או נמוך.
+            </div>
+            <div class="attempts" id="attemptsDisplay">ניסיונות: 0</div>
+            <div class="input-area">
+                <input type="number" id="guessInput" min="1" max="100" placeholder="הכנס מספר">
+                <button onclick="makeGuess()">נחש</button>
+            </div>
+            <div class="message" id="message"></div>
+            <button class="play-again-btn" id="playAgainBtn" onclick="startNewGame()" style="display:none;">🔄 שחק שוב</button>
         </div>
-        <div class="attempts" id="attemptsDisplay">Attempts: 0</div>
-        <div class="input-area">
-            <input type="number" id="guessInput" min="1" max="100" placeholder="Enter a number">
-            <button onclick="makeGuess()">Guess</button>
+        <div class="guess-board-container">
+            <div class="guess-board-title">לוח הניחושים שלך</div>
+            <ul class="guess-list" id="guessList"></ul>
         </div>
-        <div class="message" id="message"></div>
-        <button class="play-again-btn" id="playAgainBtn" onclick="startNewGame()" style="display:none;">🔄 Play Again</button>
     </div>
     <script>
         let secretNumber;
         let attempts;
         const minNum = 1;
         const maxNum = 100;
+        let guesses = [];
 
         function startNewGame() {
             secretNumber = Math.floor(Math.random() * (maxNum - minNum + 1)) + minNum;
             attempts = 0;
-            document.getElementById('attemptsDisplay').textContent = "Attempts: 0";
+            guesses = [];
+            document.getElementById('attemptsDisplay').textContent = "ניסיונות: 0";
             document.getElementById('message').textContent = "";
             document.getElementById('message').className = "message";
             document.getElementById('guessInput').value = "";
             document.getElementById('guessInput').disabled = false;
             document.querySelector('.input-area button').disabled = false;
             document.getElementById('playAgainBtn').style.display = "none";
+            updateGuessBoard();
         }
 
         function makeGuess() {
             const input = document.getElementById('guessInput');
             const guess = Number(input.value);
             if (!guess || guess < minNum || guess > maxNum) {
-                showMessage("Please enter a number between 1 and 100", "fail");
+                showMessage("אנא הכנס מספר בין 1 ל-100", "fail");
                 return;
             }
             attempts++;
-            document.getElementById('attemptsDisplay').textContent = "Attempts: " + attempts;
+            document.getElementById('attemptsDisplay').textContent = "ניסיונות: " + attempts;
+            let result;
             if (guess === secretNumber) {
-                showMessage("Congratulations! You guessed it! The number was " + secretNumber + " 🎉", "success");
+                showMessage("כל הכבוד! ניחשת נכון! המספר היה " + secretNumber + " 🎉", "success");
                 input.disabled = true;
                 document.querySelector('.input-area button').disabled = true;
                 document.getElementById('playAgainBtn').style.display = "inline-block";
+                result = "equal";
             } else if (guess < secretNumber) {
-                showMessage("My number is higher!", "fail");
+                showMessage("המספר שלי גבוה יותר!", "fail");
+                result = "up";
             } else {
-                showMessage("My number is lower!", "fail");
+                showMessage("המספר שלי נמוך יותר!", "fail");
+                result = "down";
             }
+            guesses.push({num: guess, result: result});
+            updateGuessBoard();
             input.value = "";
             input.focus();
         }
@@ -146,6 +221,18 @@
             const messageDiv = document.getElementById('message');
             messageDiv.textContent = msg;
             messageDiv.className = "message " + type;
+        }
+
+        function updateGuessBoard() {
+            const guessList = document.getElementById('guessList');
+            guessList.innerHTML = "";
+            guesses.forEach((g, idx) => {
+                let arrow = "";
+                if (g.result === "up") arrow = '<span class="arrow up">⬆️</span>';
+                else if (g.result === "down") arrow = '<span class="arrow down">⬇️</span>';
+                else if (g.result === "equal") arrow = '<span class="arrow equal">🎯</span>';
+                guessList.innerHTML += `<li class="guess-item">${arrow}<span>${g.num}</span></li>`;
+            });
         }
 
         // Display the number range
