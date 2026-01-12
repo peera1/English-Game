@@ -167,84 +167,167 @@
         </div>
     </div>
     <script>
-        let secretNumber;
-        let attempts;
-        const minNum = 1;
-        const maxNum = 100;
-        let guesses = [];
-
-        function startNewGame() {
-            secretNumber = Math.floor(Math.random() * (maxNum - minNum + 1)) + minNum;
-            attempts = 0;
-            guesses = [];
-            document.getElementById('attemptsDisplay').textContent = "Attempts: 0";
-            document.getElementById('message').textContent = "";
-            document.getElementById('message').className = "message";
-            document.getElementById('guessInput').value = "";
-            document.getElementById('guessInput').disabled = false;
-            document.querySelector('.input-area button').disabled = false;
-            document.getElementById('playAgainBtn').style.display = "none";
-            updateGuessBoard();
-        }
-
-        function makeGuess() {
-            const input = document.getElementById('guessInput');
-            const guess = Number(input.value);
-            if (!guess || guess < minNum || guess > maxNum) {
-                showMessage("Please enter a number between 1 and 100", "fail");
-                return;
-            }
-            attempts++;
-            document.getElementById('attemptsDisplay').textContent = "Attempts: " + attempts;
-            let result;
-            if (guess === secretNumber) {
-                showMessage("Congratulations! You guessed it! The number was " + secretNumber + " 🎉", "success");
-                input.disabled = true;
-                document.querySelector('.input-area button').disabled = true;
-                document.getElementById('playAgainBtn').style.display = "inline-block";
-                result = "equal";
-            } else if (guess < secretNumber) {
-                showMessage("My number is higher!", "fail");
-                result = "up";
-            } else {
-                showMessage("My number is lower!", "fail");
-                result = "down";
-            }
-            guesses.push({num: guess, result: result});
-            updateGuessBoard();
-            input.value = "";
-            input.focus();
-        }
-
-        function showMessage(msg, type) {
-            const messageDiv = document.getElementById('message');
-            messageDiv.textContent = msg;
-            messageDiv.className = "message " + type;
-        }
-
-        function updateGuessBoard() {
-            const guessList = document.getElementById('guessList');
-            guessList.innerHTML = "";
-            guesses.forEach((g, idx) => {
-                let arrow = "";
-                if (g.result === "up") arrow = '<span class="arrow up">⬆️</span>';
-                else if (g.result === "down") arrow = '<span class="arrow down">⬇️</span>';
-                else if (g.result === "equal") arrow = '<span class="arrow equal">🎯</span>';
-                guessList.innerHTML += `<li class="guess-item">${arrow}<span>${g.num}</span></li>`;
+        (function() {
+            'use strict';
+            
+            // Disable console methods
+            const noop = function() {};
+            ['log', 'debug', 'info', 'warn', 'error', 'trace', 'dir', 'dirxml', 
+             'group', 'groupCollapsed', 'groupEnd', 'clear', 'count', 'countReset',
+             'assert', 'profile', 'profileEnd', 'time', 'timeLog', 'timeEnd', 'timeStamp',
+             'table', 'exception', 'memory'].forEach(method => {
+                if (console[method]) {
+                    console[method] = noop;
+                }
             });
-        }
+            
+            // Detect DevTools
+            let devtoolsOpen = false;
+            const devtoolsDetector = () => {
+                const threshold = 160;
+                if (window.outerWidth - window.innerWidth > threshold || 
+                    window.outerHeight - window.innerHeight > threshold) {
+                    if (!devtoolsOpen) {
+                        devtoolsOpen = true;
+                        alert('נא לסגור את כלי הפיתוח (DevTools) כדי להמשיך לשחק! 🚫');
+                        location.reload();
+                    }
+                }
+            };
+            setInterval(devtoolsDetector, 1000);
+            
+            // Disable right-click
+            document.addEventListener('contextmenu', e => e.preventDefault());
+            
+            // Disable common debug shortcuts
+            document.addEventListener('keydown', e => {
+                // F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C, Ctrl+U
+                if (e.key === 'F12' || 
+                    (e.ctrlKey && e.shiftKey && ['I', 'J', 'C'].includes(e.key)) ||
+                    (e.ctrlKey && e.key === 'u')) {
+                    e.preventDefault();
+                    alert('פעולה זו אינה מותרת במשחק! 🚫');
+                    return false;
+                }
+            });
+            
+            // Use closure to hide the secret number
+            let gameState = (function() {
+                let _secret = 0;
+                let _attempts = 0;
+                let _guesses = [];
+                const minNum = 1;
+                const maxNum = 100;
+                
+                return {
+                    newGame: function() {
+                        _secret = Math.floor(Math.random() * (maxNum - minNum + 1)) + minNum;
+                        _attempts = 0;
+                        _guesses = [];
+                    },
+                    checkGuess: function(guess) {
+                        _attempts++;
+                        let result;
+                        if (guess === _secret) {
+                            result = { match: true, message: "Congratulations! You guessed it! The number was " + _secret + " 🎉", attempts: _attempts };
+                        } else if (guess < _secret) {
+                            result = { match: false, message: "My number is higher!", direction: "up", attempts: _attempts };
+                        } else {
+                            result = { match: false, message: "My number is lower!", direction: "down", attempts: _attempts };
+                        }
+                        _guesses.push({ num: guess, result: result.match ? "equal" : result.direction });
+                        return result;
+                    },
+                    getAttempts: function() {
+                        return _attempts;
+                    },
+                    getGuesses: function() {
+                        return [..._guesses];
+                    },
+                    getRange: function() {
+                        return { min: minNum, max: maxNum };
+                    }
+                };
+            })();
 
-        // Display the number range
-        document.getElementById('minNum').textContent = minNum;
-        document.getElementById('maxNum').textContent = maxNum;
+            function startNewGame() {
+                gameState.newGame();
+                document.getElementById('attemptsDisplay').textContent = "Attempts: 0";
+                document.getElementById('message').textContent = "";
+                document.getElementById('message').className = "message";
+                document.getElementById('guessInput').value = "";
+                document.getElementById('guessInput').disabled = false;
+                document.querySelector('.input-area button').disabled = false;
+                document.getElementById('playAgainBtn').style.display = "none";
+                updateGuessBoard();
+            }
 
-        // Start a new game automatically
-        window.onload = startNewGame;
+            function makeGuess() {
+                const input = document.getElementById('guessInput');
+                const guess = Number(input.value);
+                const range = gameState.getRange();
+                
+                if (!guess || guess < range.min || guess > range.max) {
+                    showMessage("Please enter a number between 1 and 100", "fail");
+                    return;
+                }
+                
+                const result = gameState.checkGuess(guess);
+                document.getElementById('attemptsDisplay').textContent = "Attempts: " + result.attempts;
+                
+                if (result.match) {
+                    showMessage(result.message, "success");
+                    input.disabled = true;
+                    document.querySelector('.input-area button').disabled = true;
+                    document.getElementById('playAgainBtn').style.display = "inline-block";
+                } else {
+                    showMessage(result.message, "fail");
+                }
+                
+                updateGuessBoard();
+                input.value = "";
+                input.focus();
+            }
 
-        // Allow guessing by pressing Enter
-        document.getElementById('guessInput').addEventListener('keyup', function(e) {
-            if (e.key === 'Enter') makeGuess();
-        });
+            function showMessage(msg, type) {
+                const messageDiv = document.getElementById('message');
+                messageDiv.textContent = msg;
+                messageDiv.className = "message " + type;
+            }
+
+            function updateGuessBoard() {
+                const guessList = document.getElementById('guessList');
+                const guesses = gameState.getGuesses();
+                guessList.innerHTML = "";
+                guesses.forEach((g) => {
+                    let arrow = "";
+                    if (g.result === "up") arrow = '<span class="arrow up">⬆️</span>';
+                    else if (g.result === "down") arrow = '<span class="arrow down">⬇️</span>';
+                    else if (g.result === "equal") arrow = '<span class="arrow equal">🎯</span>';
+                    guessList.innerHTML += `<li class="guess-item">${arrow}<span>${g.num}</span></li>`;
+                });
+            }
+
+            // Display the number range
+            const range = gameState.getRange();
+            document.getElementById('minNum').textContent = range.min;
+            document.getElementById('maxNum').textContent = range.max;
+
+            // Start a new game automatically
+            window.onload = startNewGame;
+
+            // Allow guessing by pressing Enter
+            document.getElementById('guessInput').addEventListener('keyup', function(e) {
+                if (e.key === 'Enter') makeGuess();
+            });
+            
+            // Make functions global but protected
+            window.makeGuess = makeGuess;
+            window.startNewGame = startNewGame;
+            
+            // Freeze critical objects
+            Object.freeze(gameState);
+        })();
     </script>
 </body>
 </html>
