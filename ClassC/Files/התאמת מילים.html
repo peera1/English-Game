@@ -65,6 +65,8 @@
         .word-btn.incorrect { border-color: #f44336; background: #ffcdd2; color: #c62828; }
         .word-btn:disabled { cursor: not-allowed; opacity: 0.5; }
         .hebrew-btn { border-color: #f093fb; color: #f093fb; background: #fce4ec; }
+        .hebrew-btn.available { border-color: #f093fb; color: #f093fb; background: #fce4ec; }
+        .hebrew-btn.selected { border-color: #ffd54f; background: #fff9c4; color: #f57f17; transform: scale(1.05); }
         .hebrew-btn:disabled { background: #f5f5f5; color: #bdbdbd; border-color: #e0e0e0; }
         .speaker-icon {
             position: absolute;
@@ -184,7 +186,7 @@
         <div id="gameView">
             <div class="header">
                 <h1>🎮 משחק התאמת מילים</h1>
-                <p style="font-size: 1.2em; color: #666; margin: 10px 0;">לחץ על מילה באנגלית, ואז על התרגום שלה בעברית!</p>
+                <p style="font-size: 1.2em; color: #666; margin: 10px 0;">לחץ על מילה בצד אחד, ואז על המילה המתאימה בצד השני!</p>
                 <p style="font-size: 1em; color: #999; margin: 5px 0;">לחץ על 🔊 כדי לשמוע את המילה</p>
                 <div class="score">הותאמו: <span id="matchCount">0</span> / 10</div>
             </div>
@@ -252,7 +254,6 @@ const wordBank = [
     { word: "pen", hebrew: "עט", sentence: "I write with a pen." },
     { word: "bag", hebrew: "תיק", sentence: "My bag is heavy." },
     { word: "desk", hebrew: "שולחן כתיבה", sentence: "The desk is brown." },
-    { word: "window", hebrew: "חלון", sentence: "The window is open." },
     { word: "floor", hebrew: "רצפה", sentence: "The floor is clean." },
     { word: "wall", hebrew: "קיר", sentence: "The wall is white." },
     { word: "bed", hebrew: "מיטה", sentence: "I sleep in my bed." },
@@ -323,7 +324,6 @@ const wordBank = [
     { word: "goat", hebrew: "עז", sentence: "The goat eats grass." },
     { word: "chicken", hebrew: "תרנגולת", sentence: "The chicken lays eggs." },
     { word: "duck", hebrew: "ברווז", sentence: "The duck swims in the pond." },
-    { word: "fish", hebrew: "דג", sentence: "The fish swims in the water." },
     { word: "frog", hebrew: "צפרדע", sentence: "The frog jumps." },
     { word: "rabbit", hebrew: "ארנב", sentence: "The rabbit eats carrots." },
     { word: "mouse", hebrew: "עכבר", sentence: "The mouse is small." },
@@ -341,10 +341,6 @@ const wordBank = [
     { word: "butterfly", hebrew: "פרפר", sentence: "The butterfly is colorful." },
     { word: "spider", hebrew: "עכביש", sentence: "The spider spins a web." },
     { word: "fly", hebrew: "זבוב", sentence: "The fly is buzzing." },
-    { word: "bird", hebrew: "ציפור", sentence: "The bird sings." },
-    { word: "duck", hebrew: "ברווז", sentence: "The duck quacks." },
-    { word: "hen", hebrew: "תרנגולת", sentence: "The hen lays eggs." },
-    { word: "egg", hebrew: "ביצה", sentence: "The egg is white." },
     { word: "nest", hebrew: "קן", sentence: "The bird builds a nest." },
     { word: "wing", hebrew: "כנף", sentence: "The bird has wings." },
     { word: "tail", hebrew: "זנב", sentence: "The dog wags its tail." },
@@ -414,16 +410,17 @@ const wordBank = [
     { word: "white", hebrew: "לבן", sentence: "The snow is white." },
     { word: "brown", hebrew: "חום", sentence: "The bear is brown." },
     { word: "pink", hebrew: "ורוד", sentence: "The flower is pink." },
-    { word: "orange", hebrew: "כתום", sentence: "The orange is orange." },
     { word: "purple", hebrew: "סגול", sentence: "The grape is purple." }
 ];
 
 let currentWords = [];
-let selectedWord = null;
+let shuffledHebrewOrder = []; // שומר על הסדר של המילים בעברית
+let selectedEnglishWord = null;
+let selectedHebrewWord = null;
 let matches = {};
 let results = [];
 let correctSentences = [];
-let attempts = {}; // Track attempts per word
+let attempts = {};
 
 function shuffleArray(arr) {
     const newArr = [...arr];
@@ -447,7 +444,9 @@ function speak(text, lang = 'en-US') {
 
 function startNewGame() {
     currentWords = getRandomWords();
-    selectedWord = null;
+    shuffledHebrewOrder = shuffleArray([...currentWords]); // סדר אקראי אבל קבוע
+    selectedEnglishWord = null;
+    selectedHebrewWord = null;
     matches = {};
     results = [];
     correctSentences = [];
@@ -464,6 +463,7 @@ function renderGame() {
     englishDiv.innerHTML = '';
     hebrewDiv.innerHTML = '';
 
+    // English words
     currentWords.forEach(item => {
         const btn = document.createElement('button');
         btn.className = 'word-btn';
@@ -478,7 +478,7 @@ function renderGame() {
         const textSpan = document.createElement('span');
         textSpan.textContent = item.word;
         btn.appendChild(textSpan);
-        btn.onclick = () => selectWord(item.word);
+        btn.onclick = () => selectEnglishWord(item.word);
 
         if (matches[item.word]) {
             btn.disabled = true;
@@ -486,7 +486,7 @@ function renderGame() {
             const resultIcon = document.createElement('span');
             resultIcon.textContent = ' ✓';
             btn.appendChild(resultIcon);
-        } else if (selectedWord === item.word) {
+        } else if (selectedEnglishWord === item.word) {
             btn.classList.add('selected');
         } else {
             btn.classList.add('available');
@@ -494,68 +494,91 @@ function renderGame() {
         englishDiv.appendChild(btn);
     });
 
-    // Shuffle Hebrew words for display
-    const shuffledHebrew = shuffleArray(currentWords);
-    shuffledHebrew.forEach(item => {
+    // Hebrew words - משתמש בסדר הקבוע
+    shuffledHebrewOrder.forEach(item => {
         const btn = document.createElement('button');
         btn.className = 'word-btn hebrew-btn';
         btn.textContent = item.hebrew;
-        btn.onclick = () => selectHebrew(item.hebrew);
+        btn.onclick = () => selectHebrewWord(item.hebrew);
 
-        // Only disable if already matched correctly
         if (Object.values(matches).includes(item.hebrew)) {
             btn.disabled = true;
             btn.classList.add('correct');
+        } else if (selectedHebrewWord === item.hebrew) {
+            btn.classList.add('selected');
+        } else {
+            btn.classList.add('available');
         }
         hebrewDiv.appendChild(btn);
     });
 
-    // Update match count
     document.getElementById('matchCount').textContent = Object.keys(matches).length;
 }
 
-function selectWord(word) {
+function selectEnglishWord(word) {
     if (matches[word]) return;
-    selectedWord = word;
-    renderGame();
+    
+    // אם כבר יש מילה עברית נבחרת, נבדוק התאמה
+    if (selectedHebrewWord) {
+        checkMatch(word, selectedHebrewWord);
+    } else {
+        // אחרת, פשוט נבחר את המילה
+        selectedEnglishWord = word;
+        selectedHebrewWord = null;
+        renderGame();
+    }
 }
 
-function selectHebrew(hebrew) {
-    if (!selectedWord) return;
-    const item = currentWords.find(w => w.word === selectedWord);
-    if (!attempts[selectedWord]) attempts[selectedWord] = 0;
-    attempts[selectedWord] += 1;
-    const correct = item && item.hebrew === hebrew;
+function selectHebrewWord(hebrew) {
+    // אם כבר יש מילה אנגלית נבחרת, נבדוק התאמה
+    if (selectedEnglishWord) {
+        checkMatch(selectedEnglishWord, hebrew);
+    } else {
+        // אחרת, פשוט נבחר את המילה
+        selectedHebrewWord = hebrew;
+        selectedEnglishWord = null;
+        renderGame();
+    }
+}
+
+function checkMatch(englishWord, hebrewWord) {
+    const item = currentWords.find(w => w.word === englishWord);
+    if (!attempts[englishWord]) attempts[englishWord] = 0;
+    attempts[englishWord] += 1;
+    
+    const correct = item && item.hebrew === hebrewWord;
+    
     if (correct) {
-        matches[selectedWord] = hebrew;
+        matches[englishWord] = hebrewWord;
         results.push({
-            word: selectedWord,
-            hebrew: hebrew,
+            word: englishWord,
+            hebrew: hebrewWord,
             correct: true,
-            sentence: item ? item.sentence : '',
-            tries: attempts[selectedWord]
+            sentence: item.sentence,
+            tries: attempts[englishWord]
         });
         correctSentences.push({
-            word: selectedWord,
-            hebrew: hebrew,
+            word: englishWord,
+            hebrew: hebrewWord,
             sentence: item.sentence
         });
-        selectedWord = null;
+        selectedEnglishWord = null;
+        selectedHebrewWord = null;
         renderGame();
         updateSentencesList();
         if (Object.keys(matches).length === 10) {
             setTimeout(showSummary, 800);
         }
     } else {
-        // Just record the attempt, don't disable anything
         results.push({
-            word: selectedWord,
-            hebrew: hebrew,
+            word: englishWord,
+            hebrew: hebrewWord,
             correct: false,
             sentence: item ? item.sentence : '',
-            tries: attempts[selectedWord]
+            tries: attempts[englishWord]
         });
-        // Keep the word selected so the player can try again
+        // נשאיר את המילה האנגלית נבחרת כדי שהמשתמש יוכל לנסות שוב
+        selectedHebrewWord = null;
         renderGame();
     }
 }
@@ -585,15 +608,14 @@ function showSummary() {
     document.getElementById('gameView').classList.add('hidden');
     document.getElementById('summaryView').classList.remove('hidden');
     document.getElementById('finalScore').textContent = Object.keys(matches).length;
-    // Stars
+    
     let stars = '';
     const score = Object.keys(matches).length;
     for (let i = 0; i < Math.floor(score / 2); i++) stars += '⭐';
     document.getElementById('starsDisplay').textContent = stars;
-    // Results
+    
     const resultsList = document.getElementById('resultsList');
     resultsList.innerHTML = '';
-    // Show only the first correct match for each word, and all attempts
     currentWords.forEach(item => {
         const wordResults = results.filter(r => r.word === item.word);
         const correctResult = wordResults.find(r => r.correct);
@@ -609,7 +631,6 @@ function showSummary() {
     });
 }
 
-// התחל משחק אוטומטית
 window.onload = startNewGame;
     </script>
 </body>
