@@ -1,24 +1,79 @@
 <!doctype html>
 <html lang="he" dir="rtl">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Word Hero – כיתה א׳</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#8bb7ff">
+<title>Word Hero – גיבורי המילים באנגלית</title>
 <style>
-*{box-sizing:border-box}body{margin:0;min-height:100vh;padding:18px;display:grid;place-items:center;background:linear-gradient(145deg,#6dd5fa,#b993ff);font-family:Arial,sans-serif;color:#27304a}.app{width:min(760px,100%)}.card{padding:24px;background:white;border-radius:26px;box-shadow:0 12px 32px #26304a33;text-align:center}.hide{display:none!important}.hero{font-size:4rem}h1{font-size:clamp(2rem,7vw,3rem);margin:8px}p{font-size:1.15rem;line-height:1.6}.btn,.listen{border:0;border-radius:999px;padding:13px 24px;font-size:1.15rem;font-weight:bold;cursor:pointer}.btn{background:#ff9f1c;color:white;box-shadow:0 5px #c97800}.listen{background:#eef3ff;color:#3b4cca}.top{display:flex;align-items:center;gap:12px;margin-bottom:12px;color:#fff;font-weight:bold}.lives{white-space:nowrap}.track{height:16px;border-radius:99px;background:#ffffff77;flex:1;overflow:hidden}.bar{height:100%;background:#ffcf56;transition:width .25s}.word{font-size:clamp(3.2rem,15vw,6rem);font-weight:900;color:#3b4cca;direction:ltr;margin:16px}.msg{min-height:3rem;font-size:1.5rem;font-weight:bold;margin:16px 0 8px}.opts{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;direction:ltr}.opt{aspect-ratio:1;border:4px solid transparent;border-radius:22px;background:#fff;box-shadow:0 7px #cfd6ee;font-size:clamp(3rem,15vw,5.5rem);cursor:pointer}.opt:disabled{cursor:default}.opt.correct{border-color:#2ecc71;background:#e8fff1}.opt.wrong{border-color:#ff5a5f;background:#ffecee;opacity:.5}.note{font-size:.95rem;color:#68718c;margin-top:14px}@media(max-width:480px){.card{padding:18px 14px}.opts{gap:8px}}
-</style></head>
-<body><main class="app">
-<section class="card" id="start"><div class="hero">🦸‍♂️🔤</div><h1>Word Hero</h1><p>גיבורי המילים באנגלית!<br>שומעים מילה באנגלית ובוחרים את התמונה המתאימה.</p><p>📝 10 שאלות · ❤️ 3 לבבות</p><button class="btn" id="startBtn">▶ מתחילים!</button><div class="note">אפשר לשמוע שוב בעזרת כפתור Listen. ניתן לבחור גם במקשים 1, 2, 3.</div></section>
-<section class="hide" id="game"><div class="top"><span class="lives" id="lives"></span><div class="track"><div class="bar" id="bar"></div></div><span id="count"></span></div><div class="card"><div class="word" id="word"></div><button class="listen" id="listen">🔊 Listen</button><div class="msg" id="msg" aria-live="polite"></div><div class="opts" id="opts"></div></div></section>
-<section class="card hide" id="end"><div class="hero" id="endEmoji"></div><h1 id="endTitle"></h1><p id="endText"></p><button class="btn" id="again">🔄 משחק חדש</button></section>
+*{box-sizing:border-box}body{margin:0;min-height:100vh;padding:18px;display:grid;place-items:center;background:linear-gradient(145deg,#78c8f7,#b19bff);font-family:Arial,'Segoe UI',sans-serif;color:#27304a}.app{width:min(100%,900px)}.card{background:#fff;border-radius:26px;padding:clamp(22px,5vw,46px);box-shadow:0 18px 40px #26377530;text-align:center}.hide{display:none!important}.hero{font-size:64px}.title{margin:8px 0;color:#3f51cf;font-size:clamp(30px,7vw,48px)}.intro{color:#56637b;line-height:1.6}.btn{border:0;border-radius:999px;padding:14px 26px;background:#4658d8;color:white;font-size:19px;font-weight:800;cursor:pointer}.btn:hover{filter:brightness(1.08);transform:translateY(-1px)}.btn:focus-visible,.listen:focus-visible,.choice:focus-visible{outline:4px solid #ffbd3e;outline-offset:3px}.top{display:flex;align-items:center;gap:12px;margin:0 0 16px;color:#fff;font-size:17px;font-weight:800}.track{height:16px;flex:1;background:#ffffff80;border-radius:99px;overflow:hidden}.bar{height:100%;width:0;background:#fff;border-radius:99px;transition:width .25s}.lives{white-space:nowrap}.game-card{min-height:530px;display:flex;flex-direction:column;justify-content:space-between}.word{direction:ltr;unicode-bidi:isolate;color:#3f51cf;font-size:clamp(58px,12vw,110px);font-weight:900;margin:18px 0 10px}.listen{border:0;border-radius:999px;background:#eef2ff;color:#3f51cf;padding:14px 26px;font-size:19px;font-weight:800;cursor:pointer}.message{min-height:32px;margin:16px 0;color:#41516a;font-weight:700;font-size:18px}.choices{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:auto}.choice{min-height:170px;border:0;border-radius:18px;background:#fff;color:#2d3748;box-shadow:0 7px 0 #d5daf0;cursor:pointer;font-size:82px;transition:transform .15s,background .15s}.choice:hover:not(:disabled){transform:translateY(-4px);background:#f8f9ff}.choice:disabled{cursor:default;opacity:.72}.choice.correct{background:#e2f8ea;box-shadow:0 7px 0 #9ed7ad}.choice.wrong{background:#ffe5e5;box-shadow:0 7px 0 #edb2b2}.summary{margin-top:16px}.summary h2{color:#3f51cf}.summary-stats{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:15px 0 22px}.stat{background:#eef2ff;border-radius:12px;padding:10px 15px;font-weight:700}.table-wrap{overflow-x:auto;border-radius:14px}table{width:100%;min-width:650px;border-collapse:collapse;background:#fff}th,td{padding:11px 9px;border:1px solid #e0e5f0;text-align:center}th{background:#4658d8;color:white}tbody tr:nth-child(even){background:#f7f8ff}.word-cell{direction:ltr;unicode-bidi:isolate;font-size:21px;font-weight:800;color:#3f51cf}.first-cap{color:#bd3a30;text-decoration:underline;text-decoration-thickness:2px}.listen-small{border:0;border-radius:999px;padding:8px 12px;background:#e6f7e9;cursor:pointer;font-weight:700}.actions{display:flex;justify-content:center;margin-top:20px}.note{font-size:14px;color:#718096;line-height:1.5}@media(max-width:600px){body{padding:10px}.top{font-size:14px;gap:7px}.game-card{min-height:470px;padding:20px 14px}.choice{min-height:125px;font-size:62px}.choices{gap:8px}.word{margin:15px 0}.card{border-radius:20px}}
+</style>
+</head>
+<body>
+<main class="app">
+  <section id="start" class="card">
+    <div class="hero" aria-hidden="true">🦸‍♂️🔤</div>
+    <h1 class="title">Word Hero</h1>
+    <p class="intro">גיבורי המילים באנגלית!<br>שומעים מילה באנגלית ובוחרים את התמונה המתאימה.</p>
+    <p>📝 10 שאלות · ❤️ 3 לבבות</p>
+    <p class="note">שימו לב: המילה מוצגת עם אות גדולה בתחילתה, למשל <b dir="ltr">Boat</b>.</p>
+    <button class="btn" id="startBtn" type="button">▶ מתחילים!</button>
+  </section>
+
+  <section id="game" class="hide" aria-label="משחק מילים">
+    <div class="top"><span id="count">1 / 10</span><div class="track" aria-label="התקדמות המשחק"><div class="bar" id="bar"></div></div><span class="lives" id="lives" aria-label="לבבות"></span></div>
+    <div class="card game-card">
+      <div>
+        <div class="word" id="questionWord" lang="en" dir="ltr"></div>
+        <button class="listen" id="listen" type="button">Listen 🔊</button>
+        <div class="message" id="msg" role="status" aria-live="polite"></div>
+      </div>
+      <div class="choices" id="choices" aria-label="בחרו את התמונה המתאימה"></div>
+    </div>
+  </section>
+
+  <section id="end" class="card summary hide">
+    <div class="hero" id="endEmoji" aria-hidden="true">🏆</div>
+    <h1 class="title" id="endTitle">כל הכבוד!</h1>
+    <p class="intro" id="endText"></p>
+    <div class="summary-stats" id="summaryStats"></div>
+    <h2>📋 סיכום מפורט – כל המילים ששיחקנו</h2>
+    <p class="note">לחצו על 🔊 בשורה המתאימה כדי לשמוע שוב כל מילה.</p>
+    <div class="table-wrap"><table>
+      <thead><tr><th>שאלה</th><th>המילה באנגלית</th><th>פירוש</th><th>התמונה</th><th>התשובה שלך</th><th>תוצאה</th><th>השמעה חוזרת</th></tr></thead>
+      <tbody id="summaryRows"></tbody>
+    </table></div>
+    <div class="actions"><button class="btn" id="again" type="button">🔄 משחק חדש</button></div>
+  </section>
 </main>
 <script>
 'use strict';
-const WORDS=[['dog','🐶'],['cat','🐱'],['cow','🐄'],['pig','🐷'],['duck','🦆'],['frog','🐸'],['bee','🐝'],['fish','🐟'],['bird','🐦'],['lion','🦁'],['monkey','🐵'],['elephant','🐘'],['horse','🐴'],['rabbit','🐰'],['mouse','🐭'],['apple','🍎'],['banana','🍌'],['milk','🥛'],['egg','🥚'],['bread','🍞'],['cake','🎂'],['pizza','🍕'],['sun','☀️'],['moon','🌙'],['star','⭐'],['tree','🌳'],['flower','🌸'],['rain','🌧️'],['house','🏠'],['car','🚗'],['bus','🚌'],['bike','🚲'],['boat','⛵'],['book','📖'],['ball','⚽'],['shoe','👟'],['key','🔑'],['clock','⏰'],['heart','❤️']].map(([w,e])=>({w,e}));
-const $=id=>document.getElementById(id);let questions=[],index=0,lives=3,score=0,locked=false;
-function shuffle(a){a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
-function speak(word){if(!('speechSynthesis'in window)){ $('msg').textContent='הקול אינו נתמך בדפדפן הזה';return }speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(word);u.lang='en-US';u.rate=.82;speechSynthesis.speak(u)}
-function startGame(){if('speechSynthesis'in window)speechSynthesis.cancel();questions=shuffle(WORDS).slice(0,10);index=score=0;lives=3;$('start').classList.add('hide');$('end').classList.add('hide');$('game').classList.remove('hide');showQuestion()}
-function showQuestion(){locked=false;const answer=questions[index],options=shuffle([answer,...shuffle(WORDS.filter(x=>x.w!==answer.w)).slice(0,2)]);$('lives').textContent='❤️'.repeat(lives)+'🖤'.repeat(3-lives);$('count').textContent=`${index+1} / 10`;$('bar').style.width=`${index*10}%`;$('word').textContent=answer.w;$('msg').textContent='';$('opts').replaceChildren();options.forEach(item=>{const b=document.createElement('button');b.type='button';b.className='opt';b.textContent=item.e;b.setAttribute('aria-label','אפשרות '+item.w);b.onclick=()=>choose(b,item);$('opts').appendChild(b)});setTimeout(()=>{if(!locked)speak(answer.w)},350)}
-function choose(button,item){if(locked||button.disabled)return;const answer=questions[index];if(item.w===answer.w){locked=true;score++;button.classList.add('correct');$('msg').textContent='נכון! כל הכבוד! 🎉';[...$('opts').children].forEach(b=>b.disabled=true);setTimeout(()=>{index++;index===questions.length?finish(true):showQuestion()},900)}else{lives--;button.classList.add('wrong');button.disabled=true;$('lives').textContent='❤️'.repeat(lives)+'🖤'.repeat(3-lives);$('msg').textContent=lives?'כמעט! נסו שוב 😊':'נגמרו הלבבות';if(!lives){locked=true;[...$('opts').children].forEach(b=>b.disabled=true);setTimeout(()=>finish(false),900)}}}
-function finish(done){if('speechSynthesis'in window)speechSynthesis.cancel();$('game').classList.add('hide');$('end').classList.remove('hide');$('endEmoji').textContent=done?'🏆':'💔';$('endTitle').textContent=done?'כל הכבוד! סיימתם את המשחק!':'לא נורא, מנסים שוב!';$('endText').textContent=`עניתם נכון על ${score} מתוך 10 שאלות.`}
-$('startBtn').onclick=startGame;$('again').onclick=startGame;$('listen').onclick=()=>{if(questions[index])speak(questions[index].w)};document.addEventListener('keydown',e=>{if(!['1','2','3'].includes(e.key)||$('game').classList.contains('hide'))return;const b=$('opts').children[Number(e.key)-1];if(b&&!b.disabled)b.click()});
-</script></body></html>
+const WORDS=[
+  {word:'Dog',hebrew:'כלב',emoji:'🐶'},{word:'Cat',hebrew:'חתול',emoji:'🐱'},
+  {word:'Cow',hebrew:'פרה',emoji:'🐄'},{word:'Pig',hebrew:'חזיר',emoji:'🐷'},
+  {word:'Duck',hebrew:'ברווז',emoji:'🦆'},{word:'Frog',hebrew:'צפרדע',emoji:'🐸'},
+  {word:'Bee',hebrew:'דבורה',emoji:'🐝'},{word:'Fish',hebrew:'דג',emoji:'🐟'},
+  {word:'Bird',hebrew:'ציפור',emoji:'🐦'},{word:'Lion',hebrew:'אריה',emoji:'🦁'},
+  {word:'Monkey',hebrew:'קוף',emoji:'🐵'},{word:'Elephant',hebrew:'פיל',emoji:'🐘'},
+  {word:'Rabbit',hebrew:'ארנב',emoji:'🐰'},{word:'Turtle',hebrew:'צב',emoji:'🐢'},
+  {word:'Bear',hebrew:'דוב',emoji:'🐻'},{word:'Horse',hebrew:'סוס',emoji:'🐴'},
+  {word:'Sheep',hebrew:'כבשה',emoji:'🐑'},{word:'Chicken',hebrew:'תרנגולת',emoji:'🐔'},
+  {word:'Mouse',hebrew:'עכבר',emoji:'🐭'},{word:'Snake',hebrew:'נחש',emoji:'🐍'},
+  {word:'Boat',hebrew:'סירה',emoji:'⛵'},{word:'Sun',hebrew:'שמש',emoji:'☀️'},
+  {word:'Apple',hebrew:'תפוח',emoji:'🍎'},{word:'Car',hebrew:'מכונית',emoji:'🚗'},
+  {word:'Ball',hebrew:'כדור',emoji:'⚽'},{word:'House',hebrew:'בית',emoji:'🏠'},
+  {word:'Flower',hebrew:'פרח',emoji:'🌷'},{word:'Rocket',hebrew:'טיל',emoji:'🚀'},
+  {word:'Star',hebrew:'כוכב',emoji:'⭐'},{word:'Ice cream',hebrew:'גלידה',emoji:'🍦'}
+];
+const $=id=>document.getElementById(id);let questions=[],results=[],index=0,lives=3,score=0,locked=false;
+function shuffle(items){const a=[...items];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function displayWord(word){return word.trim().replace(/(^|\s)([a-z])/g,(_,space,letter)=>space+letter.toUpperCase())}
+function speak(word){if(!('speechSynthesis'in window)){ $('msg').textContent='השמעת קול אינה זמינה בדפדפן הזה';return }speechSynthesis.cancel();const utterance=new SpeechSynthesisUtterance(word);utterance.lang='en-US';utterance.rate=.8;speechSynthesis.speak(utterance)}
+function startGame(){if('speechSynthesis'in window)speechSynthesis.cancel();questions=shuffle(WORDS).slice(0,10);results=[];index=score=0;lives=3;locked=false;$('start').classList.add('hide');$('end').classList.add('hide');$('game').classList.remove('hide');showQuestion()}
+function showQuestion(){locked=false;const answer=questions[index];const options=shuffle([answer,...shuffle(WORDS.filter(item=>item.word!==answer.word)).slice(0,2)]);$('count').textContent=`${index+1} / 10`;$('bar').style.width=`${index/10*100}%`;$('lives').textContent='❤️ '.repeat(lives);$('questionWord').textContent=displayWord(answer.word);$('msg').textContent='בחרו את התמונה המתאימה למילה';$('choices').replaceChildren();options.forEach((item,optionIndex)=>{const button=document.createElement('button');button.type='button';button.className='choice';button.textContent=item.emoji;button.setAttribute('aria-label',`תמונה ${optionIndex+1}`);button.addEventListener('click',()=>choose(button,item,answer));$('choices').appendChild(button)})}
+function choose(button,item,answer){if(locked||button.disabled)return;const buttons=[...$('choices').querySelectorAll('button')];if(item.word===answer.word){locked=true;button.classList.add('correct');buttons.forEach(b=>b.disabled=true);score++;results.push({question:answer,chosen:item,correct:true});$('msg').textContent='נכון מאוד! כל הכבוד 🎉';setTimeout(()=>{index++;index===questions.length?finish(true):showQuestion()},750)}else{button.classList.add('wrong');button.disabled=true;lives--;const row=results.find(result=>result.question.word===answer.word);if(row)row.wrongAnswers.push(item);else results.push({question:answer,chosen:item,correct:false,wrongAnswers:[item]});$('lives').textContent='❤️ '.repeat(lives);$('msg').textContent=lives?'כמעט! נסו שוב 💪':'נגמרו הלבבות — כל ניסיון מלמד אותנו!';if(!lives){locked=true;buttons.forEach(b=>b.disabled=true);const current=results.find(result=>result.question.word===answer.word);if(current){current.correct=false;current.chosen=item}setTimeout(()=>finish(false),850)}}}
+function finish(completed){if('speechSynthesis'in window)speechSynthesis.cancel();$('game').classList.add('hide');$('end').classList.remove('hide');$('bar').style.width=`${index/10*100}%`;$('endEmoji').textContent=completed?'🏆':'💛';$('endTitle').textContent=completed?'כל הכבוד! 🎉':'עשית עבודה נהדרת!';$('endText').textContent=completed?'סיימתם את כל השאלות! עברו על הטבלה והשמיעו שוב כל מילה.':'המשחק הסתיים, והנה המילים שפגשתם. אפשר לשמוע כל אחת שוב ולשחק מחדש.';$('summaryStats').innerHTML=`<span class="stat">✅ תשובות נכונות: ${score} מתוך ${questions.length}</span><span class="stat">❤️ לבבות שנותרו: ${lives}</span><span class="stat">📚 מילים ששיחקנו: ${results.length} מתוך ${questions.length}</span>`;const rows=$('summaryRows');rows.replaceChildren();results.forEach((result,i)=>{const tr=document.createElement('tr');const word=displayWord(result.question.word);const answerText=result.correct?result.question.emoji:(result.chosen?.emoji||'—');tr.innerHTML=`<td>${i+1}</td><td class="word-cell" lang="en"><span class="first-cap">${word.charAt(0)}</span>${word.slice(1)}</td><td>${result.question.hebrew}</td><td style="font-size:30px">${result.question.emoji}</td><td style="font-size:25px">${answerText}</td><td>${result.correct?'✅ נכון':'❌ לא נכון'}</td><td><button class="listen-small" type="button">🔊 השמעה</button></td>`;tr.querySelector('.listen-small').addEventListener('click',()=>speak(result.question.word));rows.appendChild(tr)});$('bar').style.width='100%'}
+$('startBtn').addEventListener('click',startGame);$('again').addEventListener('click',startGame);$('listen').addEventListener('click',()=>{if(questions[index])speak(questions[index].word)});document.addEventListener('keydown',event=>{if(!['1','2','3'].includes(event.key)||$('game').classList.contains('hide'))return;const button=$('choices').children[Number(event.key)-1];if(button)button.click()});
+</script>
+</body>
+</html>
