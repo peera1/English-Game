@@ -4,8 +4,1708 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>המסע ל-100 באנגלית! - כיתה ד' Unit 1</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Rubik:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Rubik', sans-serif;
+            background: linear-gradient(135deg, #eef2ff 0%, #fae8ff 50%, #fef3c7 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+            user-select: none;
+        }
+        .en-font {
+            font-family: 'Fredoka', 'Rubik', sans-serif;
+            direction: ltr;
+        }
+        @keyframes popIn {
+            0% { transform: scale(0.7); opacity: 0; }
+            70% { transform: scale(1.06); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-8px); }
+            40%, 80% { transform: translateX(8px); }
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-6px); }
+        }
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(250, 204, 21, 0.7); }
+            50% { box-shadow: 0 0 20px 6px rgba(250, 204, 21, 0.4); }
+        }
+        .animate-pop { animation: popIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+        .animate-shake { animation: shake 0.4s ease-in-out; }
+        .animate-float { animation: float 3s ease-in-out infinite; }
+        .animate-glow { animation: pulseGlow 2s infinite; }
+
+        .btn-3d {
+            transition: all 0.12s ease;
+            box-shadow: 0 5px 0 rgba(0,0,0,0.18);
+        }
+        .btn-3d:active:not(:disabled) {
+            transform: translateY(4px);
+            box-shadow: 0 1px 0 rgba(0,0,0,0.18);
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(12px);
+            border: 3px solid rgba(255, 255, 255, 0.95);
+        }
+        #confetti-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+        }
+    </style>
 </head>
-<body>
-    <!-- CONTENT_PLACEHOLDER -->
+<body class="text-slate-800 pb-12">
+    <canvas id="confetti-canvas"></canvas>
+
+    <!-- Header / Top Gamification Bar -->
+    <header class="sticky top-0 z-40 bg-white/90 backdrop-blur-md shadow-md border-b-2 border-purple-100">
+        <div class="max-w-5xl mx-auto px-3 sm:px-6 py-2.5 flex flex-wrap items-center justify-between gap-2">
+            <!-- Brand / Home Button -->
+            <button onclick="goHome()" class="flex items-center gap-2 text-right group cursor-pointer">
+                <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-gradient-to-tr from-purple-600 to-pink-500 flex items-center justify-center text-white text-xl sm:text-2xl shadow-md group-hover:scale-105 transition">
+                    👑
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-base sm:text-xl text-purple-900 leading-tight">המסע ל-100!</h1>
+                    <p class="text-[11px] sm:text-xs text-purple-600 font-medium">אנגלית כיתה ד' • Unit 1</p>
+                </div>
+            </button>
+
+            <!-- Stats Pills -->
+            <div class="flex items-center gap-2 sm:gap-3">
+                <!-- Streak -->
+                <div id="streak-badge" class="flex items-center gap-1 bg-orange-100 border-2 border-orange-300 px-2.5 sm:px-3 py-1 rounded-full text-orange-700 font-bold text-xs sm:text-sm transition-transform">
+                    <span class="text-base sm:text-lg">🔥</span>
+                    <span id="streak-count">0</span>
+                    <span class="hidden sm:inline">רצף</span>
+                </div>
+
+                <!-- Stars / XP -->
+                <div class="flex items-center gap-1 bg-amber-100 border-2 border-amber-300 px-2.5 sm:px-3 py-1 rounded-full text-amber-800 font-bold text-xs sm:text-sm">
+                    <span class="text-base sm:text-lg">⭐</span>
+                    <span id="xp-count">0</span>
+                    <span class="hidden sm:inline">נק'</span>
+                </div>
+
+                <!-- Level Badge -->
+                <div id="level-badge" class="hidden md:flex items-center gap-1 bg-purple-100 border-2 border-purple-300 px-3 py-1 rounded-full text-purple-800 font-bold text-sm">
+                    <span>🏆</span>
+                    <span id="level-title">מתחילה אלופה</span>
+                </div>
+
+                <!-- Sound Toggle -->
+                <button id="sound-btn" onclick="toggleSound()" title="הפעל/השתק צלילים" class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-lg transition cursor-pointer">
+                    🔊
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Encouraging Toast Banner -->
+    <div id="praise-banner" class="fixed top-20 left-1/2 -translate-x-1/2 z-50 pointer-events-none opacity-0 transition-all duration-300 transform -translate-y-4">
+        <div class="bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 text-white px-6 py-2.5 rounded-full shadow-xl border-2 border-white font-extrabold text-lg sm:text-xl flex items-center gap-2 whitespace-nowrap">
+            <span id="praise-emoji">🌟</span>
+            <span id="praise-text">אלופה! כל הכבוד!</span>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <main class="max-w-4xl mx-auto px-3 sm:px-6 pt-5 sm:pt-8">
+
+        <!-- ==================== HOME / MAP VIEW ==================== -->
+        <section id="home-view" class="animate-pop">
+            <!-- Hero Welcome Card -->
+            <div class="glass-card rounded-3xl p-5 sm:p-8 shadow-xl mb-6 text-center relative overflow-hidden">
+                <div class="inline-block bg-purple-100 text-purple-800 font-bold px-4 py-1 rounded-full text-xs sm:text-sm mb-3">
+                    ✨ כולל את כל החומר משני דפי התרגול (נוסח א' + נוסח ב') ✨
+                </div>
+                <h2 class="text-2xl sm:text-4xl font-extrabold text-slate-800 mb-2">
+                    מוכנה לכבוש את המבחן באנגלית? 🚀
+                </h2>
+                <p class="text-slate-600 text-sm sm:text-lg max-w-2xl mx-auto mb-5">
+                    בחרי שלב במפה כדי לתרגל, לצבור כוכבים ולהגיע ל-<strong>100</strong> בקלות ובכיף!
+                </p>
+
+                <!-- Overall Progress Bar -->
+                <div class="max-w-md mx-auto bg-slate-100 rounded-full h-5 p-1 border border-slate-200 mb-2">
+                    <div id="total-progress-bar" class="bg-gradient-to-l from-emerald-400 to-teal-500 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+                </div>
+                <p class="text-xs sm:text-sm font-bold text-slate-600">
+                    הושלמו <span id="completed-stages-count" class="text-emerald-600">0</span> מתוך <span id="total-stages-count">8</span> שלבים
+                </p>
+            </div>
+
+            <!-- Stages Grid -->
+            <div id="stages-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <!-- Populated dynamically by JS -->
+            </div>
+        </section>
+
+        <!-- ==================== GAMEPLAY VIEW ==================== -->
+        <section id="game-view" class="hidden">
+            <!-- Top Stage Navigation Bar -->
+            <div class="flex items-center justify-between gap-3 mb-4">
+                <button onclick="goHome()" class="btn-3d bg-white hover:bg-slate-50 text-slate-700 font-bold px-4 py-2 rounded-2xl border-2 border-slate-200 flex items-center gap-1.5 text-sm sm:text-base cursor-pointer">
+                    <span>➡️</span>
+                    <span>חזרה למפה</span>
+                </button>
+
+                <div class="flex-1 max-w-md">
+                    <div class="flex justify-between text-xs font-bold text-slate-600 mb-1 px-1">
+                        <span id="stage-header-title">שלב 1</span>
+                        <span id="stage-progress-text">1 / 10</span>
+                    </div>
+                    <div class="w-full bg-white/80 rounded-full h-3.5 p-0.5 border border-purple-200 shadow-inner">
+                        <div id="stage-progress-bar" class="bg-gradient-to-l from-purple-600 to-pink-500 h-full rounded-full transition-all duration-300" style="width: 10%"></div>
+                    </div>
+                </div>
+
+                <button onclick="speakCurrentWord()" id="tts-btn" title="הקשב למילה באנגלית" class="btn-3d bg-sky-500 hover:bg-sky-600 text-white font-bold p-2.5 rounded-2xl flex items-center gap-1 text-sm sm:text-base cursor-pointer">
+                    <span>🗣️</span>
+                    <span class="hidden sm:inline">הקראה</span>
+                </button>
+            </div>
+
+            <!-- Dynamic Question Arena -->
+            <div id="arena-card" class="glass-card rounded-3xl p-5 sm:p-8 shadow-xl min-h-[380px] flex flex-col justify-between relative">
+                <div id="question-container" class="w-full">
+                    <!-- Dynamic Question Content Injected Here -->
+                </div>
+
+                <!-- Feedback & Next Button Footer -->
+                <div id="feedback-area" class="mt-6 pt-4 border-t-2 border-slate-100 hidden">
+                    <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
+                        <div id="feedback-message" class="font-bold text-base sm:text-lg text-center sm:text-right"></div>
+                        <button id="next-btn" onclick="nextQuestion()" class="btn-3d w-full sm:w-auto bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-extrabold px-8 py-3 rounded-2xl text-lg cursor-pointer">
+                            המשך ⬅️
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== STAGE COMPLETE MODAL / VIEW ==================== -->
+        <section id="complete-view" class="hidden animate-pop">
+            <div class="glass-card rounded-3xl p-6 sm:p-10 shadow-2xl text-center max-w-xl mx-auto border-4 border-amber-300">
+                <div class="text-6xl sm:text-7xl mb-4 animate-float">🏆</div>
+                <h2 id="complete-title" class="text-2xl sm:text-4xl font-extrabold text-purple-900 mb-2">כל הכבוד אלופה!</h2>
+                <p id="complete-subtitle" class="text-slate-600 text-base sm:text-lg mb-6">סיימת את השלב בהצלחה רבה!</p>
+
+                <div class="grid grid-cols-3 gap-3 mb-6">
+                    <div class="bg-amber-50 border-2 border-amber-200 rounded-2xl p-3">
+                        <div class="text-2xl mb-1">⭐</div>
+                        <div id="complete-stars" class="font-extrabold text-xl text-amber-700">3/3</div>
+                        <div class="text-xs text-amber-800 font-medium">כוכבים</div>
+                    </div>
+                    <div class="bg-emerald-50 border-2 border-emerald-200 rounded-2xl p-3">
+                        <div class="text-2xl mb-1">🎯</div>
+                        <div id="complete-accuracy" class="font-extrabold text-xl text-emerald-700">100%</div>
+                        <div class="text-xs text-emerald-800 font-medium">דיוק</div>
+                    </div>
+                    <div class="bg-purple-50 border-2 border-purple-200 rounded-2xl p-3">
+                        <div class="text-2xl mb-1">💎</div>
+                        <div id="complete-xp" class="font-extrabold text-xl text-purple-700">+100</div>
+                        <div class="text-xs text-purple-800 font-medium">נקודות</div>
+                    </div>
+                </div>
+
+                <div id="mistakes-review-box" class="hidden text-right bg-rose-50 border-2 border-rose-200 rounded-2xl p-4 mb-6">
+                    <h4 class="font-bold text-rose-800 mb-2 flex items-center gap-1.5">
+                        <span>💡</span>
+                        <span>מילים שכדאי לזכור למבחן:</span>
+                    </h4>
+                    <ul id="mistakes-list" class="space-y-1.5 text-sm text-rose-900"></ul>
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                    <button onclick="restartCurrentStage()" class="btn-3d bg-amber-400 hover:bg-amber-500 text-amber-950 font-extrabold px-6 py-3 rounded-2xl text-base cursor-pointer">
+                        🔄 תרגול נוסף של השלב
+                    </button>
+                    <button onclick="goHome()" class="btn-3d bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-extrabold px-8 py-3 rounded-2xl text-base cursor-pointer">
+                        🗺️ המשך לשלב הבא
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        /* =====================================================================
+           1. COMPLETE CURRICULUM DATA (FROM BOTH TEST A & TEST B)
+           ===================================================================== */
+
+        // Part A: Vocabulary (English -> Hebrew) - All 20 words from Test A & Test B
+        const VOCAB_DATA = [
+            // Test A
+            { en: "teacher", he: "מורה", emoji: "👩‍🏫" },
+            { en: "town", he: "עיר", emoji: "🏙️" },
+            { en: "family", he: "משפחה", emoji: "👨‍👩‍👧‍👦" },
+            { en: "eraser", he: "מחק", emoji: "🧼" },
+            { en: "notebook", he: "מחברת", emoji: "📓" },
+            { en: "scissors", he: "מספריים", emoji: "✂️" },
+            { en: "homework", he: "שיעורי בית", emoji: "📚" },
+            { en: "lunch", he: "ארוחת צהריים", emoji: "🥪" },
+            { en: "address", he: "כתובת", emoji: "📮" },
+            { en: "pupil", he: "תלמיד/ה", emoji: "🎒" },
+            // Test B
+            { en: "house", he: "בית", emoji: "🏠" },
+            { en: "new", he: "חדש", emoji: "✨" },
+            { en: "school", he: "בית ספר", emoji: "🏫" },
+            { en: "lesson", he: "שיעור", emoji: "🔔" },
+            { en: "nice", he: "נחמד / יפה", emoji: "😊" },
+            { en: "talk", he: "לדבר", emoji: "🗣️" },
+            { en: "thanks", he: "תודה", emoji: "🙏" },
+            { en: "please", he: "בבקשה", emoji: "🥺" },
+            { en: "class", he: "כיתה", emoji: "🪑" },
+            { en: "week", he: "שבוע", emoji: "📅" }
+        ];
+
+        // Part B: Spelling (Hebrew -> English) - All 16 words from Test A & Test B
+        const SPELLING_DATA = [
+            // Test A
+            { he: "חבר", en: "friend", emoji: "🤝", hint: "מתחיל ב-fr" },
+            { he: "אחות", en: "sister", emoji: "👧", hint: "sis + ter" },
+            { he: "ציפור", en: "bird", emoji: "🐦", hint: "b + ir + d" },
+            { he: "שמח", en: "happy", emoji: "😄", hint: "עם פעמיים p" },
+            { he: "לוח", en: "board", emoji: "📋", hint: "b + oar + d" },
+            { he: "אוכל", en: "food", emoji: "🍕", hint: "עם פעמיים o" },
+            { he: "רחוב", en: "street", emoji: "🛣️", hint: "עם פעמיים e" },
+            { he: "מחשב", en: "computer", emoji: "💻", hint: "com + pu + ter" },
+            // Test B
+            { he: "כיתה / שכבה", en: "grade", emoji: "🎓", hint: "g + r + a + d + e" },
+            { he: "אנגלית", en: "English", emoji: "🇬🇧", hint: "מתחיל באות גדולה E" },
+            { he: "רוצה", en: "want", emoji: "🌟", hint: "w + a + n + t" },
+            { he: "סבתא", en: "grandma", emoji: "👵", hint: "grand + ma" },
+            { he: "טלפון", en: "phone", emoji: "📱", hint: "ph נשמע כמו פ'" },
+            { he: "מספר", en: "number", emoji: "🔢", hint: "num + ber" },
+            { he: "לראות", en: "see", emoji: "👀", hint: "s + ee" },
+            { he: "יום", en: "day", emoji: "☀️", hint: "d + a + y" }
+        ];
+
+        // Part C: Word Groups Sorting - Both Rounds (Test A & Test B)
+        const SORTING_ROUNDS = [
+            {
+                title: "סבב 1: משפחה, ציוד ומקצועות (נוסח א')",
+                categories: [
+                    { id: "family", title: "בני משפחה (Family)", color: "pink", emoji: "👨‍👩‍👧" },
+                    { id: "schoolA", title: "ציוד לכיתה (School Things)", color: "sky", emoji: "✏️" },
+                    { id: "lessons", title: "מקצועות לימוד (Lessons)", color: "amber", emoji: "🎨" }
+                ],
+                items: [
+                    { word: "brother", cat: "family", he: "אח" },
+                    { word: "mother", cat: "family", he: "אמא" },
+                    { word: "grandpa", cat: "family", he: "סבא" },
+                    { word: "father", cat: "family", he: "אבא" },
+                    { word: "pencil", cat: "schoolA", he: "עיפרון" },
+                    { word: "book", cat: "schoolA", he: "ספר" },
+                    { word: "chair", cat: "schoolA", he: "כיסא" },
+                    { word: "paper", cat: "schoolA", he: "נייר / דף" },
+                    { word: "math", cat: "lessons", he: "חשבון" },
+                    { word: "art", cat: "lessons", he: "אמנות" },
+                    { word: "music", cat: "lessons", he: "מוזיקה" },
+                    { word: "sports", cat: "lessons", he: "ספורט" }
+                ]
+            },
+            {
+                title: "סבב 2: פעולות, ציוד וימות השבוע (נוסח ב')",
+                categories: [
+                    { id: "verbs", title: "פעולות (Verbs)", color: "emerald", emoji: "🏃‍♀️" },
+                    { id: "schoolB", title: "ציוד לכיתה (School Things)", color: "sky", emoji: "🎒" },
+                    { id: "days", title: "ימות השבוע (Days)", color: "purple", emoji: "📅" }
+                ],
+                items: [
+                    { word: "write", cat: "verbs", he: "לכתוב" },
+                    { word: "fly", cat: "verbs", he: "לעוף" },
+                    { word: "meet", cat: "verbs", he: "להיפגש" },
+                    { word: "learn", cat: "verbs", he: "ללמוד" },
+                    { word: "eraser", cat: "schoolB", he: "מחק" },
+                    { word: "notebook", cat: "schoolB", he: "מחברת" },
+                    { word: "board", cat: "schoolB", he: "לוח" },
+                    { word: "scissors", cat: "schoolB", he: "מספריים" },
+                    { word: "Sunday", cat: "days", he: "יום ראשון" },
+                    { word: "Friday", cat: "days", he: "יום שישי" },
+                    { word: "Monday", cat: "days", he: "יום שני" },
+                    { word: "Wednesday", cat: "days", he: "יום רביעי" }
+                ]
+            }
+        ];
+
+        // Part D: Complete the Sentences - All 12 sentences from Test A & Test B
+        const SENTENCES_DATA = [
+            // Test A
+            { before: "I", after: "in a nice house in Israel.", answer: "live", options: ["live", "fly", "need", "write"], he: "אני גר/ה בבית נחמד בישראל." },
+            { before: "A bird can", after: "in the sky.", answer: "fly", options: ["fly", "meet", "learn", "live"], he: "ציפור יכולה לעוף בשמיים." },
+            { before: "I", after: "a pencil and a notebook for the lesson.", answer: "need", options: ["need", "write", "fly", "meet"], he: "אני צריך/ה עיפרון ומחברת לשיעור." },
+            { before: "Please", after: "your name on the paper.", answer: "write", options: ["write", "learn", "live", "need"], he: "בבקשה כתוב/כתבי את שמך על הדף." },
+            { before: "Let's", after: "at school at 8:00.", answer: "meet", options: ["meet", "fly", "write", "live"], he: "בואו ניפגש בבית הספר בשעה 8:00." },
+            { before: "We", after: "English every week.", answer: "learn", options: ["learn", "need", "fly", "meet"], he: "אנחנו לומדים אנגלית בכל שבוע." },
+            // Test B
+            { before: "My address is 10 Herzl", after: ".", answer: "street", options: ["street", "lunch", "friend", "favorite"], he: "הכתובת שלי היא רחוב הרצל 10." },
+            { before: "I", after: "two brothers and one sister.", answer: "have", options: ["have", "like", "live", "need"], he: "יש לי שני אחים ואחות אחת." },
+            { before: "Dan is my good", after: "at school.", answer: "friend", options: ["friend", "street", "lunch", "board"], he: "דן הוא החבר הטוב שלי בבית הספר." },
+            { before: "What is your", after: "lesson?", answer: "favorite", options: ["favorite", "nice", "new", "happy"], he: "מה השיעור האהוב עליך?" },
+            { before: "I eat", after: "at 1:00 every day.", answer: "lunch", options: ["lunch", "street", "friend", "pencil"], he: "אני אוכל/ת ארוחת צהריים ב-1:00 כל יום." },
+            { before: "I", after: "music and art.", answer: "like", options: ["like", "have", "fly", "write"], he: "אני אוהב/ת מוזיקה ואמנות." }
+        ];
+
+        // Part E: Days of the Week (All 7 days)
+        const DAYS_ORDERED = [
+            { num: 1, he: "יום ראשון", en: "Sunday" },
+            { num: 2, he: "יום שני", en: "Monday" },
+            { num: 3, he: "יום שלישי", en: "Tuesday" },
+            { num: 4, he: "יום רביעי", en: "Wednesday" },
+            { num: 5, he: "יום חמישי", en: "Thursday" },
+            { num: 6, he: "יום שישי", en: "Friday" },
+            { num: 7, he: "יום שבת", en: "Saturday" }
+        ];
+
+        // Part F: Questions & Answers (All 11 pairs from Test A & Test B)
+        const QA_ROUNDS = [
+            {
+                title: "סבב 1: שאלות ותשובות (נוסח א')",
+                pairs: [
+                    { q: "What's your name?", a: "My name is Dan.", heQ: "איך קוראים לך?" },
+                    { q: "Where do you live?", a: "I live in Tel Aviv.", heQ: "איפה את/ה גר/ה?" },
+                    { q: "How old are you?", a: "I'm 9 years old.", heQ: "בן/בת כמה את/ה?" },
+                    { q: "Do you have a sister?", a: "Yes, I do.", heQ: "יש לך אחות?" },
+                    { q: "What's your phone number?", a: "It's 050-1234567.", heQ: "מה מספר הטלפון שלך?" },
+                    { q: "What's your favorite lesson?", a: "My favorite lesson is sports.", heQ: "מה השיעור האהוב עליך?" }
+                ]
+            },
+            {
+                title: "סבב 2: שאלות ותשובות (נוסח ב')",
+                pairs: [
+                    { q: "What's your address?", a: "My address is 5 Ben Gurion street.", heQ: "מה הכתובת שלך?" },
+                    { q: "Do you have a pencil?", a: "No, I don't.", heQ: "יש לך עיפרון?" },
+                    { q: "Where do you live?", a: "I live in Haifa.", heQ: "איפה את/ה גר/ה?" },
+                    { q: "What's your name?", a: "My name is Noa.", heQ: "איך קוראים לך?" },
+                    { q: "How old are you?", a: "I am 10 years old.", heQ: "בן/בת כמה את/ה?" }
+                ]
+            }
+        ];
+
+        // Part G: Reading Rules / Phonics (All 16 words from Test A & Test B)
+        const PHONICS_DATA = [
+            // Test A
+            { he: "תמונה", full: "photo", prefix: "", suffix: "oto", correct: "ph", options: ["ph", "sh"], rule: "ph נשמע כמו פ' רפה (photo)" },
+            { he: "ארוחת צהריים", full: "lunch", prefix: "lun", suffix: "", correct: "ch", options: ["sh", "ch"], rule: "ch נשמע כמו צ' (lunch)" },
+            { he: "שלוש", full: "three", prefix: "", suffix: "ree", correct: "th", options: ["th", "wh"], rule: "th נשמע כמו ת' עם הלשון (three)" },
+            { he: "עץ", full: "tree", prefix: "tr", suffix: "", correct: "ee", options: ["ee", "oo"], rule: "ee נשמע כמו חיריק ארוך (tree)" },
+            { he: "בית", full: "house", prefix: "h", suffix: "se", correct: "ou", options: ["ar", "ou"], rule: "ou נשמע כמו אוֹאוּ (house)" },
+            { he: "מכונית", full: "car", prefix: "c", suffix: "", correct: "ar", options: ["ar", "or"], rule: "ar נשמע כמו אַר (car)" },
+            { he: "כיתה", full: "class", prefix: "cla", suffix: "", correct: "ss", options: ["ss", "ch"], rule: "ss בסוף מילה נשמע ס' (class)" },
+            { he: "ספר", full: "book", prefix: "b", suffix: "k", correct: "oo", options: ["oo", "ee"], rule: "oo נשמע כמו שורוק (book)" },
+            // Test B
+            { he: "כיסא", full: "chair", prefix: "", suffix: "air", correct: "ch", options: ["ch", "sh"], rule: "ch נשמע כמו צ' (chair)" },
+            { he: "מורה", full: "teacher", prefix: "tea", suffix: "er", correct: "ch", options: ["ch", "th"], rule: "ch נשמע כמו צ' (teacher)" },
+            { he: "דג", full: "fish", prefix: "fi", suffix: "", correct: "sh", options: ["sh", "ch"], rule: "sh נשמע כמו ש' (fish)" },
+            { he: "חום (צבע)", full: "brown", prefix: "br", suffix: "n", correct: "ow", options: ["ow", "ee"], rule: "ow נשמע כמו אוֹאוּ (brown)" },
+            { he: "רגליים", full: "feet", prefix: "f", suffix: "t", correct: "ee", options: ["ee", "ar"], rule: "ee נשמע כמו חיריק ארוך (feet)" },
+            { he: "חווה", full: "farm", prefix: "f", suffix: "m", correct: "ar", options: ["ar", "or"], rule: "ar נשמע כמו אַר (farm)" },
+            { he: "סוס", full: "horse", prefix: "h", suffix: "se", correct: "or", options: ["or", "ir"], rule: "or נשמע כמו אוֹר (horse)" },
+            { he: "ירח", full: "moon", prefix: "m", suffix: "n", correct: "oo", options: ["oo", "ea"], rule: "oo נשמע כמו שורוק (moon)" }
+        ];
+
+        /* =====================================================================
+           2. STAGES CONFIGURATION
+           ===================================================================== */
+        const STAGES = [
+            {
+                id: "vocab",
+                num: 1,
+                title: "אוצר מילים מנצח",
+                subtitle: "תרגום 20 מילים מאנגלית לעברית (נוסח א' + ב')",
+                icon: "📚",
+                color: "from-violet-500 to-purple-600",
+                borderColor: "border-purple-200",
+                badgeBg: "bg-purple-100 text-purple-800"
+            },
+            {
+                id: "spelling",
+                num: 2,
+                title: "אלופת האיות",
+                subtitle: "בניית 16 מילים באנגלית מעברית (נוסח א' + ב')",
+                icon: "✍️",
+                color: "from-pink-500 to-rose-600",
+                borderColor: "border-pink-200",
+                badgeBg: "bg-pink-100 text-pink-800"
+            },
+            {
+                id: "sorting",
+                num: 3,
+                title: "מיון מילים לקבוצות",
+                subtitle: "24 מילים למיון: משפחה, ציוד, מקצועות, פעולות וימים",
+                icon: "🗂️",
+                color: "from-sky-500 to-blue-600",
+                borderColor: "border-sky-200",
+                badgeBg: "bg-sky-100 text-sky-800"
+            },
+            {
+                id: "sentences",
+                num: 4,
+                title: "השלמת משפטים",
+                subtitle: "12 משפטים להשלמה עם מחסן מילים חכם",
+                icon: "🧩",
+                color: "from-emerald-500 to-teal-600",
+                borderColor: "border-emerald-200",
+                badgeBg: "bg-emerald-100 text-emerald-800"
+            },
+            {
+                id: "days",
+                num: 5,
+                title: "ימות השבוע (Days)",
+                subtitle: "סידור כל 7 ימות השבוע לפי הסדר + חידון בזק",
+                icon: "📅",
+                color: "from-amber-400 to-orange-500",
+                borderColor: "border-amber-200",
+                badgeBg: "bg-amber-100 text-amber-800"
+            },
+            {
+                id: "qa",
+                num: 6,
+                title: "שאלות ותשובות",
+                subtitle: "התאמה בין 11 שאלות לתשובות הנכונות באנגלית",
+                icon: "💬",
+                color: "from-indigo-500 to-blue-700",
+                borderColor: "border-indigo-200",
+                badgeBg: "bg-indigo-100 text-indigo-800"
+            },
+            {
+                id: "phonics",
+                num: 7,
+                title: "כללי קריאה (Phonics)",
+                subtitle: "בחירת צירוף האותיות הנכון ב-16 מילים",
+                icon: "🔤",
+                color: "from-fuchsia-500 to-pink-600",
+                borderColor: "border-fuchsia-200",
+                badgeBg: "bg-fuchsia-100 text-fuchsia-800"
+            },
+            {
+                id: "boss",
+                num: 8,
+                title: "מבחן המסכם ל-100! 👑",
+                subtitle: "אתגר מעורב מכל הנושאים לבדיקת מוכנות מושלמת",
+                icon: "🏆",
+                color: "from-yellow-400 via-amber-500 to-orange-600",
+                borderColor: "border-amber-300",
+                badgeBg: "bg-amber-100 text-amber-900"
+            }
+        ];
+
+        const PRAISE_MESSAGES = [
+            { text: "אלופה! בול פגיעה!", emoji: "🎯" },
+            { text: "מדהים! את בדרך ל-100!", emoji: "💯" },
+            { text: "איזו כוכבת! כל הכבוד!", emoji: "🌟" },
+            { text: "מושלם! אין עלייך!", emoji: "👑" },
+            { text: "וואו! איזו שליטה באנגלית!", emoji: "🚀" },
+            { text: "תשובה של אלופות!", emoji: "🏆" },
+            { text: "פשוט גאונה! המשיכי כך!", emoji: "✨" }
+        ];
+
+        /* =====================================================================
+           3. STATE & SOUND ENGINE (WEB AUDIO API)
+           ===================================================================== */
+        let state = {
+            xp: 0,
+            streak: 0,
+            soundEnabled: true,
+            completedStages: {}, // stageId -> { stars: 3, bestAccuracy: 100 }
+            currentStageId: null,
+            questions: [],
+            currentIndex: 0,
+            correctCount: 0,
+            mistakes: [],
+            answeredCurrent: false,
+            currentSpeakText: ""
+        };
+
+        // Load saved progress if available
+        try {
+            const saved = localStorage.getItem("english_quest_g4_v1");
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                state.xp = parsed.xp || 0;
+                state.completedStages = parsed.completedStages || {};
+            }
+        } catch (e) {}
+
+        function saveProgress() {
+            try {
+                localStorage.setItem("english_quest_g4_v1", JSON.stringify({
+                    xp: state.xp,
+                    completedStages: state.completedStages
+                }));
+            } catch (e) {}
+        }
+
+        // Synthesized Sound Effects
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        let audioCtx = null;
+
+        function ensureAudio() {
+            if (!audioCtx) audioCtx = new AudioCtx();
+            if (audioCtx.state === "suspended") audioCtx.resume();
+        }
+
+        function playSound(type) {
+            if (!state.soundEnabled) return;
+            try {
+                ensureAudio();
+                const now = audioCtx.currentTime;
+
+                if (type === "success") {
+                    const freqs = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+                    freqs.forEach((f, idx) => {
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        osc.type = "triangle";
+                        osc.frequency.setValueAtTime(f, now + idx * 0.065);
+                        gain.gain.setValueAtTime(0.18, now + idx * 0.065);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.065 + 0.3);
+                        osc.connect(gain);
+                        gain.connect(audioCtx.destination);
+                        osc.start(now + idx * 0.065);
+                        osc.stop(now + idx * 0.065 + 0.32);
+                    });
+                } else if (type === "pop") {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = "sine";
+                    osc.frequency.setValueAtTime(600, now);
+                    osc.frequency.exponentialRampToValueAtTime(900, now + 0.08);
+                    gain.gain.setValueAtTime(0.12, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.09);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.1);
+                } else if (type === "error") {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = "sine";
+                    osc.frequency.setValueAtTime(260, now);
+                    osc.frequency.linearRampToValueAtTime(200, now + 0.22);
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.26);
+                } else if (type === "fanfare") {
+                    const notes = [523.25, 659.25, 783.99, 1046.50, 783.99, 1046.50];
+                    const times = [0, 0.1, 0.2, 0.32, 0.48, 0.62];
+                    notes.forEach((f, i) => {
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        osc.type = "triangle";
+                        osc.frequency.setValueAtTime(f, now + times[i]);
+                        gain.gain.setValueAtTime(0.22, now + times[i]);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + times[i] + 0.35);
+                        osc.connect(gain);
+                        gain.connect(audioCtx.destination);
+                        osc.start(now + times[i]);
+                        osc.stop(now + times[i] + 0.38);
+                    });
+                }
+            } catch (e) {}
+        }
+
+        function toggleSound() {
+            state.soundEnabled = !state.soundEnabled;
+            document.getElementById("sound-btn").textContent = state.soundEnabled ? "🔊" : "🔇";
+            if (state.soundEnabled) playSound("pop");
+        }
+
+        function speakText(text) {
+            if (!text || !("speechSynthesis" in window)) return;
+            try {
+                window.speechSynthesis.cancel();
+                const utter = new SpeechSynthesisUtterance(text);
+                utter.lang = "en-US";
+                utter.rate = 0.88;
+                window.speechSynthesis.speak(utter);
+            } catch (e) {}
+        }
+
+        function speakCurrentWord() {
+            if (state.currentSpeakText) {
+                speakText(state.currentSpeakText);
+            }
+        }
+
+        /* =====================================================================
+           4. CONFETTI & VISUAL FEEDBACK
+           ===================================================================== */
+        const confettiCanvas = document.getElementById("confetti-canvas");
+        const cCtx = confettiCanvas.getContext("2d");
+        let confettiPieces = [];
+
+        function resizeConfetti() {
+            confettiCanvas.width = window.innerWidth;
+            confettiCanvas.height = window.innerHeight;
+        }
+        window.addEventListener("resize", resizeConfetti);
+        resizeConfetti();
+
+        function launchConfetti(count = 55) {
+            const colors = ["#a855f7", "#ec4899", "#f59e0b", "#10b981", "#3b82f6", "#facc15"];
+            for (let i = 0; i < count; i++) {
+                confettiPieces.push({
+                    x: Math.random() * confettiCanvas.width,
+                    y: -20 - Math.random() * 100,
+                    w: 8 + Math.random() * 8,
+                    h: 6 + Math.random() * 6,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    vx: (Math.random() - 0.5) * 6,
+                    vy: 3 + Math.random() * 5,
+                    rot: Math.random() * 360,
+                    vRot: (Math.random() - 0.5) * 12
+                });
+            }
+        }
+
+        function updateConfetti() {
+            cCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+            confettiPieces.forEach((p, idx) => {
+                p.x += p.vx;
+                p.y += p.vy;
+                p.rot += p.vRot;
+                cCtx.save();
+                cCtx.translate(p.x, p.y);
+                cCtx.rotate((p.rot * Math.PI) / 180);
+                cCtx.fillStyle = p.color;
+                cCtx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+                cCtx.restore();
+                if (p.y > confettiCanvas.height + 30) {
+                    confettiPieces.splice(idx, 1);
+                }
+            });
+            requestAnimationFrame(updateConfetti);
+        }
+        requestAnimationFrame(updateConfetti);
+
+        let praiseTimeout = null;
+        function showPraiseBanner() {
+            const msg = PRAISE_MESSAGES[Math.floor(Math.random() * PRAISE_MESSAGES.length)];
+            const banner = document.getElementById("praise-banner");
+            document.getElementById("praise-emoji").textContent = msg.emoji;
+            document.getElementById("praise-text").textContent = msg.text;
+
+            banner.classList.remove("opacity-0", "-translate-y-4");
+            banner.classList.add("opacity-100", "translate-y-0");
+
+            clearTimeout(praiseTimeout);
+            praiseTimeout = setTimeout(() => {
+                banner.classList.remove("opacity-100", "translate-y-0");
+                banner.classList.add("opacity-0", "-translate-y-4");
+            }, 1600);
+        }
+
+        /* =====================================================================
+           5. UI HEADER & HOME MAP RENDERING
+           ===================================================================== */
+        function shuffle(arr) {
+            const copy = [...arr];
+            for (let i = copy.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [copy[i], copy[j]] = [copy[j], copy[i]];
+            }
+            return copy;
+        }
+
+        function updateStatsUI() {
+            document.getElementById("xp-count").textContent = state.xp;
+            document.getElementById("streak-count").textContent = state.streak;
+
+            const streakBadge = document.getElementById("streak-badge");
+            if (state.streak >= 3) {
+                streakBadge.classList.add("scale-110", "bg-orange-200");
+            } else {
+                streakBadge.classList.remove("scale-110", "bg-orange-200");
+            }
+
+            let levelTitle = "מתחילה אלופה";
+            if (state.xp >= 1500) levelTitle = "מאסטרית 100 באנגלית 👑";
+            else if (state.xp >= 900) levelTitle = "כוכבת על באנגלית 🌟";
+            else if (state.xp >= 450) levelTitle = "מתקדמת מצטיינת 🚀";
+            else if (state.xp >= 150) levelTitle = "חוקרת מילים 🔍";
+            document.getElementById("level-title").textContent = levelTitle;
+
+            const completedCount = Object.keys(state.completedStages).length;
+            document.getElementById("completed-stages-count").textContent = completedCount;
+            document.getElementById("total-stages-count").textContent = STAGES.length;
+            const pct = Math.round((completedCount / STAGES.length) * 100);
+            document.getElementById("total-progress-bar").style.width = `${pct}%`;
+        }
+
+        function renderHomeMap() {
+            updateStatsUI();
+            const grid = document.getElementById("stages-grid");
+            grid.innerHTML = "";
+
+            STAGES.forEach((stage) => {
+                const doneInfo = state.completedStages[stage.id];
+                const isBoss = stage.id === "boss";
+
+                const card = document.createElement("button");
+                card.onclick = () => startStage(stage.id);
+                card.className = `btn-3d text-right glass-card rounded-3xl p-5 border-2 ${stage.borderColor} hover:scale-[1.02] transition-all flex items-center gap-4 cursor-pointer relative overflow-hidden ${isBoss ? "sm:col-span-2 bg-gradient-to-l from-amber-50/95 to-yellow-50/95 border-amber-300" : ""}`;
+
+                const starsHtml = doneInfo
+                    ? `<div class="flex items-center gap-0.5 text-sm">${"⭐".repeat(doneInfo.stars)}${"☆".repeat(3 - doneInfo.stars)}</div>`
+                    : `<span class="text-xs font-bold px-2.5 py-0.5 rounded-full ${stage.badgeBg}">שלב ${stage.num}</span>`;
+
+                card.innerHTML = `
+                    <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br ${stage.color} flex items-center justify-center text-3xl sm:text-4xl text-white shadow-md shrink-0">
+                        ${stage.icon}
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center justify-between gap-2 mb-1">
+                            <h3 class="font-extrabold text-lg sm:text-xl text-slate-800 truncate">${stage.title}</h3>
+                            ${starsHtml}
+                        </div>
+                        <p class="text-xs sm:text-sm text-slate-600 leading-snug">${stage.subtitle}</p>
+                    </div>
+                    <div class="text-purple-500 font-extrabold text-xl shrink-0">⬅️</div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function goHome() {
+            document.getElementById("game-view").classList.add("hidden");
+            document.getElementById("complete-view").classList.add("hidden");
+            document.getElementById("home-view").classList.remove("hidden");
+            renderHomeMap();
+        }
+
+        /* =====================================================================
+           6. STAGE BUILDER & QUESTION GENERATORS
+           ===================================================================== */
+        function buildQuestionsForStage(stageId) {
+            if (stageId === "vocab") {
+                return shuffle(VOCAB_DATA).map(item => {
+                    const distractors = shuffle(VOCAB_DATA.filter(x => x.en !== item.en)).slice(0, 3).map(x => x.he);
+                    return {
+                        type: "vocab",
+                        item,
+                        options: shuffle([item.he, ...distractors])
+                    };
+                });
+            }
+
+            if (stageId === "spelling") {
+                return shuffle(SPELLING_DATA).map(item => ({
+                    type: "spelling",
+                    item
+                }));
+            }
+
+            if (stageId === "sorting") {
+                return SORTING_ROUNDS.map(round => ({
+                    type: "sorting",
+                    round: {
+                        ...round,
+                        items: shuffle(round.items)
+                    }
+                }));
+            }
+
+            if (stageId === "sentences") {
+                return shuffle(SENTENCES_DATA).map(item => ({
+                    type: "sentence",
+                    item: {
+                        ...item,
+                        options: shuffle(item.options)
+                    }
+                }));
+            }
+
+            if (stageId === "days") {
+                const quizQuestions = shuffle(DAYS_ORDERED).map(day => {
+                    const others = shuffle(DAYS_ORDERED.filter(d => d.en !== day.en)).slice(0, 3).map(d => d.en);
+                    return {
+                        type: "day_quiz",
+                        day,
+                        options: shuffle([day.en, ...others])
+                    };
+                });
+                return [
+                    { type: "days_order" },
+                    ...quizQuestions
+                ];
+            }
+
+            if (stageId === "qa") {
+                return QA_ROUNDS.map(round => ({
+                    type: "qa_match",
+                    round
+                }));
+            }
+
+            if (stageId === "phonics") {
+                return shuffle(PHONICS_DATA).map(item => ({
+                    type: "phonics",
+                    item: {
+                        ...item,
+                        options: shuffle(item.options)
+                    }
+                }));
+            }
+
+            if (stageId === "boss") {
+                // Mixed Final Boss Exam from all topics (18 rich questions!)
+                const vQ = shuffle(VOCAB_DATA).slice(0, 4).map(item => {
+                    const distractors = shuffle(VOCAB_DATA.filter(x => x.en !== item.en)).slice(0, 3).map(x => x.he);
+                    return { type: "vocab", item, options: shuffle([item.he, ...distractors]) };
+                });
+                const spQ = shuffle(SPELLING_DATA).slice(0, 3).map(item => ({ type: "spelling", item }));
+                const snQ = shuffle(SENTENCES_DATA).slice(0, 4).map(item => ({
+                    type: "sentence",
+                    item: { ...item, options: shuffle(item.options) }
+                }));
+                const dQ = shuffle(DAYS_ORDERED).slice(0, 2).map(day => {
+                    const others = shuffle(DAYS_ORDERED.filter(d => d.en !== day.en)).slice(0, 3).map(d => d.en);
+                    return { type: "day_quiz", day, options: shuffle([day.en, ...others]) };
+                });
+                const phQ = shuffle(PHONICS_DATA).slice(0, 4).map(item => ({
+                    type: "phonics",
+                    item: { ...item, options: shuffle(item.options) }
+                }));
+                const qaSingle = shuffle([...QA_ROUNDS[0].pairs, ...QA_ROUNDS[1].pairs]).slice(0, 3).map(pair => {
+                    const allAns = [...QA_ROUNDS[0].pairs, ...QA_ROUNDS[1].pairs].map(p => p.a).filter(a => a !== pair.a);
+                    return {
+                        type: "qa_single",
+                        pair,
+                        options: shuffle([pair.a, ...shuffle(allAns).slice(0, 3)])
+                    };
+                });
+                return shuffle([...vQ, ...spQ, ...snQ, ...dQ, ...phQ, ...qaSingle]);
+            }
+            return [];
+        }
+
+        function startStage(stageId) {
+            playSound("pop");
+            state.currentStageId = stageId;
+            state.questions = buildQuestionsForStage(stageId);
+            state.currentIndex = 0;
+            state.correctCount = 0;
+            state.mistakes = [];
+            state.answeredCurrent = false;
+
+            const stageObj = STAGES.find(s => s.id === stageId);
+            document.getElementById("stage-header-title").textContent = `${stageObj.icon} ${stageObj.title}`;
+
+            document.getElementById("home-view").classList.add("hidden");
+            document.getElementById("complete-view").classList.add("hidden");
+            document.getElementById("game-view").classList.remove("hidden");
+
+            renderCurrentQuestion();
+        }
+
+        function restartCurrentStage() {
+            if (state.currentStageId) startStage(state.currentStageId);
+        }
+
+        function handleSuccess(points = 15, mistakeLabel = null, speakAfter = null) {
+            state.answeredCurrent = true;
+            state.correctCount++;
+            state.streak++;
+            const bonus = state.streak >= 3 ? 5 : 0;
+            state.xp += points + bonus;
+
+            playSound("success");
+            showPraiseBanner();
+            launchConfetti(30);
+            updateStatsUI();
+            saveProgress();
+
+            if (speakAfter) speakText(speakAfter);
+
+            const fbArea = document.getElementById("feedback-area");
+            const fbMsg = document.getElementById("feedback-message");
+            fbMsg.innerHTML = `<span class="text-emerald-600">✅ מעולה! +${points + bonus} נקודות ${bonus ? "🔥 בונוס רצף!" : ""}</span>`;
+            fbArea.classList.remove("hidden");
+        }
+
+        function handleMistake(explanationHtml, mistakeRecord) {
+            state.answeredCurrent = true;
+            state.streak = 0;
+            playSound("error");
+            updateStatsUI();
+
+            if (mistakeRecord) {
+                state.mistakes.push(mistakeRecord);
+            }
+
+            const arena = document.getElementById("arena-card");
+            arena.classList.add("animate-shake");
+            setTimeout(() => arena.classList.remove("animate-shake"), 450);
+
+            const fbArea = document.getElementById("feedback-area");
+            const fbMsg = document.getElementById("feedback-message");
+            fbMsg.innerHTML = `<span class="text-rose-600">💡 לא נורא, לומדים! ${explanationHtml}</span>`;
+            fbArea.classList.remove("hidden");
+        }
+
+        function nextQuestion() {
+            playSound("pop");
+            state.currentIndex++;
+            if (state.currentIndex >= state.questions.length) {
+                finishStage();
+            } else {
+                renderCurrentQuestion();
+            }
+        }
+
+        function finishStage() {
+            playSound("fanfare");
+            launchConfetti(110);
+
+            const total = state.questions.length;
+            const accuracy = Math.round((state.correctCount / total) * 100);
+            const stars = accuracy >= 90 ? 3 : accuracy >= 70 ? 2 : 1;
+            const stageBonus = stars * 25;
+            state.xp += stageBonus;
+
+            const prev = state.completedStages[state.currentStageId];
+            if (!prev || stars >= prev.stars) {
+                state.completedStages[state.currentStageId] = { stars, bestAccuracy: accuracy };
+            }
+            saveProgress();
+            updateStatsUI();
+
+            document.getElementById("game-view").classList.add("hidden");
+            document.getElementById("complete-view").classList.remove("hidden");
+
+            document.getElementById("complete-stars").textContent = `${stars}/3 ⭐`;
+            document.getElementById("complete-accuracy").textContent = `${accuracy}%`;
+            document.getElementById("complete-xp").textContent = `+${stageBonus}`;
+
+            if (accuracy === 100) {
+                document.getElementById("complete-title").textContent = "ציון 100 מושלם! 👑";
+                document.getElementById("complete-subtitle").textContent = "ענית נכון על כל השאלות בלי אף טעות! את מוכנה למבחן!";
+            } else if (accuracy >= 80) {
+                document.getElementById("complete-title").textContent = "כל הכבוד אלופה! 🌟";
+                document.getElementById("complete-subtitle").textContent = "תוצאה נהדרת! עוד קצת תרגול ואת על 100!";
+            } else {
+                document.getElementById("complete-title").textContent = "יופי של התקדמות! 💪";
+                document.getElementById("complete-subtitle").textContent = "עברי על המילים למטה ונסי שוב כדי לשפר את השיא!";
+            }
+
+            const reviewBox = document.getElementById("mistakes-review-box");
+            const mistakesList = document.getElementById("mistakes-list");
+            if (state.mistakes.length > 0) {
+                reviewBox.classList.remove("hidden");
+                mistakesList.innerHTML = state.mistakes.map(m => `<li>• ${m}</li>`).join("");
+            } else {
+                reviewBox.classList.add("hidden");
+            }
+        }
+
+        /* =====================================================================
+           7. RENDERERS FOR ALL 7 QUESTION MECHANICS
+           ===================================================================== */
+        function renderCurrentQuestion() {
+            state.answeredCurrent = false;
+            document.getElementById("feedback-area").classList.add("hidden");
+
+            const q = state.questions[state.currentIndex];
+            const total = state.questions.length;
+            document.getElementById("stage-progress-text").textContent = `${state.currentIndex + 1} / ${total}`;
+            document.getElementById("stage-progress-bar").style.width = `${((state.currentIndex + 1) / total) * 100}%`;
+
+            const container = document.getElementById("question-container");
+            container.innerHTML = "";
+            container.className = "w-full animate-pop";
+
+            // Set TTS word if applicable
+            state.currentSpeakText = "";
+            const ttsBtn = document.getElementById("tts-btn");
+            ttsBtn.classList.add("opacity-40", "pointer-events-none");
+
+            if (q.type === "vocab") renderVocabQuestion(q, container);
+            else if (q.type === "spelling") renderSpellingQuestion(q, container);
+            else if (q.type === "sorting") renderSortingQuestion(q, container);
+            else if (q.type === "sentence") renderSentenceQuestion(q, container);
+            else if (q.type === "days_order") renderDaysOrderQuestion(q, container);
+            else if (q.type === "day_quiz") renderDayQuizQuestion(q, container);
+            else if (q.type === "qa_match") renderQAMatchQuestion(q, container);
+            else if (q.type === "qa_single") renderQASingleQuestion(q, container);
+            else if (q.type === "phonics") renderPhonicsQuestion(q, container);
+
+            if (state.currentSpeakText) {
+                ttsBtn.classList.remove("opacity-40", "pointer-events-none");
+            }
+        }
+
+        // --- A. VOCABULARY (ENGLISH -> HEBREW) ---
+        function renderVocabQuestion(q, container) {
+            state.currentSpeakText = q.item.en;
+            speakText(q.item.en);
+
+            container.innerHTML = `
+                <div class="text-center mb-6">
+                    <span class="inline-block bg-purple-100 text-purple-800 text-xs sm:text-sm font-bold px-3 py-1 rounded-full mb-3">
+                        מה הפירוש בעברית של המילה?
+                    </span>
+                    <div class="flex items-center justify-center gap-3 my-2">
+                        <span class="text-4xl sm:text-5xl">${q.item.emoji}</span>
+                        <button onclick="speakCurrentWord()" class="en-font text-4xl sm:text-6xl font-bold text-purple-900 bg-purple-50 hover:bg-purple-100 px-6 py-3 rounded-3xl border-2 border-purple-200 transition cursor-pointer">
+                            ${q.item.en} 🔊
+                        </button>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 max-w-2xl mx-auto">
+                    ${q.options.map(opt => `
+                        <button data-opt="${opt}" onclick="checkVocabAnswer(this, '${opt.replace(/'/g, "\\'")}')" class="vocab-opt btn-3d bg-white hover:bg-purple-50 border-2 border-slate-200 hover:border-purple-400 rounded-2xl p-4 text-lg sm:text-xl font-bold text-slate-800 cursor-pointer">
+                            ${opt}
+                        </button>
+                    `).join("")}
+                </div>
+            `;
+        }
+
+        function checkVocabAnswer(btn, chosen) {
+            if (state.answeredCurrent) return;
+            const q = state.questions[state.currentIndex];
+            const buttons = document.querySelectorAll(".vocab-opt");
+
+            buttons.forEach(b => {
+                b.disabled = true;
+                if (b.dataset.opt === q.item.he) {
+                    b.classList.remove("bg-white", "border-slate-200");
+                    b.classList.add("bg-emerald-500", "text-white", "border-emerald-600");
+                }
+            });
+
+            if (chosen === q.item.he) {
+                handleSuccess(15, null, q.item.en);
+            } else {
+                btn.classList.remove("bg-white", "border-slate-200");
+                btn.classList.add("bg-rose-500", "text-white", "border-rose-600");
+                handleMistake(
+                    `<strong class="en-font">${q.item.en}</strong> = <strong>${q.item.he}</strong>`,
+                    `<strong class="en-font">${q.item.en}</strong> — ${q.item.he}`
+                );
+            }
+        }
+
+        // --- B. SPELLING BUILDER (HEBREW -> ENGLISH) ---
+        let spellingState = { built: [], tiles: [] };
+
+        function renderSpellingQuestion(q, container) {
+            state.currentSpeakText = q.item.en;
+            const letters = q.item.en.split("");
+            const scrambled = shuffle(letters.map((char, idx) => ({ char, id: idx, used: false })));
+            spellingState = { built: [], tiles: scrambled };
+
+            container.innerHTML = `
+                <div class="text-center mb-5">
+                    <span class="inline-block bg-pink-100 text-pink-800 text-xs sm:text-sm font-bold px-3 py-1 rounded-full mb-2">
+                        כתבי את המילה באנגלית בעזרת האותיות!
+                    </span>
+                    <div class="text-5xl mb-2">${q.item.emoji}</div>
+                    <h3 class="text-3xl sm:text-4xl font-extrabold text-slate-800 mb-1">${q.item.he}</h3>
+                    <button onclick="document.getElementById('spell-hint').classList.remove('hidden')" class="text-xs font-bold text-amber-700 bg-amber-100 hover:bg-amber-200 px-3 py-1 rounded-full mt-1 cursor-pointer">
+                        💡 צריכה רמז?
+                    </button>
+                    <p id="spell-hint" class="hidden text-sm font-bold text-amber-800 mt-1">${q.item.hint}</p>
+                </div>
+
+                <!-- Target Slots (LTR) -->
+                <div id="spell-slots" dir="ltr" class="flex flex-wrap justify-center gap-2 min-h-[64px] bg-pink-50/80 border-2 border-dashed border-pink-300 rounded-2xl p-3 mb-5 max-w-xl mx-auto"></div>
+
+                <!-- Scrambled Letter Tiles (LTR) -->
+                <div id="spell-bank" dir="ltr" class="flex flex-wrap justify-center gap-2.5 mb-5 max-w-xl mx-auto"></div>
+
+                <!-- Action Buttons -->
+                <div class="flex justify-center gap-3">
+                    <button onclick="clearSpelling()" class="btn-3d bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-5 py-2.5 rounded-2xl text-sm sm:text-base cursor-pointer">
+                        🗑️ נקה הכל
+                    </button>
+                    <button id="check-spell-btn" onclick="checkSpellingAnswer()" class="btn-3d bg-gradient-to-r from-pink-500 to-rose-600 hover:from-pink-600 hover:to-rose-700 text-white font-extrabold px-8 py-2.5 rounded-2xl text-base sm:text-lg cursor-pointer">
+                        בדיקה ✨
+                    </button>
+                </div>
+            `;
+            updateSpellingUI();
+        }
+
+        function updateSpellingUI() {
+            const q = state.questions[state.currentIndex];
+            const slotsEl = document.getElementById("spell-slots");
+            const bankEl = document.getElementById("spell-bank");
+            if (!slotsEl || !bankEl) return;
+
+            const targetLen = q.item.en.length;
+            let slotsHtml = "";
+            for (let i = 0; i < targetLen; i++) {
+                const tile = spellingState.built[i];
+                if (tile) {
+                    slotsHtml += `
+                        <button onclick="removeSpellingTile(${i})" class="en-font w-11 h-12 sm:w-13 sm:h-14 rounded-xl bg-purple-600 text-white font-bold text-2xl sm:text-3xl shadow-md hover:bg-purple-700 transition cursor-pointer">
+                            ${tile.char}
+                        </button>
+                    `;
+                } else {
+                    slotsHtml += `
+                        <div class="w-11 h-12 sm:w-13 sm:h-14 rounded-xl bg-white border-2 border-pink-200 flex items-center justify-center text-pink-200 font-bold text-xl">
+                            _
+                        </div>
+                    `;
+                }
+            }
+            slotsEl.innerHTML = slotsHtml;
+
+            bankEl.innerHTML = spellingState.tiles.map(t => `
+                <button ${t.used ? "disabled" : ""} onclick="pickSpellingTile(${t.id})" class="en-font btn-3d w-12 h-13 sm:w-14 sm:h-15 rounded-2xl font-bold text-2xl sm:text-3xl transition cursor-pointer ${
+                    t.used
+                        ? "bg-slate-100 text-slate-300 border-2 border-slate-200 opacity-40 shadow-none"
+                        : "bg-white hover:bg-amber-50 text-slate-800 border-2 border-amber-300"
+                }">
+                    ${t.char}
+                </button>
+            `).join("");
+        }
+
+        function pickSpellingTile(tileId) {
+            if (state.answeredCurrent) return;
+            const tile = spellingState.tiles.find(t => t.id === tileId);
+            if (!tile || tile.used) return;
+            playSound("pop");
+            tile.used = true;
+            spellingState.built.push(tile);
+            updateSpellingUI();
+        }
+
+        function removeSpellingTile(builtIndex) {
+            if (state.answeredCurrent) return;
+            const tile = spellingState.built[builtIndex];
+            if (!tile) return;
+            playSound("pop");
+            tile.used = false;
+            spellingState.built.splice(builtIndex, 1);
+            updateSpellingUI();
+        }
+
+        function clearSpelling() {
+            if (state.answeredCurrent) return;
+            playSound("pop");
+            spellingState.tiles.forEach(t => t.used = false);
+            spellingState.built = [];
+            updateSpellingUI();
+        }
+
+        function checkSpellingAnswer() {
+            if (state.answeredCurrent) return;
+            const q = state.questions[state.currentIndex];
+            const attempt = spellingState.built.map(t => t.char).join("");
+            if (attempt.length < q.item.en.length) {
+                const slotsEl = document.getElementById("spell-slots");
+                slotsEl.classList.add("animate-shake");
+                setTimeout(() => slotsEl.classList.remove("animate-shake"), 400);
+                return;
+            }
+
+            document.getElementById("check-spell-btn").disabled = true;
+            if (attempt === q.item.en) {
+                handleSuccess(20, null, q.item.en);
+            } else {
+                speakText(q.item.en);
+                handleMistake(
+                    `${q.item.he} כותבים כך: <strong class="en-font text-lg">${q.item.en}</strong>`,
+                    `${q.item.he} — <strong class="en-font">${q.item.en}</strong>`
+                );
+            }
+        }
+
+        // --- C. WORD GROUPS SORTING ---
+        let sortingState = { selectedWord: null, placed: {} };
+
+        function renderSortingQuestion(q, container) {
+            sortingState = { selectedWord: null, placed: {} };
+            q.round.categories.forEach(c => sortingState.placed[c.id] = []);
+
+            container.innerHTML = `
+                <div class="text-center mb-4">
+                    <span class="inline-block bg-sky-100 text-sky-800 text-xs sm:text-sm font-bold px-3 py-1 rounded-full mb-1">
+                        ${q.round.title}
+                    </span>
+                    <h3 class="text-lg sm:text-xl font-extrabold text-slate-800">
+                        לחצי על מילה באנגלית ואז לחצי על הקבוצה המתאימה לה!
+                    </h3>
+                </div>
+
+                <!-- Word Pool -->
+                <div id="sort-pool" dir="ltr" class="flex flex-wrap justify-center gap-2 bg-slate-50 border-2 border-slate-200 rounded-2xl p-3 mb-5 min-h-[76px]"></div>
+
+                <!-- 3 Category Buckets -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    ${q.round.categories.map(cat => `
+                        <div onclick="placeWordInBucket('${cat.id}')" class="rounded-2xl border-2 border-${cat.color}-300 bg-${cat.color}-50/70 hover:bg-${cat.color}-100/80 p-3 min-h-[160px] flex flex-col transition cursor-pointer">
+                            <div class="font-extrabold text-center text-sm sm:text-base text-${cat.color}-900 border-b border-${cat.color}-200 pb-2 mb-2">
+                                ${cat.emoji} ${cat.title}
+                            </div>
+                            <div id="bucket-${cat.id}" dir="ltr" class="flex flex-wrap gap-1.5 justify-center flex-1 items-start"></div>
+                        </div>
+                    `).join("")}
+                </div>
+            `;
+            updateSortingUI();
+        }
+
+        function updateSortingUI() {
+            const q = state.questions[state.currentIndex];
+            const poolEl = document.getElementById("sort-pool");
+            const allPlacedWords = Object.values(sortingState.placed).flat();
+            const remaining = q.round.items.filter(i => !allPlacedWords.includes(i.word));
+
+            poolEl.innerHTML = remaining.map(item => {
+                const isSelected = sortingState.selectedWord === item.word;
+                return `
+                    <button onclick="selectSortWord('${item.word}')" class="en-font btn-3d px-3.5 py-2 rounded-xl font-bold text-base sm:text-lg transition cursor-pointer ${
+                        isSelected
+                            ? "bg-purple-600 text-white border-2 border-purple-800 scale-105"
+                            : "bg-white text-slate-800 border-2 border-slate-300 hover:border-purple-400"
+                    }">
+                        ${item.word}
+                    </button>
+                `;
+            }).join("");
+
+            q.round.categories.forEach(cat => {
+                const bEl = document.getElementById(`bucket-${cat.id}`);
+                bEl.innerHTML = sortingState.placed[cat.id].map(w => `
+                    <span class="en-font bg-white border border-${cat.color}-300 text-${cat.color}-900 font-bold px-2.5 py-1 rounded-lg text-sm shadow-sm">
+                        ✓ ${w}
+                    </span>
+                `).join("");
+            });
+        }
+
+        function selectSortWord(word) {
+            if (state.answeredCurrent) return;
+            playSound("pop");
+            speakText(word);
+            sortingState.selectedWord = (sortingState.selectedWord === word) ? null : word;
+            updateSortingUI();
+        }
+
+        function placeWordInBucket(catId) {
+            if (state.answeredCurrent || !sortingState.selectedWord) return;
+            const q = state.questions[state.currentIndex];
+            const itemObj = q.round.items.find(i => i.word === sortingState.selectedWord);
+            if (!itemObj) return;
+
+            if (itemObj.cat === catId) {
+                playSound("pop");
+                sortingState.placed[catId].push(itemObj.word);
+                sortingState.selectedWord = null;
+                state.xp += 4;
+                updateStatsUI();
+                updateSortingUI();
+
+                const totalPlaced = Object.values(sortingState.placed).flat().length;
+                if (totalPlaced === q.round.items.length) {
+                    handleSuccess(25);
+                }
+            } else {
+                playSound("error");
+                const poolEl = document.getElementById("sort-pool");
+                poolEl.classList.add("animate-shake");
+                setTimeout(() => poolEl.classList.remove("animate-shake"), 400);
+            }
+        }
+
+        // --- D. SENTENCE COMPLETION ---
+        function renderSentenceQuestion(q, container) {
+            const fullSentence = `${q.item.before} ${q.item.answer} ${q.item.after}`.replace(" .", ".");
+            state.currentSpeakText = fullSentence;
+
+            container.innerHTML = `
+                <div class="text-center mb-6">
+                    <span class="inline-block bg-emerald-100 text-emerald-800 text-xs sm:text-sm font-bold px-3 py-1 rounded-full mb-3">
+                        השלימי את המילה החסרה במשפט:
+                    </span>
+                    <div dir="ltr" class="en-font text-2xl sm:text-3xl font-bold text-slate-800 bg-emerald-50/80 border-2 border-emerald-200 rounded-3xl p-5 my-2 leading-relaxed">
+                        ${q.item.before}
+                        <span id="sentence-blank" class="inline-block min-w-[110px] border-b-4 border-emerald-500 text-emerald-700 px-3 mx-1">?</span>
+                        ${q.item.after}
+                    </div>
+                    <button onclick="document.getElementById('sent-he').classList.remove('hidden')" class="text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 px-3 py-1 rounded-full mt-2 cursor-pointer">
+                        🇮🇱 הצג תרגום לעברית
+                    </button>
+                    <p id="sent-he" class="hidden text-sm font-bold text-emerald-800 mt-1">${q.item.he}</p>
+                </div>
+
+                <div dir="ltr" class="grid grid-cols-2 gap-3 max-w-xl mx-auto">
+                    ${q.item.options.map(opt => `
+                        <button data-opt="${opt}" onclick="checkSentenceAnswer(this, '${opt}')" class="sent-opt en-font btn-3d bg-white hover:bg-emerald-50 border-2 border-slate-200 hover:border-emerald-400 rounded-2xl p-3.5 text-xl sm:text-2xl font-bold text-slate-800 cursor-pointer">
+                            ${opt}
+                        </button>
+                    `).join("")}
+                </div>
+            `;
+        }
+
+        function checkSentenceAnswer(btn, chosen) {
+            if (state.answeredCurrent) return;
+            const q = state.questions[state.currentIndex];
+            const buttons = document.querySelectorAll(".sent-opt");
+
+            document.getElementById("sentence-blank").textContent = q.item.answer;
+            document.getElementById("sent-he").classList.remove("hidden");
+
+            buttons.forEach(b => {
+                b.disabled = true;
+                if (b.dataset.opt === q.item.answer) {
+                    b.classList.remove("bg-white", "border-slate-200");
+                    b.classList.add("bg-emerald-500", "text-white", "border-emerald-600");
+                }
+            });
+
+            if (chosen === q.item.answer) {
+                handleSuccess(15, null, state.currentSpeakText);
+            } else {
+                btn.classList.remove("bg-white", "border-slate-200");
+                btn.classList.add("bg-rose-500", "text-white", "border-rose-600");
+                speakText(state.currentSpeakText);
+                handleMistake(
+                    `המילה הנכונה היא <strong class="en-font">${q.item.answer}</strong>`,
+                    `<span dir="ltr" class="en-font">${q.item.before} <strong>${q.item.answer}</strong> ${q.item.after}</span>`
+                );
+            }
+        }
+
+        // --- E. DAYS OF THE WEEK ---
+        let daysOrderState = [];
+
+        function renderDaysOrderQuestion(q, container) {
+            daysOrderState = [];
+            const shuffledDays = shuffle(DAYS_ORDERED);
+
+            container.innerHTML = `
+                <div class="text-center mb-4">
+                    <span class="inline-block bg-amber-100 text-amber-800 text-xs sm:text-sm font-bold px-3 py-1 rounded-full mb-1">
+                        משימת רכבת הימים 🚂
+                    </span>
+                    <h3 class="text-xl sm:text-2xl font-extrabold text-slate-800">
+                        לחצי על ימות השבוע לפי הסדר מיום ראשון (1) עד שבת (7)!
+                    </h3>
+                </div>
+
+                <!-- 7 Ordered Slots -->
+                <div class="grid grid-cols-2 sm:grid-cols-7 gap-2 mb-5">
+                    ${DAYS_ORDERED.map((d, idx) => `
+                        <div class="bg-amber-50 border-2 border-amber-200 rounded-2xl p-2 text-center">
+                            <div class="text-xs font-bold text-amber-800 mb-1">${d.num}. ${d.he}</div>
+                            <div id="day-slot-${idx}" class="en-font h-10 rounded-xl bg-white border border-dashed border-amber-300 flex items-center justify-center font-bold text-sm text-purple-900">
+                                ?
+                            </div>
+                        </div>
+                    `).join("")}
+                </div>
+
+                <!-- Shuffled Day Buttons -->
+                <div id="days-bank" dir="ltr" class="flex flex-wrap justify-center gap-2.5">
+                    ${shuffledDays.map(d => `
+                        <button id="day-btn-${d.en}" onclick="pickDayInOrder('${d.en}')" class="en-font btn-3d bg-white hover:bg-amber-50 border-2 border-amber-300 px-4 py-2.5 rounded-2xl font-bold text-lg text-slate-800 cursor-pointer">
+                            ${d.en}
+                        </button>
+                    `).join("")}
+                </div>
+            `;
+        }
+
+        function pickDayInOrder(dayEn) {
+            if (state.answeredCurrent) return;
+            const nextExpected = DAYS_ORDERED[daysOrderState.length];
+            if (!nextExpected) return;
+
+            if (dayEn === nextExpected.en) {
+                playSound("pop");
+                speakText(dayEn);
+                const slotEl = document.getElementById(`day-slot-${daysOrderState.length}`);
+                slotEl.textContent = dayEn;
+                slotEl.classList.remove("bg-white", "border-dashed");
+                slotEl.classList.add("bg-emerald-500", "text-white", "border-emerald-600");
+
+                const btn = document.getElementById(`day-btn-${dayEn}`);
+                btn.disabled = true;
+                btn.classList.add("opacity-30", "shadow-none");
+
+                daysOrderState.push(dayEn);
+                if (daysOrderState.length === 7) {
+                    handleSuccess(30);
+                }
+            } else {
+                playSound("error");
+                const bank = document.getElementById("days-bank");
+                bank.classList.add("animate-shake");
+                setTimeout(() => bank.classList.remove("animate-shake"), 400);
+            }
+        }
+
+        function renderDayQuizQuestion(q, container) {
+            state.currentSpeakText = q.day.en;
+            container.innerHTML = `
+                <div class="text-center mb-6">
+                    <span class="inline-block bg-amber-100 text-amber-800 text-xs sm:text-sm font-bold px-3 py-1 rounded-full mb-3">
+                        איך אומרים באנגלית?
+                    </span>
+                    <div class="text-5xl mb-2">📅</div>
+                    <h3 class="text-3xl sm:text-4xl font-extrabold text-slate-800">
+                        ${q.day.he} <span class="text-xl text-amber-600">(יום ${q.day.num})</span>
+                    </h3>
+                </div>
+                <div dir="ltr" class="grid grid-cols-2 gap-3 max-w-xl mx-auto">
+                    ${q.options.map(opt => `
+                        <button data-opt="${opt}" onclick="checkDayQuizAnswer(this, '${opt}')" class="day-opt en-font btn-3d bg-white hover:bg-amber-50 border-2 border-slate-200 hover:border-amber-400 rounded-2xl p-4 text-xl sm:text-2xl font-bold text-slate-800 cursor-pointer">
+                            ${opt}
+                        </button>
+                    `).join("")}
+                </div>
+            `;
+        }
+
+        function checkDayQuizAnswer(btn, chosen) {
+            if (state.answeredCurrent) return;
+            const q = state.questions[state.currentIndex];
+            const buttons = document.querySelectorAll(".day-opt");
+
+            buttons.forEach(b => {
+                b.disabled = true;
+                if (b.dataset.opt === q.day.en) {
+                    b.classList.remove("bg-white", "border-slate-200");
+                    b.classList.add("bg-emerald-500", "text-white", "border-emerald-600");
+                }
+            });
+
+            if (chosen === q.day.en) {
+                handleSuccess(15, null, q.day.en);
+            } else {
+                btn.classList.remove("bg-white", "border-slate-200");
+                btn.classList.add("bg-rose-500", "text-white", "border-rose-600");
+                handleMistake(
+                    `${q.day.he} = <strong class="en-font">${q.day.en}</strong>`,
+                    `${q.day.he} — <strong class="en-font">${q.day.en}</strong>`
+                );
+            }
+        }
+
+        // --- F. QUESTIONS & ANSWERS MATCHING ---
+        let qaMatchState = { selectedQ: null, matchedQs: [] };
+
+        function renderQAMatchQuestion(q, container) {
+            qaMatchState = { selectedQ: null, matchedQs: [] };
+            const shuffledAnswers = shuffle(q.round.pairs.map(p => p.a));
+
+            container.innerHTML = `
+                <div class="text-center mb-4">
+                    <span class="inline-block bg-indigo-100 text-indigo-800 text-xs sm:text-sm font-bold px-3 py-1 rounded-full mb-1">
+                        ${q.round.title}
+                    </span>
+                    <h3 class="text-lg sm:text-xl font-extrabold text-slate-800">
+                        בחרי שאלה מצד שמאל והתאימי לה את התשובה הנכונה!
+                    </h3>
+                </div>
+
+                <div dir="ltr" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Questions Column -->
+                    <div class="space-y-2.5">
+                        <div class="text-center font-bold text-indigo-900 text-sm mb-1">Questions (שאלות)</div>
+                        ${q.round.pairs.map((p, idx) => `
+                            <button id="qa-q-${idx}" onclick="selectQAQuestion(${idx})" class="en-font btn-3d w-full text-left bg-white hover:bg-indigo-50 border-2 border-indigo-200 rounded-2xl p-3 font-bold text-base sm:text-lg text-slate-800 transition cursor-pointer">
+                                ${idx + 1}. ${p.q}
+                            </button>
+                        `).join("")}
+                    </div>
+
+                    <!-- Answers Column -->
+                    <div class="space-y-2.5">
+                        <div class="text-center font-bold text-emerald-900 text-sm mb-1">Answers (תשובות)</div>
+                        ${shuffledAnswers.map((ans, idx) => `
+                            <button id="qa-a-${idx}" data-ans="${ans.replace(/"/g, "&quot;")}" onclick="selectQAAnswer(this)" class="en-font btn-3d w-full text-left bg-white hover:bg-emerald-50 border-2 border-emerald-200 rounded-2xl p-3 font-bold text-base sm:text-lg text-slate-800 transition cursor-pointer">
+                                ${ans}
+                            </button>
+                        `).join("")}
+                    </div>
+                </div>
+            `;
+        }
+
+        function selectQAQuestion(qIdx) {
+            if (state.answeredCurrent || qaMatchState.matchedQs.includes(qIdx)) return;
+            const q = state.questions[state.currentIndex];
+            playSound("pop");
+            speakText(q.round.pairs[qIdx].q);
+
+            qaMatchState.selectedQ = qIdx;
+            q.round.pairs.forEach((_, idx) => {
+                const el = document.getElementById(`qa-q-${idx}`);
+                if (!qaMatchState.matchedQs.includes(idx)) {
+                    el.classList.remove("bg-indigo-600", "text-white", "border-indigo-800");
+                    el.classList.add("bg-white", "text-slate-800");
+                }
+            });
+            const activeEl = document.getElementById(`qa-q-${qIdx}`);
+            activeEl.classList.remove("bg-white", "text-slate-800");
+            activeEl.classList.add("bg-indigo-600", "text-white", "border-indigo-800");
+        }
+
+        function selectQAAnswer(btnEl) {
+            if (state.answeredCurrent || qaMatchState.selectedQ === null) return;
+            const q = state.questions[state.currentIndex];
+            const pair = q.round.pairs[qaMatchState.selectedQ];
+            const chosenAns = btnEl.dataset.ans;
+
+            if (chosenAns === pair.a) {
+                playSound("pop");
+                speakText(pair.a);
+
+                const qBtn = document.getElementById(`qa-q-${qaMatchState.selectedQ}`);
+                qBtn.classList.remove("bg-indigo-600", "border-indigo-800");
+                qBtn.classList.add("bg-emerald-500", "text-white", "border-emerald-600", "opacity-75");
+                qBtn.disabled = true;
+
+                btnEl.classList.remove("bg-white", "border-emerald-200");
+                btnEl.classList.add("bg-emerald-500", "text-white", "border-emerald-600", "opacity-75");
+                btnEl.disabled = true;
+
+                qaMatchState.matchedQs.push(qaMatchState.selectedQ);
+                qaMatchState.selectedQ = null;
+                state.xp += 6;
+                updateStatsUI();
+
+                if (qaMatchState.matchedQs.length === q.round.pairs.length) {
+                    handleSuccess(25);
+                }
+            } else {
+                playSound("error");
+                btnEl.classList.add("animate-shake");
+                setTimeout(() => btnEl.classList.remove("animate-shake"), 400);
+            }
+        }
+
+        // Single Q&A for Final Boss
+        function renderQASingleQuestion(q, container) {
+            state.currentSpeakText = q.pair.q;
+            container.innerHTML = `
+                <div class="text-center mb-6">
+                    <span class="inline-block bg-indigo-100 text-indigo-800 text-xs sm:text-sm font-bold px-3 py-1 rounded-full mb-3">
+                        בחרי את התשובה הנכונה לשאלה:
+                    </span>
+                    <div dir="ltr" class="en-font text-2xl sm:text-4xl font-bold text-indigo-900 bg-indigo-50 border-2 border-indigo-200 rounded-3xl p-4 my-2">
+                        "${q.pair.q}"
+                    </div>
+                </div>
+                <div dir="ltr" class="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-2xl mx-auto">
+                    ${q.options.map(opt => `
+                        <button data-opt="${opt.replace(/"/g, "&quot;")}" onclick="checkQASingleAnswer(this)" class="qa-s-opt en-font btn-3d bg-white hover:bg-indigo-50 border-2 border-slate-200 rounded-2xl p-4 text-lg sm:text-xl font-bold text-slate-800 cursor-pointer">
+                            ${opt}
+                        </button>
+                    `).join("")}
+                </div>
+            `;
+        }
+
+        function checkQASingleAnswer(btn) {
+            if (state.answeredCurrent) return;
+            const q = state.questions[state.currentIndex];
+            const buttons = document.querySelectorAll(".qa-s-opt");
+            buttons.forEach(b => {
+                b.disabled = true;
+                if (b.dataset.opt === q.pair.a) {
+                    b.classList.remove("bg-white", "border-slate-200");
+                    b.classList.add("bg-emerald-500", "text-white", "border-emerald-600");
+                }
+            });
+            if (btn.dataset.opt === q.pair.a) {
+                handleSuccess(15, null, q.pair.a);
+            } else {
+                btn.classList.add("bg-rose-500", "text-white", "border-rose-600");
+                handleMistake(
+                    `<span dir="ltr" class="en-font">${q.pair.q} → <strong>${q.pair.a}</strong></span>`,
+                    `<span dir="ltr" class="en-font">${q.pair.q} → ${q.pair.a}</span>`
+                );
+            }
+        }
+
+        // --- G. PHONICS / READING RULES ---
+        function renderPhonicsQuestion(q, container) {
+            state.currentSpeakText = q.item.full;
+
+            container.innerHTML = `
+                <div class="text-center mb-6">
+                    <span class="inline-block bg-fuchsia-100 text-fuchsia-800 text-xs sm:text-sm font-bold px-3 py-1 rounded-full mb-2">
+                        כללי קריאה: השלימי את צירוף האותיות הנכון!
+                    </span>
+                    <h3 class="text-2xl sm:text-3xl font-extrabold text-slate-800 mb-3">${q.item.he}</h3>
+                    <div dir="ltr" class="en-font inline-flex items-center justify-center text-4xl sm:text-6xl font-bold text-fuchsia-950 bg-fuchsia-50 border-2 border-fuchsia-200 rounded-3xl px-8 py-4 tracking-wider">
+                        <span>${q.item.prefix}</span>
+                        <span id="phonics-gap" class="inline-block min-w-[68px] mx-1 border-b-4 border-fuchsia-500 text-fuchsia-600">__</span>
+                        <span>${q.item.suffix}</span>
+                    </div>
+                </div>
+
+                <div dir="ltr" class="flex justify-center gap-4 max-w-md mx-auto">
+                    ${q.item.options.map(opt => `
+                        <button data-opt="${opt}" onclick="checkPhonicsAnswer(this, '${opt}')" class="phon-opt en-font btn-3d flex-1 bg-white hover:bg-fuchsia-50 border-2 border-fuchsia-200 hover:border-fuchsia-500 rounded-3xl py-5 text-3xl sm:text-4xl font-bold text-slate-800 cursor-pointer">
+                            ${opt}
+                        </button>
+                    `).join("")}
+                </div>
+            `;
+        }
+
+        function checkPhonicsAnswer(btn, chosen) {
+            if (state.answeredCurrent) return;
+            const q = state.questions[state.currentIndex];
+            const buttons = document.querySelectorAll(".phon-opt");
+
+            document.getElementById("phonics-gap").textContent = q.item.correct;
+
+            buttons.forEach(b => {
+                b.disabled = true;
+                if (b.dataset.opt === q.item.correct) {
+                    b.classList.remove("bg-white", "border-fuchsia-200");
+                    b.classList.add("bg-emerald-500", "text-white", "border-emerald-600");
+                }
+            });
+
+            if (chosen === q.item.correct) {
+                handleSuccess(15, null, q.item.full);
+            } else {
+                btn.classList.remove("bg-white", "border-fuchsia-200");
+                btn.classList.add("bg-rose-500", "text-white", "border-rose-600");
+                speakText(q.item.full);
+                handleMistake(
+                    `${q.item.rule}`,
+                    `${q.item.he}: <strong class="en-font">${q.item.full}</strong> (${q.item.correct})`
+                );
+            }
+        }
+
+        // Initialize App
+        window.onload = function () {
+            renderHomeMap();
+        };
+    </script>
 </body>
 </html>
