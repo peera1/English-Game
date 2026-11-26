@@ -1,1 +1,681 @@
-PLACEHOLDER
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#75c8f5">
+<title>Word Hero – גיבורי המילים באנגלית</title>
+<style>
+:root{--ink:#243052;--muted:#66708e;--blue:#4778f5;--purple:#8c62e8;--pink:#ff83ac;--yellow:#ffd86f;--green:#32b982;--paper:#fff;--shadow:0 18px 55px #3e4d8c26}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;padding:20px;display:grid;place-items:center;background:radial-gradient(circle at 12% 18%,#fff5b9 0 7%,transparent 7.3%),radial-gradient(circle at 91% 79%,#d7f8e9 0 9%,transparent 9.3%),linear-gradient(135deg,#9de6fc,#c4aaf8 65%,#f7b5cf);color:var(--ink)}
+button{font:inherit}
+.app{width:min(100%,880px);margin:auto}.card{background:#ffffffed;border:3px solid #fff;border-radius:32px;padding:clamp(22px,5vw,46px);box-shadow:var(--shadow);text-align:center;overflow:hidden}.hide{display:none!important}
+.hero{font-size:clamp(68px,13vw,106px);line-height:1.2;filter:drop-shadow(0 8px 0 #f4d66c);animation:bob 2.8s ease-in-out infinite}@keyframes bob{50%{transform:translateY(-8px) rotate(2deg)}}
+.title{font-size:clamp(38px,8vw,64px);line-height:1;margin:8px 0;color:#435dd2;letter-spacing:-1.5px}.intro{font-size:clamp(20px,4vw,27px);line-height:1.55;margin:18px auto;max-width:640px}.howto{display:inline-flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:center;background:#fff7d6;border-radius:18px;padding:12px 18px;margin:12px 0 20px;font-weight:800}.howto span{font-size:27px}
+.hero-picker{margin:14px auto 22px;max-width:680px;background:linear-gradient(145deg,#f6f8ff,#eef2ff);border:2px solid #dfe6ff;border-radius:24px;padding:16px}.hero-picker-label{font-size:18px;font-weight:900;color:#394bb5;margin:0 0 12px}.hero-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.hero-option{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:12px 8px;border-radius:18px;border:3px solid #e2e7ff;background:#fff;color:var(--ink);cursor:pointer;transition:.16s transform,.16s border-color,.16s box-shadow,.16s background;min-height:102px}.hero-option:hover{transform:translateY(-3px);border-color:#b8c4ff}.hero-option.selected{border-color:#4778f5;background:linear-gradient(155deg,#eef3ff,#f8f2ff);box-shadow:0 6px 0 #c5d2ff}.hero-avatar{font-size:34px;line-height:1.15}.hero-name{font-size:17px;font-weight:900;color:#2a3a74}.hero-role{font-size:13px;font-weight:700;color:var(--muted)}
+.btn{border:0;border-radius:20px;padding:16px 30px;background:linear-gradient(135deg,#ff9b67,#ff6f9d);color:white;font-weight:800;font-size:clamp(20px,4vw,25px);box-shadow:0 7px 0 #d95d82,0 12px 22px #bd5c8950;cursor:pointer;transition:.15s transform,.15s box-shadow}.btn:active{transform:translateY(5px);box-shadow:0 2px 0 #d95d82}.btn.secondary{background:linear-gradient(135deg,#70b7fa,#7d86ee);box-shadow:0 7px 0 #5964c0}.btn.secondary:active{box-shadow:0 2px 0 #5964c0}
+button:focus-visible{outline:4px solid #ffc94d;outline-offset:4px}.note{color:var(--muted);font-size:15px;line-height:1.5}
+.top{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:14px;font-size:18px;font-weight:800}.track{height:18px;border-radius:99px;background:#edf0ff;overflow:hidden}.bar{height:100%;width:10%;background:linear-gradient(90deg,#70d5a7,#7bd7e8,#8f86ec);border-radius:99px;transition:.35s width}.icon-btn{border:0;background:#eef2ff;color:#5664bd;border-radius:14px;min-width:48px;height:48px;font-size:25px;cursor:pointer}
+.hud-strip{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;background:#ffffffe6;border:2px solid #fff;border-radius:22px;padding:10px 16px;margin:10px 0;box-shadow:0 8px 24px #3e4d8c14}.hud-group{display:flex;flex-wrap:wrap;align-items:center;gap:8px}.hud-pill{display:inline-flex;align-items:center;gap:6px;background:#f2f5ff;border:1px solid #dfe5ff;border-radius:999px;padding:6px 12px;font-size:14px;font-weight:800;color:#2c3b73}.hud-pill.xp{background:#fff8dc;border-color:#ffe38a;color:#7a5400}.hud-pill.streak{background:#fff0f4;border-color:#ffc7d8;color:#a82752}.hud-pill.streak.hot{background:linear-gradient(135deg,#ffe3ec,#fff1cc);border-color:#ff89a9;color:#9e1f49;animation:pulse-badge 1.2s ease-in-out infinite}@keyframes pulse-badge{50%{transform:scale(1.04)}}.hud-pill.rank{background:#eefcf5;border-color:#b7ebd2;color:#156e4b}
+.quest-trail{background:#ffffffe6;border:2px solid #fff;border-radius:24px;padding:12px 16px;margin-bottom:14px;box-shadow:0 8px 24px #3e4d8c14}.quest-header{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:14px;font-weight:800;color:#4152a8;margin-bottom:10px}.quest-road{position:relative;display:flex;align-items:center;justify-content:space-between;gap:2px;padding:6px 4px;direction:ltr}.quest-line{position:absolute;left:14px;right:14px;top:50%;height:6px;transform:translateY(-50%);background:#e6eaff;border-radius:99px;z-index:0}.quest-line-fill{height:100%;width:0;background:linear-gradient(90deg,#4778f5,#32b982,#ffb347);border-radius:99px;transition:.35s width}.quest-step{position:relative;z-index:1;width:18px;height:18px;border-radius:50%;background:#e9edff;border:2px solid #c8d1f7;display:grid;place-items:center;font-size:10px;transition:.25s transform,.25s background,.25s border-color}.quest-step.done{background:#46c78c;border-color:#269d67;color:#fff}.quest-step.current{width:34px;height:34px;font-size:20px;background:#fff;border:3px solid #4778f5;box-shadow:0 4px 12px #4778f544;transform:translateY(-2px)}.quest-step.goal{width:34px;height:34px;font-size:19px;background:#fff7d6;border:3px solid #f2b729}.quest-step.goal.reached{background:#ffe680;box-shadow:0 0 16px #ffd23099;transform:scale(1.08)}
+.earned-mini{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.mini-badge{font-size:12px;font-weight:800;background:#f4f6ff;border:1px solid #dbe2ff;color:#3d4fa8;border-radius:999px;padding:3px 10px}.mini-badge.locked{opacity:.48;background:#f7f8fb;border-style:dashed;color:#7b849e}
+.game-card{padding:clamp(20px,4vw,36px)}.round-label{display:inline-block;background:#ecedff;color:#5761bc;border-radius:99px;padding:7px 15px;font-weight:800;margin-bottom:12px}.word{font-size:clamp(42px,9vw,70px);line-height:1.05;margin:10px 0 18px;color:#26366f}.word .sub{display:block;color:#66708e;font-size:.42em;margin-top:8px}
+.choices{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}.choice{min-height:clamp(138px,24vw,195px);border:3px solid #edf0ff;border-radius:25px;background:linear-gradient(160deg,#fdfdff,#edf2ff);box-shadow:0 7px 0 #dfe4f6;cursor:pointer;transition:.16s transform,.16s border-color,.16s background;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px}.choice:hover{transform:translateY(-4px);border-color:#bbc5ff}.choice .emoji{font-size:clamp(50px,11vw,78px);line-height:1.1}.choice .hebrew{font-size:clamp(20px,4vw,27px);font-weight:900;margin-top:8px}.choice.correct{background:linear-gradient(145deg,#dcfff1,#effff7);border-color:#37bd86;box-shadow:0 7px 0 #9edbc3}.choice.wrong{background:linear-gradient(145deg,#fff0f2,#ffe5e9);border-color:#ef7182;box-shadow:0 7px 0 #dfabb4}.choice:disabled{cursor:default}.choice.correct,.choice.wrong{transform:scale(.98)}
+.message{min-height:31px;margin:12px 0 0;font-size:clamp(20px,4vw,26px);font-weight:900}.message.good{color:#1d9b69}.message.bad{color:#cf4c67}.message.neutral{color:var(--muted)}.xp-gain{display:inline-block;margin-top:6px;background:#fff4c2;color:#7b5200;border:1px solid #ffd866;border-radius:999px;padding:4px 12px;font-size:15px;font-weight:900}
+.success-screen{position:relative;isolation:isolate}.success-card{background:linear-gradient(145deg,#fffef7,#f2fff8);border:4px solid #fff;border-radius:32px;padding:clamp(24px,5vw,44px);box-shadow:0 18px 55px #3e4d8c26;text-align:center}.success-burst{font-size:clamp(74px,15vw,118px);line-height:1.05;filter:drop-shadow(0 8px 0 #f4d66c)}.success-title{font-size:clamp(38px,8vw,58px);line-height:1.1;margin:12px 0 8px;color:#32a975}.success-english{font-size:clamp(22px,5vw,32px);font-weight:900;color:#435dd2;margin:0}.success-hebrew{font-size:clamp(20px,4vw,27px);color:var(--muted);margin:8px 0 14px}.success-meta{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-bottom:20px}.success-tag{background:#eef3ff;border:1px solid #d5e0ff;color:#3548a3;font-weight:800;font-size:15px;padding:6px 14px;border-radius:999px}#confetti{position:absolute;inset:0;pointer-events:none;overflow:hidden}.piece{position:absolute;top:-20px;width:10px;height:16px;border-radius:3px;animation:fall linear forwards}@keyframes fall{to{transform:translate(var(--drift),90vh) rotate(720deg)}}
+.end-card{width:min(100%,1050px);max-height:calc(100vh - 40px);overflow-y:auto}.end-card .hero{animation:none}.summary-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:22px 0}.stat{min-width:0;background:linear-gradient(145deg,#fff,#eef2ff);border:1px solid #e4e7ff;border-radius:18px;padding:14px}.stat strong{display:block;font-size:32px;color:#5561bf}.stat span{font-size:16px;color:var(--muted)}
+.badges-panel{background:linear-gradient(145deg,#fffdf4,#f5f7ff);border:2px solid #e4e9ff;border-radius:22px;padding:16px;margin:18px 0;text-align:right}.badges-title{margin:0 0 12px;font-size:20px;color:#3e51b5;text-align:center}.badges-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.badge-card{background:#fff;border:2px solid #e6ebff;border-radius:16px;padding:12px 10px;text-align:center}.badge-card.unlocked{border-color:#53c48e;background:linear-gradient(160deg,#ffffff,#effff7)}.badge-card.locked{opacity:.55;border-style:dashed}.badge-icon{font-size:28px;line-height:1.1}.badge-name{font-size:15px;font-weight:900;color:#273773;margin-top:6px}.badge-desc{font-size:12px;color:var(--muted);margin-top:3px}
+.results-heading{margin:28px 0 12px;color:#435dd2;font-size:clamp(24px,5vw,34px)}.results-intro{margin:0 auto 16px;color:var(--muted);font-size:17px}.table-wrap{overflow-x:auto;border-radius:18px;border:1px solid #e4e7ff;background:#fff;text-align:right;-webkit-overflow-scrolling:touch}.results-table{width:100%;border-collapse:collapse;min-width:590px}.results-table th,.results-table td{padding:12px 14px;border-bottom:1px solid #edf0fa}.results-table th{background:#eef1ff;color:#4f5bad;font-size:16px;position:sticky;top:0}.results-table tbody tr:last-child td{border-bottom:0}.results-table tbody tr:nth-child(even){background:#fafbff}.word-cell{font-weight:900;color:#354b9d;direction:ltr;text-align:left}.meaning-cell{font-weight:800}.result-status{font-weight:800;white-space:nowrap}.result-status.perfect{color:#16875f}.result-status.retry{color:#b16b17}.result-status.missed{color:#bd4d65}.listen-word{border:0;border-radius:12px;background:#eaf0ff;color:#4f5bad;min-width:42px;min-height:40px;font-size:21px;cursor:pointer}.listen-word:hover{background:#dce5ff}.end-actions{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin-top:24px}
+#fireworks{position:fixed;inset:0;z-index:20;overflow:hidden;pointer-events:none}.firework{position:absolute;left:var(--x);top:var(--y);width:5px;height:5px;border-radius:50%;background:transparent;animation:firework-burst 1.25s ease-out forwards;box-shadow:0 0 8px currentColor}@keyframes firework-burst{0%{box-shadow:0 0 0 0 currentColor;opacity:1}100%{box-shadow:var(--sparks);opacity:0}}
+@media(max-width:720px){.badges-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){body{padding:12px}.card,.success-card{border-radius:25px;padding:22px 16px}.hero-grid{grid-template-columns:1fr}.top{gap:7px;font-size:15px}.track{height:14px}.choices{gap:9px}.choice{min-height:128px;border-radius:19px}.choice .emoji{font-size:48px}.choice .hebrew{font-size:20px}.btn{width:100%;padding:15px 18px}.end-card{max-height:calc(100vh - 24px)}.summary-stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.stat{padding:10px 6px}.stat strong{font-size:27px}.results-table th,.results-table td{padding:10px}.results-table{min-width:540px}.quest-step{width:13px;height:13px;font-size:8px}.quest-step.current,.quest-step.goal{width:28px;height:28px;font-size:16px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<main class="app">
+  <section id="start" class="card" aria-labelledby="startTitle">
+    <div class="hero" id="startHeroPreview" aria-hidden="true">🦸‍♂️🔤🦸‍♀️</div>
+    <h1 class="title" id="startTitle">Word Hero</h1>
+    <p class="intro">ברוכים הבאים למסע גיבורי המילים!<br>בחרו את הגיבור או הגיבורה שלכם, ענו נכון על 15 שאלות והגיעו אל <strong>היעד הגדול 🏆</strong>!</p>
+    <div class="hero-picker" role="group" aria-label="בחירת דמות גיבור או גיבורה">
+      <p class="hero-picker-label">🦸‍♂️🦸‍♀️ בחרו את הגיבור או הגיבורה למסע:</p>
+      <div class="hero-grid" id="heroGrid"></div>
+    </div>
+    <div class="howto"><span aria-hidden="true">👂</span><b>נשמעים</b><span aria-hidden="true">👀</span><b>רואים</b><span aria-hidden="true">🎯</span><b>מתקדמים ליעד</b></div><br>
+    <button class="btn" id="startBtn" type="button">צאו למסע הגיבורים!</button>
+  </section>
+
+  <section id="game" class="hide" aria-label="משחק מילים">
+    <div class="top">
+      <span id="count">שאלה 1 מתוך 15</span>
+      <div class="track" role="progressbar" aria-label="התקדמות המשחק" aria-valuemin="0" aria-valuemax="15" aria-valuenow="1"><div class="bar" id="bar"></div></div>
+      <button class="icon-btn" id="listen" type="button" aria-label="האזינו למילה">🔊</button>
+    </div>
+
+    <div class="hud-strip" aria-label="מצב הגיבור ונקודות">
+      <div class="hud-group">
+        <span class="hud-pill rank" id="rankPill">🌱 מגייס מתחיל</span>
+        <span class="hud-pill xp" id="xpPill">⭐ 0 XP</span>
+        <span class="hud-pill streak" id="streakPill">🔥 רצף: 0</span>
+      </div>
+      <div class="hud-group">
+        <span class="hud-pill" id="heroHudPill">🦸‍♂️ גיבור המילים</span>
+      </div>
+    </div>
+
+    <div class="quest-trail" aria-label="מסלול ההתקדמות אל היעד">
+      <div class="quest-header">
+        <span id="questStatusText">שלב 0 מתוך 15 אל היעד</span>
+        <span id="goalTargetLabel">🎯 היעד הגדול: פסגת המילים</span>
+      </div>
+      <div class="quest-road" id="questRoad" aria-hidden="true">
+        <div class="quest-line"><div class="quest-line-fill" id="questLineFill"></div></div>
+      </div>
+      <div class="earned-mini" id="miniBadges" aria-label="תגים שהושגו"></div>
+    </div>
+
+    <div class="card game-card">
+      <span class="round-label" id="roundLabel">בחרו את התשובה הנכונה</span>
+      <div class="word" id="word"><span id="englishWord"></span><span class="sub" id="hebrewHint"></span></div>
+      <div class="choices" id="choices"></div>
+      <div class="message neutral" id="msg" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <section id="success" class="success-screen hide" aria-live="polite">
+    <div id="confetti" aria-hidden="true"></div>
+    <div class="success-card">
+      <div class="success-burst" id="successEmoji" aria-hidden="true">🌟</div>
+      <h2 class="success-title" id="successTitle">נכון!</h2>
+      <p class="success-english" id="successEnglish"></p>
+      <p class="success-hebrew" id="successHebrew"></p>
+      <div class="success-meta" id="successMeta"></div>
+      <button class="btn" id="nextBtn" type="button">התקדמו לשלב הבא</button>
+    </div>
+  </section>
+
+  <section id="end" class="card end-card hide" aria-labelledby="endTitle">
+    <div class="hero" id="endEmoji" aria-hidden="true">🏆</div>
+    <h1 class="title" id="endTitle">הגעתם ליעד!</h1>
+    <p class="intro" id="endText">סיימתם את המסע!</p>
+    <div class="summary-stats">
+      <div class="stat"><strong id="finalScore">0</strong><span>תשובות נכונות</span></div>
+      <div class="stat"><strong id="finalXp">0</strong><span>נקודות XP</span></div>
+      <div class="stat"><strong id="bestStreakStat">0</strong><span>שיא רצף הצלחות</span></div>
+      <div class="stat"><strong id="firstTryCount">0</strong><span>נכונות בניסיון ראשון</span></div>
+    </div>
+
+    <div class="badges-panel">
+      <h3 class="badges-title">🏅 התגים שלכם במסע</h3>
+      <div class="badges-grid" id="endBadgesGrid"></div>
+    </div>
+
+    <h2 class="results-heading">📚 המילים שלמדנו</h2>
+    <p class="results-intro">לחצו על הרמקול כדי לשמוע שוב כל מילה באנגלית.</p>
+    <div class="table-wrap">
+      <table class="results-table">
+        <thead><tr><th scope="col">#</th><th scope="col">מילה באנגלית</th><th scope="col">פירוש</th><th scope="col">תוצאה</th><th scope="col">ניסיונות</th><th scope="col">האזנה</th></tr></thead>
+        <tbody id="resultsBody"></tbody>
+      </table>
+    </div>
+    <div class="end-actions">
+      <button class="btn" id="again" type="button">🔄 מסע חדש</button>
+      <button class="btn secondary" id="changeHeroBtn" type="button">🦸 החלפת גיבור/ה</button>
+    </div>
+  </section>
+</main>
+<div id="fireworks" aria-hidden="true"></div>
+<script>
+'use strict';
+
+// Full vocabulary bank (78 entries: 43 original words + 35 newly added words, including both meanings of "Orange")
+const WORDS=[
+ {word:'Dog',hebrew:'כלב',emoji:'🐶'}, {word:'Cat',hebrew:'חתול',emoji:'🐱'}, {word:'Cow',hebrew:'פרה',emoji:'🐮'},
+ {word:'Pig',hebrew:'חזיר',emoji:'🐷'}, {word:'Duck',hebrew:'ברווז',emoji:'🦆'}, {word:'Bird',hebrew:'ציפור',emoji:'🐦'},
+ {word:'Fish',hebrew:'דג',emoji:'🐟'}, {word:'Frog',hebrew:'צפרדע',emoji:'🐸'}, {word:'Lion',hebrew:'אריה',emoji:'🦁'},
+ {word:'Bear',hebrew:'דוב',emoji:'🐻'}, {word:'Apple',hebrew:'תפוח',emoji:'🍎'}, {word:'Cake',hebrew:'עוגה',emoji:'🎂'},
+ {word:'Food',hebrew:'אוכל',emoji:'🍔'}, {word:'Ice cream',hebrew:'גלידה',emoji:'🍦'}, {word:'Milk',hebrew:'חלב',emoji:'🥛'},
+ {word:'Baby',hebrew:'תינוק',emoji:'👶'}, {word:'Brother',hebrew:'אח',emoji:'👦'}, {word:'Father',hebrew:'אבא',emoji:'👨'},
+ {word:'Family',hebrew:'משפחה',emoji:'👨‍👩‍👧‍👦'}, {word:'Banana',hebrew:'בננה',emoji:'🍌'}, {word:'Sun',hebrew:'שמש',emoji:'☀️'},
+ {word:'Star',hebrew:'כוכב',emoji:'⭐'}, {word:'Car',hebrew:'מכונית',emoji:'🚗'}, {word:'Ball',hebrew:'כדור',emoji:'⚽'},
+ {word:'Book',hebrew:'ספר',emoji:'📘'}, {word:'House',hebrew:'בית',emoji:'🏠'}, {word:'Flower',hebrew:'פרח',emoji:'🌸'},
+ {word:'Tree',hebrew:'עץ',emoji:'🌳'}, {word:'White',hebrew:'לבן',emoji:'⬜'}, {word:'Blue',hebrew:'כחול',emoji:'🟦'},
+ {word:'Green',hebrew:'ירוק',emoji:'🟩'}, {word:'Red',hebrew:'אדום',emoji:'🟥'}, {word:'Yellow',hebrew:'צהוב',emoji:'🟨'},
+ {word:'Friend',hebrew:'חבר',emoji:'🧒'}, {word:'Clock',hebrew:'שעון',emoji:'🕐'}, {word:'Chair',hebrew:'כיסא',emoji:'🪑'},
+ {word:'Bed',hebrew:'מיטה',emoji:'🛏️'}, {word:'Table',hebrew:'שולחן',emoji:'┬─┬'}, {word:'One',hebrew:'אחת',emoji:'1️⃣'},
+ {word:'Two',hebrew:'שתיים',emoji:'2️⃣'}, {word:'Three',hebrew:'שלוש',emoji:'3️⃣'}, {word:'Four',hebrew:'ארבע',emoji:'4️⃣'},
+ {word:'Five',hebrew:'חמש',emoji:'5️⃣'},
+ // Animals
+ {word:'Horse',hebrew:'סוס',emoji:'🐴'}, {word:'Rabbit',hebrew:'ארנב',emoji:'🐰'}, {word:'Monkey',hebrew:'קוף',emoji:'🐒'},
+ {word:'Elephant',hebrew:'פיל',emoji:'🐘'}, {word:'Penguin',hebrew:'פינגווין',emoji:'🐧'},
+ // Food & Drink
+ {word:'Bread',hebrew:'לחם',emoji:'🍞'}, {word:'Water',hebrew:'מים',emoji:'💧'}, {word:'Egg',hebrew:'ביצה',emoji:'🥚'},
+ {word:'Cheese',hebrew:'גבינה',emoji:'🧀'}, {word:'Orange',hebrew:'תפוז',emoji:'🍊'},
+ // Family
+ {word:'Mother',hebrew:'אמא',emoji:'👩'}, {word:'Sister',hebrew:'אחות',emoji:'👧'}, {word:'Grandmother',hebrew:'סבתא',emoji:'👵'},
+ {word:'Grandfather',hebrew:'סבא',emoji:'👴'}, {word:'Parents',hebrew:'הורים',emoji:'👨‍👩‍👧‍👦'},
+ // Nature & Weather
+ {word:'Moon',hebrew:'ירח',emoji:'🌙'}, {word:'Cloud',hebrew:'ענן',emoji:'☁️'}, {word:'Rain',hebrew:'גשם',emoji:'🌧️'},
+ {word:'Mountain',hebrew:'הר',emoji:'⛰️'}, {word:'Ocean',hebrew:'אוקיינוס',emoji:'🌊'},
+ // Colors
+ {word:'Black',hebrew:'שחור',emoji:'⬛'}, {word:'Pink',hebrew:'ורוד',emoji:'🩷'}, {word:'Purple',hebrew:'סגול',emoji:'🟪'},
+ {word:'Brown',hebrew:'חום',emoji:'🟫'}, {word:'Orange',hebrew:'כתום',emoji:'🟧'},
+ // Everyday Objects
+ {word:'Phone',hebrew:'טלפון',emoji:'📱'}, {word:'Pencil',hebrew:'עיפרון',emoji:'✏️'}, {word:'Shoes',hebrew:'נעליים',emoji:'👟'},
+ {word:'Cup',hebrew:'כוס',emoji:'🥤'}, {word:'Door',hebrew:'דלת',emoji:'🚪'},
+ // Numbers
+ {word:'Six',hebrew:'שש',emoji:'6️⃣'}, {word:'Seven',hebrew:'שבע',emoji:'7️⃣'}, {word:'Eight',hebrew:'שמונה',emoji:'8️⃣'},
+ {word:'Nine',hebrew:'תשע',emoji:'9️⃣'}, {word:'Ten',hebrew:'עשר',emoji:'🔟'}
+];
+
+// Selectable boy, girl, and duo hero characters for the quest
+const HEROES=[
+  {id:'boy',avatar:'🦸‍♂️',title:'אביר המילים',role:'גיבור אמיץ'},
+  {id:'girl',avatar:'🦸‍♀️',title:'גיבורת המילים',role:'גיבורה נועזת'},
+  {id:'duo',avatar:'🦸‍♂️🦸‍♀️',title:'צוות גיבורי העל',role:'גיבור וגיבורה יחד'}
+];
+
+// Hero rank tiers based on accumulated XP
+const RANKS=[
+  {minXp:0,label:'🌱 מגייס מתחיל'},
+  {minXp:180,label:'🧭 סייר מילים'},
+  {minXp:420,label:'⚔️ גיבור אמיץ'},
+  {minXp:700,label:'👑 אלוף העל'}
+];
+
+// Earnable badges unlocked during the run
+const BADGES=[
+  {id:'first_step',icon:'🚀',name:'צעד ראשון',desc:'עניתם נכון על שאלה ראשונה'},
+  {id:'streak_3',icon:'🔥',name:'רצף לוהט',desc:'הגעתם ל-3 תשובות נכונות ברצף'},
+  {id:'sharp_eye',icon:'🎯',name:'כוכב דיוק',desc:'5 תשובות נכונות בניסיון הראשון'},
+  {id:'goal_master',icon:'🏆',name:'כובש היעד',desc:'השלמתם את המסע והגעתם ליעד'}
+];
+
+const PRAISES=[{english:'Amazing work!',hebrew:'עבודה מדהימה!'},{english:'You did it!',hebrew:'הצלחתם!'},{english:'Fantastic job!',hebrew:'עבודה נהדרת!'},{english:'Excellent!',hebrew:'מצוין!'}];
+const $=id=>document.getElementById(id);
+
+let selectedHero=HEROES[2];
+let questions=[],results=[],index=0,score=0,xp=0,streak=0,bestStreak=0,stepsReached=0;
+let unlockedBadges=new Set();
+let lastGainSummary={points:0,streakBonus:0,firstTryBonus:0,newBadges:[]};
+let locked=false,waitingNext=false,fireworkTimer=null,fireworkStopTimer=null;
+
+// Fisher-Yates shuffle returning a new shuffled array
+function shuffle(items){
+  const a=[...items];
+  for(let i=a.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
+// Pick 2 distinct distractor words avoiding duplicate Hebrew meanings when possible
+function pickDistractors(answer){
+  const candidates=shuffle(WORDS.filter(item=>item.word!==answer.word));
+  const picked=[];
+  const usedHebrew=new Set([answer.hebrew]);
+
+  for(const item of candidates){
+    if(!usedHebrew.has(item.hebrew)){
+      picked.push(item);
+      usedHebrew.add(item.hebrew);
+      if(picked.length===2)return picked;
+    }
+  }
+
+  for(const item of candidates){
+    if(!picked.includes(item)){
+      picked.push(item);
+      if(picked.length===2)break;
+    }
+  }
+  return picked;
+}
+
+function speak(text){
+  if(!('speechSynthesis'in window))return;
+  try{
+    speechSynthesis.cancel();
+    const utterance=new SpeechSynthesisUtterance(text);
+    utterance.lang=/^[A-Za-z]/.test(text)?'en-US':'he-IL';
+    utterance.rate=.8;
+    speechSynthesis.speak(utterance);
+  }catch(_err){}
+}
+
+// Compute current rank from accumulated XP
+function getCurrentRank(currentXp){
+  let active=RANKS[0];
+  for(const r of RANKS){
+    if(currentXp>=r.minXp)active=r;
+  }
+  return active;
+}
+
+// Evaluate and unlock badges based on run progress
+function evaluateBadges(){
+  const newlyUnlocked=[];
+  const firstTryTotal=results.filter(r=>r.correct&&r.attempts===1).length;
+  const checks=[
+    {id:'first_step',cond:score>=1},
+    {id:'streak_3',cond:bestStreak>=3},
+    {id:'sharp_eye',cond:firstTryTotal>=5},
+    {id:'goal_master',cond:stepsReached>=questions.length}
+  ];
+  for(const item of checks){
+    if(item.cond&&!unlockedBadges.has(item.id)){
+      unlockedBadges.add(item.id);
+      const badgeObj=BADGES.find(b=>b.id===item.id);
+      if(badgeObj)newlyUnlocked.push(badgeObj);
+    }
+  }
+  return newlyUnlocked;
+}
+
+// Render selectable boy, girl, and duo hero cards on the start screen
+function renderHeroPicker(){
+  const grid=$('heroGrid');
+  grid.replaceChildren();
+  for(const hero of HEROES){
+    const btn=document.createElement('button');
+    btn.type='button';
+    btn.className='hero-option'+(selectedHero.id===hero.id?' selected':'');
+    btn.setAttribute('aria-pressed',String(selectedHero.id===hero.id));
+
+    const avatar=document.createElement('span');
+    avatar.className='hero-avatar';
+    avatar.setAttribute('aria-hidden','true');
+    avatar.textContent=hero.avatar;
+
+    const name=document.createElement('span');
+    name.className='hero-name';
+    name.textContent=hero.title;
+
+    const role=document.createElement('span');
+    role.className='hero-role';
+    role.textContent=hero.role;
+
+    btn.append(avatar,name,role);
+    btn.addEventListener('click',()=>{
+      selectedHero=hero;
+      $('startHeroPreview').textContent=hero.avatar+'🔤';
+      renderHeroPicker();
+    });
+    grid.append(btn);
+  }
+}
+
+// Update HUD pills (rank, XP, streak, hero) and 15-step quest trail
+function updateHudAndTrail(){
+  const rank=getCurrentRank(xp);
+  $('rankPill').textContent=rank.label;
+  $('xpPill').textContent=`⭐ ${xp} XP`;
+  $('streakPill').textContent=`🔥 רצף: ${streak}`;
+  $('streakPill').classList.toggle('hot',streak>=3);
+  $('heroHudPill').textContent=`${selectedHero.avatar} ${selectedHero.title}`;
+
+  const total=questions.length||15;
+  $('questStatusText').textContent=`התקדמות למטרה: שלב ${stepsReached} מתוך ${total}`;
+
+  const road=$('questRoad');
+  const fill=$('questLineFill');
+  road.replaceChildren(fill);
+  const pct=total>0?(stepsReached/total)*100:0;
+  fill.style.width=pct+'%';
+
+  for(let s=0;s<=total;s++){
+    const node=document.createElement('span');
+    const isGoal=s===total;
+    node.className='quest-step';
+    if(isGoal){
+      node.classList.add('goal');
+      if(stepsReached>=total)node.classList.add('reached');
+      node.textContent='🏆';
+    }else if(s===stepsReached){
+      node.classList.add('current');
+      node.textContent=selectedHero.avatar;
+    }else if(s<stepsReached){
+      node.classList.add('done');
+      node.textContent='✓';
+    }
+    road.append(node);
+  }
+
+  const mini=$('miniBadges');
+  mini.replaceChildren();
+  for(const badge of BADGES){
+    const pill=document.createElement('span');
+    const earned=unlockedBadges.has(badge.id);
+    pill.className='mini-badge'+(earned?'':' locked');
+    pill.textContent=`${badge.icon} ${badge.name}`;
+    mini.append(pill);
+  }
+}
+
+function showMessage(text,type='neutral',gainHtml=''){
+  const msgEl=$('msg');
+  msgEl.replaceChildren();
+  msgEl.append(document.createTextNode(text));
+  if(gainHtml){
+    const tag=document.createElement('div');
+    tag.className='xp-gain';
+    tag.textContent=gainHtml;
+    msgEl.append(tag);
+  }
+  msgEl.className='message '+type;
+}
+
+function startGame(){
+  stopFireworks();
+  if('speechSynthesis'in window){
+    try{speechSynthesis.cancel();}catch(_err){}
+  }
+  questions=shuffle(WORDS).slice(0,15);
+  results=questions.map(question=>({question,chosen:null,correct:false,attempts:0}));
+  index=0;
+  score=0;
+  xp=0;
+  streak=0;
+  bestStreak=0;
+  stepsReached=0;
+  unlockedBadges=new Set();
+  lastGainSummary={points:0,streakBonus:0,firstTryBonus:0,newBadges:[]};
+
+  $('start').classList.add('hide');
+  $('end').classList.add('hide');
+  $('success').classList.add('hide');
+  $('game').classList.remove('hide');
+  updateHudAndTrail();
+  showQuestion();
+}
+
+function showQuestion(){
+  locked=false;
+  waitingNext=false;
+  const answer=questions[index];
+  const options=shuffle([answer,...pickDistractors(answer)]);
+  $('count').textContent=`שאלה ${index+1} מתוך ${questions.length}`;
+  $('bar').style.width=((index+1)/questions.length*100)+'%';
+  $('bar').parentElement.setAttribute('aria-valuenow',index+1);
+  $('englishWord').textContent=answer.word;
+  $('hebrewHint').textContent=answer.hebrew;
+  $('choices').replaceChildren();
+  showMessage('');
+  updateHudAndTrail();
+
+  for(const item of options){
+    const button=document.createElement('button');
+    button.type='button';
+    button.className='choice';
+    const emoji=document.createElement('span');
+    emoji.className='emoji';
+    emoji.setAttribute('aria-hidden','true');
+    emoji.textContent=item.emoji;
+    const meaning=document.createElement('span');
+    meaning.className='hebrew';
+    meaning.textContent=item.hebrew;
+    button.append(emoji,meaning);
+    button.setAttribute('aria-label',item.hebrew);
+    button.addEventListener('click',()=>choose(button,item,answer));
+    $('choices').append(button);
+  }
+  speak(answer.word);
+}
+
+function launchConfetti(){
+  const host=$('confetti');
+  host.replaceChildren();
+  const colors=['#ff83ac','#ffd86f','#4778f5','#32b982','#8c62e8','#ff6f9d'];
+  for(let i=0;i<70;i++){
+    const piece=document.createElement('span');
+    piece.className='piece';
+    piece.style.left=(Math.random()*100)+'%';
+    piece.style.background=colors[i%colors.length];
+    piece.style.animationDuration=(2+Math.random()*2)+'s';
+    piece.style.setProperty('--drift',(Math.random()*180-90)+'px');
+    host.append(piece);
+  }
+}
+
+function choose(button,item,answer){
+  if(locked||waitingNext||button.disabled)return;
+  const buttons=[...$('choices').querySelectorAll('button')];
+  const result=results[index];
+  result.attempts++;
+  result.chosen=item.word;
+  result.correct=item.word===answer.word;
+
+  if(result.correct){
+    score++;
+    streak++;
+    if(streak>bestStreak)bestStreak=streak;
+    stepsReached=Math.min(questions.length,stepsReached+1);
+
+    const baseXp=50;
+    const firstTryBonus=result.attempts===1?25:0;
+    const streakBonus=streak>=2?(streak-1)*10:0;
+    const gained=baseXp+firstTryBonus+streakBonus;
+    xp+=gained;
+
+    const newBadges=evaluateBadges();
+    lastGainSummary={points:gained,streakBonus,firstTryBonus,newBadges};
+
+    button.classList.add('correct');
+    const streakText=streak>=2?` • 🔥 רצף ${streak}`:'';
+    showMessage('נכון! התקדמתם שלב בדרך ליעד!','good',`+${gained} XP${streakText}`);
+    updateHudAndTrail();
+
+    locked=true;
+    waitingNext=true;
+    for(const option of buttons)option.disabled=true;
+
+    const praise=PRAISES[Math.floor(Math.random()*PRAISES.length)];
+    setTimeout(()=>{
+      $('successEmoji').textContent=answer.emoji;
+      $('successEnglish').textContent=praise.english+' '+answer.word;
+      $('successHebrew').textContent=praise.hebrew+' – '+answer.hebrew;
+
+      const meta=$('successMeta');
+      meta.replaceChildren();
+      const xpTag=document.createElement('span');
+      xpTag.className='success-tag';
+      xpTag.textContent=`⭐ +${lastGainSummary.points} XP`;
+      const stepTag=document.createElement('span');
+      stepTag.className='success-tag';
+      stepTag.textContent=`${selectedHero.avatar} שלב ${stepsReached}/${questions.length}`;
+      meta.append(xpTag,stepTag);
+
+      if(streak>=2){
+        const sTag=document.createElement('span');
+        sTag.className='success-tag';
+        sTag.textContent=`🔥 רצף ${streak} ברצף`;
+        meta.append(sTag);
+      }
+      for(const b of lastGainSummary.newBadges){
+        const bTag=document.createElement('span');
+        bTag.className='success-tag';
+        bTag.textContent=`🏅 תג חדש: ${b.icon} ${b.name}`;
+        meta.append(bTag);
+      }
+
+      $('nextBtn').textContent=index>=questions.length-1?'הגיעו אל היעד הגדול! 🏆':'התקדמו לשלב הבא';
+      $('success').classList.remove('hide');
+      $('game').classList.add('hide');
+      launchConfetti();
+      speak(answer.word+' '+praise.english);
+    },650);
+  }else{
+    streak=0;
+    button.classList.add('wrong');
+    showMessage('לא נכון, נסו שוב! הרצף אופס.','bad');
+    updateHudAndTrail();
+    button.disabled=true;
+  }
+}
+
+function nextQuestion(){
+  if(!waitingNext)return;
+  if(index>=questions.length-1)finish();
+  else{
+    index++;
+    waitingNext=false;
+    $('success').classList.add('hide');
+    $('game').classList.remove('hide');
+    showQuestion();
+  }
+}
+
+function renderBadgesSummary(){
+  const grid=$('endBadgesGrid');
+  grid.replaceChildren();
+  for(const badge of BADGES){
+    const unlocked=unlockedBadges.has(badge.id);
+    const card=document.createElement('div');
+    card.className='badge-card '+(unlocked?'unlocked':'locked');
+
+    const icon=document.createElement('div');
+    icon.className='badge-icon';
+    icon.textContent=badge.icon;
+
+    const name=document.createElement('div');
+    name.className='badge-name';
+    name.textContent=badge.name;
+
+    const desc=document.createElement('div');
+    desc.className='badge-desc';
+    desc.textContent=unlocked?badge.desc:'טרם הושג במסע זה';
+
+    card.append(icon,name,desc);
+    grid.append(card);
+  }
+}
+
+function renderResults(){
+  const body=$('resultsBody');
+  body.replaceChildren();
+  let firstTry=0;
+  for(const [i,result] of results.entries()){
+    const row=document.createElement('tr');
+    const number=document.createElement('td');
+    number.textContent=String(i+1);
+    const word=document.createElement('td');
+    word.className='word-cell';
+    word.textContent=result.question.word;
+    const meaning=document.createElement('td');
+    meaning.className='meaning-cell';
+    meaning.textContent=`${result.question.emoji} ${result.question.hebrew}`;
+    const status=document.createElement('td');
+    status.className='result-status';
+    const attempts=document.createElement('td');
+    attempts.textContent=String(result.attempts);
+    if(result.correct&&result.attempts===1){
+      firstTry++;
+      status.classList.add('perfect');
+      status.textContent='✅ נכון בניסיון ראשון';
+    }else if(result.correct){
+      status.classList.add('retry');
+      status.textContent='🌟 הצלחה';
+    }else{
+      status.classList.add('missed');
+      status.textContent='❌ לא הושלם';
+    }
+    const listenCell=document.createElement('td');
+    const listenButton=document.createElement('button');
+    listenButton.type='button';
+    listenButton.className='listen-word';
+    listenButton.textContent='🔊';
+    listenButton.setAttribute('aria-label',`השמעת המילה ${result.question.word}`);
+    listenButton.addEventListener('click',()=>speak(result.question.word));
+    listenCell.append(listenButton);
+    row.append(number,word,meaning,status,attempts,listenCell);
+    body.append(row);
+  }
+
+  const rank=getCurrentRank(xp);
+  $('firstTryCount').textContent=`${firstTry}/${results.length}`;
+  $('finalXp').textContent=String(xp);
+  $('bestStreakStat').textContent=String(bestStreak);
+  $('finalScore').textContent=`${score}/${results.length}`;
+  $('endEmoji').textContent=`${selectedHero.avatar}🏆`;
+  $('endTitle').textContent=`הגעתם ליעד, ${selectedHero.title}!`;
+  $('endText').textContent=`דרגה שהושגה: ${rank.label} • סיימתם את המסע עם ${xp} נקודות XP!`;
+  renderBadgesSummary();
+}
+
+function makeFirework(){
+  const host=$('fireworks');
+  const burst=document.createElement('span');
+  burst.className='firework';
+  burst.style.setProperty('--x',(8+Math.random()*84)+'vw');
+  burst.style.setProperty('--y',(10+Math.random()*55)+'vh');
+  const color=['#ff4f9a','#ffd447','#54d9ff','#71e6a8','#a77aff','#ff8a45'][Math.floor(Math.random()*6)];
+  burst.style.color=color;
+  const sparks=[];
+  for(let i=0;i<16;i++){
+    const angle=(Math.PI*2*i)/16;
+    const distance=45+Math.random()*70;
+    const x=Math.cos(angle)*distance;
+    const y=Math.sin(angle)*distance;
+    sparks.push(`${x}px ${y}px 0 2px ${color}`);
+  }
+  burst.style.setProperty('--sparks',sparks.join(','));
+  host.append(burst);
+  burst.addEventListener('animationend',()=>burst.remove(),{once:true});
+}
+
+function stopFireworks(){
+  if(fireworkTimer)clearInterval(fireworkTimer);
+  if(fireworkStopTimer)clearTimeout(fireworkStopTimer);
+  fireworkTimer=null;
+  fireworkStopTimer=null;
+  $('fireworks').replaceChildren();
+}
+
+function startFireworks(){
+  stopFireworks();
+  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  for(let i=0;i<4;i++)setTimeout(makeFirework,i*180);
+  fireworkTimer=setInterval(makeFirework,420);
+  fireworkStopTimer=setTimeout(stopFireworks,9000);
+}
+
+function finish(){
+  waitingNext=false;
+  evaluateBadges();
+  if('speechSynthesis'in window){
+    try{speechSynthesis.cancel();}catch(_err){}
+  }
+  $('success').classList.add('hide');
+  $('game').classList.add('hide');
+  $('end').classList.remove('hide');
+  $('bar').style.width='100%';
+  renderResults();
+  startFireworks();
+  speak('כל הכבוד! הגעתם ליעד הגדול!');
+}
+
+function openHeroSelection(){
+  stopFireworks();
+  if('speechSynthesis'in window){
+    try{speechSynthesis.cancel();}catch(_err){}
+  }
+  $('end').classList.add('hide');
+  $('game').classList.add('hide');
+  $('success').classList.add('hide');
+  $('start').classList.remove('hide');
+  renderHeroPicker();
+}
+
+$('startBtn').addEventListener('click',startGame);
+$('again').addEventListener('click',startGame);
+$('changeHeroBtn').addEventListener('click',openHeroSelection);
+$('nextBtn').addEventListener('click',nextQuestion);
+$('listen').addEventListener('click',()=>{if(questions[index])speak(questions[index].word)});
+
+renderHeroPicker();
+</script>
+</body>
+</html>
